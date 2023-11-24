@@ -12,11 +12,11 @@
 
     <nav data-home-target="nav" class="flex-col flex-grow mt-4 hidden md:flex md:justify-start md:flex-row">
       <ul class="space-y-2 list-none lg:space-y-0 lg:items-center lg:inline-flex">
-        <li>
-          <a href="#" class="px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500">
-            Login
-          </a>
-        </li>
+        <% unless user_signed_in? %>
+          <li>
+            <%= link_to "Login", new_user_session_path, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500" %>
+          </li>
+        <% end %>
         <li>
           <a href="#" class="px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500">
             Blog
@@ -37,18 +37,17 @@
             <span class="block bg-yellow-300 text-8xl px-4">PAIRIN</span>
             <span>time!</span>
           </h1>
-          <!-- <p class="max-w-xl mx-auto mt-12 font-bold text-base leading-relaxed text-gray-800">
-            Don't miss all the fun, start pairing today!
-          </p> -->
           <div class="flex justify-center w-full max-w-2xl gap-2 mx-auto mt-16">
             <div class="mt-3 rounded-lg sm:mt-0">
-              <button
-                role="button"
-                aria-label="Click to perform an action"
-                class="flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-              >
-                Sign me in
-              </button>
+              <%= link_to new_user_registration_path do %>
+                <button
+                  role="button"
+                  aria-label="Click to perform an action"
+                  class="flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+                >
+                  Sign me in
+                </button>
+              <% end %>
             </div>
             <div class="mt-3 sm:mt-0 sm:ml-3">
               <button
