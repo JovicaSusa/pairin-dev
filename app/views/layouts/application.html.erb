@@ -13,12 +13,11 @@
   </head>
 
   <body class="bg-[#c9dcd8]">
-    <div>
-      <p class="notice"><%= notice %></p>
-      <p class="alert"><%= alert %></p>
-    </div>
-
     <%= render "layouts/nav" %>
+
+    <div class="flash">
+      <%= render "layouts/flash" %>
+    </div>
 
     <%= yield %>
   </body>
