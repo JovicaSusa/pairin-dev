@@ -1,7 +1,7 @@
-<div data-controller="home" class="w-full border-b-2 border-black bg-[#bc95d4] font-bold">
+<div data-controller="home" class="w-full border-2 border-black bg-[#bc95d4] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold">
   <div class="flex flex-col max-w-screen-xl p-5 mx-auto md:items-center md:justify-between md:flex-row md:px-6 lg:px-8">
     <div class="flex flex-row items-center justify-between lg:justify-start">
-      <%= link_to "pairin", root_path, class: "uppercase text-2xl" %>
+      <%= link_to "pairing", root_path, class: "uppercase text-2xl" %>
       <button data-action="click->home#toggleNav" class="rounded-lg md:hidden focus:outline-none focus:shadow-outline"">
         <svg fill="currentColor" viewBox="0 0 20 20" class="w-8 h-8">
           <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z" clip-rule="evenodd"></path>
@@ -13,9 +13,9 @@
     <nav data-home-target="nav" class="flex-col flex-grow mt-4 hidden md:flex md:justify-start md:flex-row">
       <ul class="space-y-2 list-none lg:space-y-0 lg:items-center lg:inline-flex">
         <% if user_signed_in? %>
-        <li>
-          <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500" %>
-        </li>
+          <li>
+            <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "text-sm" %>
+          </li>
         <% else %>
           <li>
             <%= link_to "Login", new_user_session_path, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500" %>
