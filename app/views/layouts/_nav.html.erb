@@ -13,9 +13,9 @@
     <nav data-home-target="nav" class="flex-col flex-grow mt-4 hidden md:flex md:justify-start md:flex-row">
       <ul class="space-y-2 list-none lg:space-y-0 lg:items-center lg:inline-flex">
         <% if user_signed_in? %>
-        <li>
-          <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500" %>
-        </li>
+          <li>
+            <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "text-sm" %>
+          </li>
         <% else %>
           <li>
             <%= link_to "Login", new_user_session_path, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500" %>

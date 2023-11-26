@@ -1,29 +1,48 @@
-<h2>Sign up</h2>
+<div class="flex flex-col items-center px-4">
+  <div class="w-full md:w-2/6">
+    <h2 class="text-center border-b-4 border-black border-dashed text-4xl font-bold mt-8 pb-4 mb-4">Sign up</h2>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "flex flex-col items-center" }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+    <%= simple_form_for(
+      resource,
+      as: resource_name,
+      url: registration_path(resource_name),
+      html: { class: "flex flex-col items-center w-full" }
+    ) do |f| %>
+      <div class="form-inputs w-full mt-4 md:mt-6">
+        <%= f.input :email,
+                    required: true,
+                    autofocus: true,
+                    input_html: {
+                      autocomplete: "email",
+                      class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+                    } %>
+        <%= f.input :password,
+                    required: true,
+                    label_html: {
+                      class: "block mt-4"
+                    },
+                    input_html: {
+                      autocomplete: "new-password",
+                      class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+                    } %>
+        <%= f.input :password_confirmation,
+                    required: true,
+                    label_html: {
+                      class: "block mt-4"
+                    },
+                    input_html: {
+                      autocomplete: "new-password",
+                      class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+                    } %>
+      </div>
 
-  <div class="field">
-    <%= f.label :email, class: "font-bold" %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none" %>
+      <div class="form-actions mt-6">
+        <%= f.button :submit, "Sign up", class: "mt-6 flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"  %>
+      </div>
+    <% end %>
+
+    <div class="mt-12">
+      <%= render "devise/shared/links" %>
+    </div>
   </div>
-
-  <div class="field mt-4">
-    <%= f.label :password, class: "font-bold" %>
-    <% if @minimum_password_length %>
-    <em class="font-semibold text-xs">(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password", class: "rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none" %>
-  </div>
-
-  <div class="field mt-4">
-    <%= f.label :password_confirmation, class: "font-bold" %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none" %>
-  </div>
-
-  <div class="actions mt-8">
-    <%= f.submit "Sign up", class: "flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
