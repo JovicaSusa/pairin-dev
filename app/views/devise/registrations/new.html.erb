@@ -1,27 +1,18 @@
 <h2>Sign up</h2>
 
 <%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "flex flex-col items-center" }) do |f| %>
-  <%= f.error_notification %>
-
   <div class="form-inputs">
     <%= f.input :email,
                 required: true,
                 autofocus: true,
-                label_html: {
-                  class: "block"
-                },
                 input_html: {
                   autocomplete: "email",
                   class: "rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
                 } %>
     <%= f.input :password,
                 required: true,
-                hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length),
-                hint_html: {
-                  class: "text-sm"
-                },
                 label_html: {
-                  class: "block"
+                  class: "block mt-4"
                 },
                 input_html: {
                   autocomplete: "new-password",
@@ -30,7 +21,7 @@
     <%= f.input :password_confirmation,
                 required: true,
                 label_html: {
-                  class: "block"
+                  class: "block mt-4"
                 },
                 input_html: {
                   autocomplete: "new-password",
@@ -39,7 +30,7 @@
   </div>
 
   <div class="form-actions">
-    <%= f.button :submit, "Sign up", class: "flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"  %>
+    <%= f.button :submit, "Sign up", class: "mt-6 flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"  %>
   </div>
 <% end %>
 

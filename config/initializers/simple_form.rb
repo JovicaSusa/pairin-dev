@@ -52,10 +52,11 @@ SimpleForm.setup do |config|
     b.optional :readonly
 
     ## Inputs
-    # b.use :input, class: 'input', error_class: 'is-invalid', valid_class: 'is-valid'
-    b.use :label_input, class: "font-bold"
+    b.use :label, class: "font-semibold block"
+    b.use :input, error_class: 'bg-rose-100'
+    # b.use :label_input, class: "font-bold"
     b.use :hint,  wrap_with: { tag: :span, class: "hint block" }
-    b.use :error, wrap_with: { tag: :span, class: "text-sm text-red-700 block" }
+    b.use :error, wrap_with: { tag: :span, class: "text-sm font-semibold text-rose-400 block" }
 
     ## full_messages_for
     # If you want to display the full error message for the attribute, you can

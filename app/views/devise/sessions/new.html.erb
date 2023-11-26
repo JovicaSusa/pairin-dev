@@ -21,10 +21,15 @@
                   autocomplete: "current-password",
                   class: "rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
                 } %>
-    <%= f.input :remember_me, input_html: { class: "mt-4 mr-2 cursor-pointer" }, label_html: { class: "font-bold" }, as: :boolean if devise_mapping.rememberable? %>
+    <%= f.input :remember_me,
+                label: false,
+                inline_label: "Remember me",
+                input_html: { class: "mt-4 cursor-pointer" },
+                label_html: { class: "font-bold" },
+                as: :boolean if devise_mapping.rememberable? %>
   </div>
 
-  <div class="form-actions">
+  <div class="form-actions mt-6">
     <%= f.button :submit, "Log in", class: "flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
   </div>
 <% end %>
