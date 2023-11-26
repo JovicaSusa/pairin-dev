@@ -16,8 +16,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_26_172806) do
 
   create_table "pair_requests", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.text "description"
-    t.string "subject"
+    t.text "description", null: false
+    t.string "subject", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_pair_requests_on_user_id"
