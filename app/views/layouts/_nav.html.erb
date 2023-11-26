@@ -16,9 +16,6 @@
           <li>
             <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "text-sm" %>
           </li>
-        </li>
-          <%= link_to "Cancel registration", edit_user_registration_path, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500" %>
-        <li>
         <% else %>
           <li>
             <%= link_to "Login", new_user_session_path, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500" %>
