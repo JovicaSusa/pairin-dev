@@ -4,4 +4,6 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :confirmable
+
+  has_many :pair_requests, dependent: :destroy # TODO: Reconsider dependent option
 end
