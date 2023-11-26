@@ -1,36 +1,47 @@
-<h2>Change your password</h2>
+<div class="flex flex-col items-center px-4">
+  <div class="w-full md:w-2/6">
+    <h2 class="text-center border-b-4 border-black border-dashed text-4xl font-bold mt-8 pb-4 mb-4">Change your password</h2>
 
-<%= simple_form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "flex flex-col items-center" }) do |f| %>
-  <%= f.error_notification %>
+    <%= simple_form_for(
+      resource,
+      as: resource_name,
+      url: password_path(resource_name),
+      html: { method: :put, class: "flex flex-col items-center w-full" }
+    ) do |f| %>
+      <%= f.error_notification %>
 
-  <%= f.input :reset_password_token, as: :hidden %>
-  <%= f.full_error :reset_password_token %>
+      <%= f.input :reset_password_token, as: :hidden %>
+      <%= f.full_error :reset_password_token %>
 
-  <div class="form-inputs">
-    <%= f.input :password,
-                label: "New password",
-                required: true,
-                autofocus: true,
-                hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length),
-                input_html: {
-                  autocomplete: "new-password",
-                  class: "rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                } %>
-    <%= f.input :password_confirmation,
-                label: "Confirm your new password",
-                required: true,
-                label_html: {
-                  class: "mt-4"
-                },
-                input_html: {
-                  autocomplete: "new-password",
-                  class: "rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                } %>
+      <div class="form-inputs w-full mt-4 md:mt-6">
+        <%= f.input :password,
+                    label: "New password",
+                    required: true,
+                    autofocus: true,
+                    hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length),
+                    input_html: {
+                      autocomplete: "new-password",
+                      class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+                    } %>
+        <%= f.input :password_confirmation,
+                    label: "Confirm your new password",
+                    required: true,
+                    label_html: {
+                      class: "mt-4"
+                    },
+                    input_html: {
+                      autocomplete: "new-password",
+                      class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+                    } %>
+      </div>
+
+      <div class="form-actions mt-6">
+        <%= f.button :submit, "Change my password", class: "flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
+      </div>
+    <% end %>
+
+    <div class="mt-12">
+      <%= render "devise/shared/links" %>
+    </div>
   </div>
-
-  <div class="form-actions mt-6">
-    <%= f.button :submit, "Change my password", class: "flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
