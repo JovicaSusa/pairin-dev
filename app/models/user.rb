@@ -6,4 +6,5 @@ class User < ApplicationRecord
          :confirmable
 
   has_many :pair_requests, dependent: :destroy # TODO: Reconsider dependent option
+  has_many :offers, dependent: nil # TODO: Reconsider dependent option
 end
