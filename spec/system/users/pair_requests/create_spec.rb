@@ -3,7 +3,7 @@ RSpec.describe "users pair requests", type: :system do
 
   before { sign_in(current_user) }
 
-  it "displays users pair requests" do
+  it "creates pair request for current user" do
     visit users_pair_requests_path
 
     click_link "New Request"
@@ -17,7 +17,7 @@ RSpec.describe "users pair requests", type: :system do
   end
 
   context "when details not provided" do
-    it "displays users pair requests" do
+    it "displays errors" do
       visit users_pair_requests_path
 
       click_link "New Request"

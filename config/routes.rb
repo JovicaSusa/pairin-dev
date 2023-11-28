@@ -9,7 +9,9 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
-  resources :pair_requests, only: [:index]
+  resources :pair_requests, only: [:index] do
+    resources :offers, only: [:new, :create]
+  end
 
   namespace :users do
     resources :pair_requests
