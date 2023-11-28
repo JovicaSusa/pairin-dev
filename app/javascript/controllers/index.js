@@ -9,3 +9,6 @@ application.register("home", HomeController)
 
 import RemovalsController from "./removals_controller"
 application.register("removals", RemovalsController)
+
+import DatepickerController from "./datepicker_controller"
+application.register("datepicker", DatepickerController)

@@ -1,3 +1,14 @@
+@import 'flatpickr/dist/themes/confetti.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.flatpickr-weekdays {
+  border-bottom: thick dashed black;
+  font-weight: 500;
+}
+
+.flatpickr-days {
+  background-color: #bc95d4;
+}

@@ -4,6 +4,10 @@
   </div>
 
   <%= turbo_frame_tag @pair_request do %>
+    <div data-controller="datepicker">
+      <input id="give-me" />
+    </div>
+
       <%= simple_form_for @pair_request, url: users_pair_requests_path, html: { class: "flex flex-col items-center" } do |f| %>
         <%= f.input :subject, wrapper_html: { class: "w-full" } %>
         <%= f.input :description, as: :text, wrapper_html: { class: "w-full mt-4" } %>
