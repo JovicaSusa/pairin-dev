@@ -5,6 +5,7 @@ class Users::PairRequestsController < ApplicationController
 
   def new
     @pair_request = current_user.pair_requests.build
+    @pair_request.periods.build
   end
 
   def create
@@ -22,5 +23,14 @@ class Users::PairRequestsController < ApplicationController
 
   private
 
-  def pair_request_params = params.require(:pair_request).permit(:subject, :description)
+  def pair_request_params
+    params
+      .require(:pair_request)
+      .permit(
+        :subject,
+        :description,
+        :duration,
+        periods_attributes: [:start_at]
+      )
+  end
 end
