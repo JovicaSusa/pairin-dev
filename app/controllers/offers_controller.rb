@@ -10,7 +10,7 @@ class OffersController < ApplicationController
 
     if @offer.save
       respond_to do |format|
-        format.html { redirect_to pair_requests_path, notice: "Request posted! Good luck" }
+        format.html { redirect_to pair_requests_path, notice: "We have sent your offer, good luck!" }
       end
     else
       render :new, status: :unprocessable_entity
