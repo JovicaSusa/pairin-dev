@@ -20,6 +20,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_27_152218) do
     t.text "message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["offerer_id", "pair_request_id"], name: "index_offers_on_offerer_id_and_pair_request_id", unique: true
     t.index ["offerer_id"], name: "index_offers_on_offerer_id"
     t.index ["pair_request_id"], name: "index_offers_on_pair_request_id"
   end

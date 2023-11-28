@@ -7,5 +7,7 @@ class CreateOffers < ActiveRecord::Migration[7.1]
 
       t.timestamps
     end
+
+    add_index :offers, [:offerer_id, :pair_request_id], unique: true
   end
 end
