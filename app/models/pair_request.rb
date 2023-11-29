@@ -1,6 +1,10 @@
 class PairRequest < ApplicationRecord
   belongs_to :user
   has_many :offers, dependent: nil # TODO: Reconsider
+  has_many :periods, as: :periodable, dependent: :destroy
 
-  validates :description, :subject, presence: true
+  validates :description, :subject, :duration, presence: true
+  validates :duration, numericality: { greater_than: 0 }
+
+  accepts_nested_attributes_for :periods, reject_if: :all_blank, allow_destroy: true
 end

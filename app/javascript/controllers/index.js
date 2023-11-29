@@ -9,3 +9,6 @@ application.register("home", HomeController)
 
 import RemovalsController from "./removals_controller"
 application.register("removals", RemovalsController)
+
+import NestedForm from "stimulus-rails-nested-form"
+application.register("nested-form", NestedForm)

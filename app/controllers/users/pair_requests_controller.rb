@@ -22,5 +22,14 @@ class Users::PairRequestsController < ApplicationController
 
   private
 
-  def pair_request_params = params.require(:pair_request).permit(:subject, :description)
+  def pair_request_params
+    params
+      .require(:pair_request)
+      .permit(
+        :subject,
+        :description,
+        :duration,
+        periods_attributes: [:start_at, :_destroy]
+      )
+  end
 end
