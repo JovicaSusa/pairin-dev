@@ -19,5 +19,5 @@ class OffersController < ApplicationController
 
   private
 
-  def offer_params = params.require(:offer).permit(:message)
+  def offer_params = params.require(:offer).permit(:message, :period_id)
 end
