@@ -10,7 +10,9 @@ Rails.application.routes.draw do
   root "home#index"
 
   resources :pair_requests, only: [:index] do
-    resources :offers, only: [:new, :create]
+    resources :offers, only: [:index, :new,:create] do
+      post "accept", on: :member
+    end
   end
 
   namespace :users do

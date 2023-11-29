@@ -1,4 +1,9 @@
 class OffersController < ApplicationController
+  def index
+    @pair_request = current_user.pair_requests.find(params[:pair_request_id])
+    @offers = @pair_request.offers
+  end
+
   def new
     @pair_request = PairRequest.find(params[:pair_request_id])
     @offer = @pair_request.offers.build(offerer: current_user)
@@ -14,6 +19,16 @@ class OffersController < ApplicationController
       end
     else
       render :new, status: :unprocessable_entity
+    end
+  end
+
+  def accept
+    @offer = Offer.find(params[:id])
+
+    if @offer.update(accepted_at: Time.current)
+      redirect_to pair_request_offers_path, notice: "You just scheduled yourself a new pairing session. Happy pairin!"
+    else
+      render :index
     end
   end
 

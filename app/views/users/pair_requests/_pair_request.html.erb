@@ -1,4 +1,5 @@
 <li>
   <span class="block"><%= pair_request.subject %></span>
   <span class="block"><%= pair_request.description %></span>
+  <span class="block"><%= link_to "Offers", pair_request_offers_path(pair_request.id), data: { turbo: false } %></span>
 </li>
