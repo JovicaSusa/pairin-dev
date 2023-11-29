@@ -4,13 +4,28 @@
   </div>
 
   <%= turbo_frame_tag @pair_request do %>
-    <%= simple_form_for @pair_request, url: users_pair_requests_path, html: { class: "flex flex-col items-center" } do |f| %>
+    <%= simple_form_for(
+      @pair_request,
+      url: users_pair_requests_path,
+      html: { class: "flex flex-col items-center" },
+      data: { controller: "nested-form", nested_form_wrapper_selector_value: ".nested-form-wrapper" }
+    ) do |f| %>
       <%= f.input :subject, wrapper_html: { class: "w-full" } %>
       <%= f.input :description, as: :text, wrapper_html: { class: "w-full mt-4" } %>
       <%= f.input :duration, wrapper_html: { class: "w-full mt-4" } %>
-      <%= f.simple_fields_for :periods do |periods_form| %>
-        <%= periods_form.input :start_at %>
+      <template data-nested-form-target="template">
+        <%= f.simple_fields_for :periods, @pair_request.periods.build, child_index: 'NEW_RECORD' do |period_fields| %>
+          <%= render "period_form", f: period_fields %>
+        <% end %>
+      </template>
+      <%= f.simple_fields_for :periods do |period_fields| %>
+        <%= render "period_form", f: period_fields %>
       <% end %>
+
+      <div data-nested-form-target="target"></div>
+
+      <button type="button" data-action="nested-form#add">Add period</button>
+
       <%= f.button :submit, class: "mt-6 flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
     <% end %>
   <% end %>

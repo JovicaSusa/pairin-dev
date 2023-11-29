@@ -9,6 +9,7 @@ RSpec.describe "users pair requests", type: :system do
     click_link "New Request"
     fill_in "Subject", with: "AAA"
     fill_in "Description", with: "BBB"
+    fill_in "Duration", with: 45
 
     click_button "Create Pair request"
 
@@ -23,6 +24,7 @@ RSpec.describe "users pair requests", type: :system do
       click_link "New Request"
       fill_in "Subject", with: ""
       fill_in "Description", with: ""
+      fill_in "Duration", with: 0
 
       click_button "Create Pair request"
 
@@ -31,6 +33,9 @@ RSpec.describe "users pair requests", type: :system do
       end
       within(".pair_request_description") do
         expect(page).to have_content("can't be blank")
+      end
+      within(".pair_request_duration") do
+        expect(page).to have_content("must be greater than 0")
       end
     end
   end

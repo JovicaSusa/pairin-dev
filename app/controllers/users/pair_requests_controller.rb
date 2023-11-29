@@ -5,7 +5,6 @@ class Users::PairRequestsController < ApplicationController
 
   def new
     @pair_request = current_user.pair_requests.build
-    @pair_request.periods.build
   end
 
   def create
