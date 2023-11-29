@@ -38,7 +38,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_28_214821) do
   create_table "periods", force: :cascade do |t|
     t.string "periodable_type", null: false
     t.bigint "periodable_id", null: false
-    t.datetime "start_at"
+    t.datetime "start_at", null: false
+    t.datetime "end_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["periodable_type", "periodable_id"], name: "index_periods_on_periodable"
