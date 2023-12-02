@@ -29,5 +29,17 @@ RSpec.describe Offers::Accept, type: :unit do
       expect(initiator.participant).to eq(offer.pair_request.user)
       expect(pair.participant).to eq(offer.offerer)
     end
+
+    context "when accept fails" do
+      # TODO:
+    end
+
+    context "when creating session fails" do
+      # TODO:
+    end
+
+    context "when creating participations fails" do
+      # TODO:
+    end
   end
 end

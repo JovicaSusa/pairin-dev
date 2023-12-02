@@ -16,8 +16,6 @@ class Session < ApplicationRecord
   end
 
   def dates_in_order
-    return if start_at.blank? || end_at.blank?
-
-    errors.add(:end_at, "must be after start date") if end_at < start_at
+    errors.add(:end_at, "must be after start date") if (end_at && start_at) && end_at < start_at
   end
 end

@@ -11,6 +11,7 @@ module Offers
         offer.update!(accepted_at: Time.current)
 
         session = pair_request.sessions.create!(start_at: selected_period.start_at, end_at: selected_period.end_at)
+        # TODO: Try using insert_all ?
         session.participations.create!(participant: offerer, role: Participation::ROLE_PAIR)
         session.participations.create!(participant: pair_request.user, role: Participation::ROLE_INITIATOR)
       end

@@ -6,7 +6,7 @@
   <%= simple_form_for @offer, url: pair_request_offers_path, html: { class: "flex flex-col items-center" } do |f| %>
     <%= f.error :pair_request_id %>
     <%= f.input :message, as: :text, wrapper_html: { class: "w-full" } %>
-    <%= f.select :period_id, @pair_request.periods.all.map { |p| [p.start_at, p.id] }, include_blank: true %>
+    <%= f.select :period_id, @pair_request.periods.all.map { |p| [p.start_at, p.id] } %>
     <%= f.button :submit, "Send offer", class: "mt-6 flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
   <% end %>
 </div>
