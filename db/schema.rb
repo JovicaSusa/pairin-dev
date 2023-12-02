@@ -41,6 +41,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_12_02_191737) do
     t.string "participable_type", null: false
     t.bigint "participable_id", null: false
     t.bigint "participant_id", null: false
+    t.string "role", null: false
     t.index ["participable_type", "participable_id"], name: "index_participations_on_participable"
     t.index ["participant_id"], name: "index_participations_on_participant_id"
   end
