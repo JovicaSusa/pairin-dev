@@ -7,4 +7,6 @@ class User < ApplicationRecord
 
   has_many :pair_requests, dependent: :destroy # TODO: Reconsider dependent option
   has_many :offers, dependent: nil # TODO: Reconsider dependent option
+  has_many :participations, foreign_key: :participant_id, dependent: nil # TODO: Reconsider dependent option
+  has_many :session, through: :participations
 end

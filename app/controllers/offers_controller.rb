@@ -26,6 +26,10 @@ class OffersController < ApplicationController
     @offer = Offer.find(params[:id])
 
     if @offer.update(accepted_at: Time.current)
+      session = @offer.pair_request.sessions.create!(start_at: @offer.period.start_at, end_at: @offer.period.end_at)
+      session.participations.create!(participant: @offer.offerer)
+      session.participations.create!(participant: @offer.pair_request.user)
+
       redirect_to pair_request_offers_path, notice: "You just scheduled yourself a new pairing session. Happy pairin!"
     else
       render :index
