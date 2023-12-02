@@ -6,6 +6,8 @@ class Session < ApplicationRecord
   validates :start_at, :end_at, presence: true
   validate :dates_in_future, :dates_in_order
 
+  scope :future, -> { where(start_at: Time.current..) }
+
   private
 
   def dates_in_future

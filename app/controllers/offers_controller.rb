@@ -1,7 +1,6 @@
 class OffersController < ApplicationController
   def index
-    @pair_request = current_user.pair_requests.find(params[:pair_request_id])
-    @offers = @pair_request.offers
+    @offers = Offer.where(pair_request_id: params[:pair_request_id])
   end
 
   def new
@@ -10,8 +9,7 @@ class OffersController < ApplicationController
   end
 
   def create
-    @pair_request = PairRequest.find(params[:pair_request_id])
-    @offer = @pair_request.offers.build(offer_params.merge(offerer: current_user))
+    @offer = Offer.new(offer_params.merge(offerer: current_user, pair_request_id: params[:pair_request_id]))
 
     if @offer.save
       respond_to do |format|
