@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_11_28_214821) do
+ActiveRecord::Schema[7.1].define(version: 2023_12_02_191737) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -35,6 +35,15 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_28_214821) do
     t.index ["user_id"], name: "index_pair_requests_on_user_id"
   end
 
+  create_table "participations", force: :cascade do |t|
+    t.string "participable_type", null: false
+    t.bigint "participable_id", null: false
+    t.bigint "participant_id", null: false
+    t.string "role", null: false
+    t.index ["participable_type", "participable_id"], name: "index_participations_on_participable"
+    t.index ["participant_id"], name: "index_participations_on_participant_id"
+  end
+
   create_table "periods", force: :cascade do |t|
     t.string "periodable_type", null: false
     t.bigint "periodable_id", null: false
@@ -43,6 +52,16 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_28_214821) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["periodable_type", "periodable_id"], name: "index_periods_on_periodable"
+  end
+
+  create_table "sessions", force: :cascade do |t|
+    t.string "sessionable_type", null: false
+    t.bigint "sessionable_id", null: false
+    t.datetime "start_at", null: false
+    t.datetime "end_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sessionable_type", "sessionable_id"], name: "index_sessions_on_sessionable"
   end
 
   create_table "users", force: :cascade do |t|
@@ -65,4 +84,5 @@ ActiveRecord::Schema[7.1].define(version: 2023_11_28_214821) do
   add_foreign_key "offers", "pair_requests"
   add_foreign_key "offers", "users", column: "offerer_id"
   add_foreign_key "pair_requests", "users"
+  add_foreign_key "participations", "users", column: "participant_id"
 end
