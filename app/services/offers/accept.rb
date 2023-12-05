@@ -9,7 +9,7 @@ module Offers
     def self.call(...) = new(...).call
 
     def call
-      Offer.transaction do
+      ApplicationRecord.transaction do
         offer.update!(accepted_at: Time.current)
 
         session = Session.create!(

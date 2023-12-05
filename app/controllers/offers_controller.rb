@@ -9,7 +9,8 @@ class OffersController < ApplicationController
   end
 
   def create
-    @offer = Offer.new(offer_params.merge(offerer: current_user, pair_request_id: params[:pair_request_id]))
+    @pair_request = PairRequest.find(params[:pair_request_id])
+    @offer = @pair_request.offers.build(offer_params.merge(offerer: current_user))
 
     if @offer.save
       respond_to do |format|
@@ -23,7 +24,9 @@ class OffersController < ApplicationController
   def accept
     offer = Offer.find(params[:id])
 
-    if Offers::Accept.call(offer)
+    result Offers::Accept.call(offer)
+
+    if result.success?
       redirect_to pair_request_offers_path, notice: "You just scheduled yourself a new pairing session. Happy pairin!"
     else
       render :index, status: :unprocessable_entity

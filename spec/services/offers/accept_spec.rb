@@ -4,6 +4,10 @@ RSpec.describe Offers::Accept, type: :unit do
 
     let(:offer) { create(:offer) }
 
+    it "returns success" do
+      expect(call.success?).to be true
+    end
+
     it "marks offer as accepted" do
       freeze_time do
         expect { call }.to change { offer.accepted_at }.from(nil).to(Time.current)
@@ -30,16 +34,19 @@ RSpec.describe Offers::Accept, type: :unit do
       expect(pair.participant).to eq(offer.offerer)
     end
 
-    context "when accept fails" do
-      # TODO:
-    end
+    context "when failure" do
+      before { allow(Session).to receive(:create!).and_raise(ActiveRecord::RecordInvalid) }
 
-    context "when creating session fails" do
-      # TODO:
-    end
+      it "returns failure" do
+        expect(call.success?).to be false
+      end
 
-    context "when creating participations fails" do
-      # TODO:
+      it "doesn't create none of records" do
+        expect { call }
+          .to not_change { offer.reload.accepted_at }.from(nil)
+          .and not_change { Session.count }
+          .and not_change { Participation.count }
+      end
     end
   end
 end
