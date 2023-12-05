@@ -11,8 +11,8 @@ class Session < ApplicationRecord
   private
 
   def dates_in_future
-    errors.add(:end_at, "must be in future") if end_at && end_at < Time.current
-    errors.add(:start_at, "must be in future") if start_at && start_at < Time.current
+    errors.add(:end_at, "must be in future") if end_at && end_at.past?
+    errors.add(:start_at, "must be in future") if start_at && start_at.past?
   end
 
   def dates_in_order

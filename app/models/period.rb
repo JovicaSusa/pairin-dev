@@ -4,6 +4,7 @@ class Period < ApplicationRecord
   validates :start_at, :end_at, presence: true
 
   before_validation :set_end_at # TODO: Move this somewhere else(to pair request cntrl)
+  # TODO: validate that dates are in the future
 
   private
 
