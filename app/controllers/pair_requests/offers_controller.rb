@@ -24,13 +24,12 @@ class PairRequests::OffersController < ApplicationController
   def accept
     offer = Offer.find(params[:id])
 
-    result = Offers::Accept.call(offer)
-
-    if result.success?
-      redirect_to pair_request_offers_path, notice: "You just scheduled yourself a new pairing session. Happy pairin!"
-    else
-      render :index, status: :unprocessable_entity
-    end
+    Offers::Accept
+      .call(offer)
+      .either(
+        -> (success) { redirect_to pair_request_offers_path, notice: "You just scheduled yourself a new pairing session. Happy pairin!" },
+        -> (failure) { render :index, status: :unprocessable_entity }
+      )
   end
 
   private
