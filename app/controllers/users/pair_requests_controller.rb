@@ -29,7 +29,8 @@ class Users::PairRequestsController < ApplicationController
         :subject,
         :description,
         :duration,
-        periods_attributes: [:start_at, :_destroy]
+        periods_attributes: [:start_at, :_destroy],
+        taggings_attributes: [:tag_id, :_destroy]
       )
   end
 end
