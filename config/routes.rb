@@ -12,8 +12,10 @@ Rails.application.routes.draw do
   resources :sessions, only: [:index]
 
   resources :pair_requests, only: [:index] do
-    resources :offers, only: [:index, :new,:create] do
-      post "accept", on: :member
+    scope module: 'pair_requests' do
+      resources :offers, only: [:index, :new,:create] do
+        post "accept", on: :member
+      end
     end
   end
 
