@@ -2,7 +2,7 @@
   <%= simple_form_for :query, url: search_pair_requests_path, method: :get, html: { data: { controller: "searchable-select" } } do |f| %>
     <%= f.input :tag, collection: Tag.all.map { |p| [p.name, p.name] }, label: false, input_html: { multiple: true, id: "single" } %>
 
-    <%= f.submit %>
+    <%= f.submit "Go" %>
   <% end %>
 
   <%= turbo_frame_tag "pair-requests" do %>
