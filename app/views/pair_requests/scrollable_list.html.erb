@@ -1,0 +1,4 @@
+<%= turbo_frame_tag "pair-requests-page-#{@pagy.page}" do %>
+  <%= render @pair_requests %>
+  <%= render partial: "next_page" %>
+<% end %>
