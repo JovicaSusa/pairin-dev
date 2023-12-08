@@ -1,4 +1,4 @@
-RSpec.describe "users pair requests", type: :system do
+RSpec.describe "display pair requests", type: :system do
   let(:current_user) { create(:user) }
 
   let!(:current_user_pair_request_one) do
