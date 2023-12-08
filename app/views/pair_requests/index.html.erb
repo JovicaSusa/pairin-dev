@@ -1,6 +1,9 @@
 <div class="flex justify-center">
-  <%= simple_form_for :query, url: search_pair_requests_path, method: :get, html: { data: { controller: "searchable-select" } } do |f| %>
-    <%= f.input :tag, collection: Tag.all.map { |p| [p.name, p.name] }, label: false, input_html: { multiple: true, id: "single" } %>
+  <%= simple_form_for :query, url: search_pair_requests_path, method: :get do |f| %>
+    <%= f.input :tag,
+                collection: Tag.all.map { |p| [p.name, p.name] },
+                label: false,
+                input_html: { multiple: true, data: { controller: "searchable-select" } } %>
 
     <%= f.submit "Go", data: { turbo_frame: "pair-requests" } %>
   <% end %>
