@@ -8,8 +8,10 @@
     <%= f.submit "Go", data: { turbo_frame: "pair-requests" } %>
   <% end %>
 
-  <div class="grid grid-rows-<%= @pair_requests.count %> gap-y-4 md:w-1/2 mt-6 px-2">
-    <%= render @pair_requests %>
-    <%= render partial: "next_page" %>
-  </div>
+  <%= turbo_frame_tag "pair-requests" do %>
+    <div class="grid grid-rows-<%= @pair_requests.count %> gap-y-4 md:w-1/2 mt-6 px-2">
+      <%= render @pair_requests %>
+      <%= render partial: "next_page" %>
+    </div>
+  <% end %>
 </div>

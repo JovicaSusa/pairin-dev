@@ -1,5 +1,17 @@
-<%= turbo_frame_tag "pair-requests" do %>
-  <div class="grid grid-rows-<%= @pair_requests.count %> gap-y-4 md:w-1/2 mt-6 px-2">
-    <%= render @pair_requests %>
-  </div>
-<% end %>
+<div class="flex justify-center">
+  <%= simple_form_for :query, url: search_pair_requests_path, method: :get do |f| %>
+    <%= f.input :tag,
+                collection: Tag.all.map { |p| [p.name, p.name] },
+                label: false,
+                input_html: { multiple: true, data: { controller: "searchable-select" } } %>
+
+    <%= f.submit "Go", data: { turbo_frame: "pair-requests" } %>
+  <% end %>
+
+  <%= turbo_frame_tag "pair-requests" do %>
+    <div class="grid grid-rows-<%= @pair_requests.count %> gap-y-4 md:w-1/2 mt-6 px-2">
+      <%= render @pair_requests %>
+      <%= render partial: "next_page" %>
+    </div>
+  <% end %>
+</div>

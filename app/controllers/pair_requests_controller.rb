@@ -6,6 +6,8 @@ class PairRequestsController < ApplicationController
   end
 
   def search
-    @pair_requests = PairRequest.joins(:tags).where(tags: { name: params[:query][:tag] })
+    @pagy, @pair_requests = pagy_countless(PairRequest.joins(:tags).where(tags: { name: params[:query][:tag] }))
+
+    render "scrollable_list" if params[:page]
   end
 end
