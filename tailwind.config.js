@@ -8,6 +8,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        "handwritten": ["Yellowtail"]
+      },
       animation: {
         marquee: "marquee 30s linear infinite",
         appearThenFade: "appearThenFade 5s linear"

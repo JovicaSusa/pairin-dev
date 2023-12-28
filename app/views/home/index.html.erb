@@ -8,6 +8,7 @@
             <span class="block bg-yellow-300 text-8xl px-4">PAIRIN</span>
             <span>time!</span>
           </h1>
+          <h2 class="mt-4 font-semibold">Find pair programming partner quick and easy!</h2>
           <div class="flex justify-center w-full max-w-2xl gap-2 mx-auto mt-16">
             <div class="mt-3 rounded-lg sm:mt-0">
               <%= link_to new_user_registration_path do %>
@@ -37,7 +38,7 @@
 </section>
 
 <div class="relative flex w-full overflow-x-hidden border-b-8 border-t-2 border-black bg-white font-bold">
-  <div class="animate-marquee whitespace-nowrap py-12 flex">
+  <div class="hover:animate-marquee whitespace-nowrap py-12 flex">
     <span class="flex justify-center items-center bg-yellow-300 border-2 border-black rounded-xl block w-12 h-12 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
       <i class="devicon-rails-plain-wordmark"></i>
     </span>
@@ -83,55 +84,127 @@
   </div>
 </div>
 
-<div class="bg-yellow-50 pb-24 flex items-center flex-col">
-  <h2 class="font-bold text-center text-4xl pb-4 pt-16 md:text-6xl text-[#bc95d4] border-dashed border-b-4 md:pt-24 border-black">
-    How it works!
-  </h2>
+<div class="flex items-center flex-col relative bg-yellow-50 pb-24">
+  <div class="relative text-center">
+    <h2 class="uppercase mt-24 font-bold text-4xl px-6 py-6 md:text-6xl">
+      How it works
+    </h2>
 
-  <div class="flex flex-col mt-24 gap-12 md:gap-24 md:flex-row md:mt-36">
-    <div class="w-[250px] mt-8 rounded-md border-2 border-black bg-[#bc95d4] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <div class="border-b-2 border-black p-4">
-        <h2 class="text-lg">1. Post a request</h2>
-      </div>
-      <div class="p-4">
-        <p>
-          Describe the problem you're trying to solve, languages that you're planning to use and time you want
-          to spend.
-        </p>
-      </div>
+    <div class="absolute -bottom-8 -left-16">
+      <%= image_tag "arrow.svg", class: "relative w-16 h-16 -scale-x-100 rotate-45" %>
+      <span class="block font-handwritten absolute top-0 -left-2 -rotate-45 text-xl">do this</span>
     </div>
 
-    <div class="w-[250px] mt-8 rounded-md border-2 border-black bg-[#bc95d4] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <div class="border-b-2 border-black p-4">
-        <h2 class="text-lg">2. Accept application</h2>
-      </div>
-      <div class="p-4">
-        <p>
-          Choose one of (hopefully) many appliations you will receive. Don't hesitate to
-          discuss all the neaty greaty details before you accept one of the applications.
-        </p>
-      </div>
-    </div>
-
-    <div class="w-[250px] mt-8 rounded-md border-2 border-black bg-[#bc95d4] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <div class="border-b-2 border-black p-4">
-        <h2 class="text-lg">3. Schedule a session</h2>
-      </div>
-      <div class="p-4">
-        <p>
-          Agree with you pair how and when you'll tackle the issue. Have fun!
-        </p>
-      </div>
+    <div class="absolute absolute -bottom-8 -right-16">
+      <%= image_tag "arrow.svg", class: "relative w-16 h-16 -rotate-45" %>
+      <span class="font-handwritten absolute top-0 -right-2 rotate-45 text-xl">or this</span>
     </div>
   </div>
 
-  <h2 class="mt-24 text-4xl font-bold">Happy Pairing!</h2>
+  <div class="grid w-full grid-cols-2 mt-16">
+    <div class="flex flex-col items-center relative border-r-2 border-black">
+      <div class="w-2/3 flex flex-col">
+        <div class="w-5/6 border-2 border-black p-4 font-bold bg-[#bc95d4] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h2 class="text-lg">Search for Pairing Opportunities</h2>
+        </div>
 
-  <div class="mt-12 rounded-lg">
+        <div class="pt-4 pb-2 flex mt-6 px-4">
+          <%= image_tag "search.svg", class: "block w-2/6 w-40 h-40" %>
+
+          <p class="block w-4/6">
+            Discover pair programming requests from our vibrant community. Customize your search by technology, time availability, or desired experience level to find the perfect match.
+          </p>
+        </div>
+      </div>
+
+      <div class="w-2/3 mt-20 flex flex-col">
+        <div class="w-5/6 self-end border-2 border-black p-4 font-bold bg-[#bc95d4] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h2 class="text-lg">Express Your Interest</h2>
+        </div>
+
+        <div class="pt-4 pb-2 flex mt-6 px-4">
+          <p class="block w-4/6">
+            Once you've found a pairing request that aligns with your preferences, choose your availability and reach out to the requester. Craft a compelling message to increase your chances of being accepted as a programming partner.
+          </p>
+
+          <%= image_tag "apply.svg", class: "block w-2/6 w-40 h-40" %>
+        </div>
+      </div>
+
+      <div class="w-2/3 flex flex-col mt-20">
+        <div class="w-5/6 border-2 border-black p-4 font-bold bg-[#bc95d4] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h2 class="text-lg">Await Approval</h2>
+        </div>
+
+        <div class="pt-4 pb-2 flex mt-6 px-4">
+          <%= image_tag "wait.svg", class: "block w-2/6 w-40 h-40" %>
+
+          <p class="block w-4/6">
+            After expressing your interest and sending out your application, patiently await approval from the requester. During this time, feel free to prepare for the upcoming pair programming session and stay connected with our community.
+          </p>
+        </div>
+      </div>
+
+      <%= image_tag "arrow.svg", class: "absolute -bottom-32 right-50 w-24 h-24 -scale-x-100" %>
+    </div>
+    <div class="flex flex-col relative items-center border-l-2 border-black">
+      <div class="w-2/3 flex flex-col">
+        <div class="w-5/6 self-end border-2 border-black p-4 font-bold bg-[#bc95d4] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h2 class="text-lg">Post your pair programming request</h2>
+        </div>
+
+        <div class="pt-4 pb-2 flex mt-6 px-4">
+          <p class="block w-4/6">
+            Share your coding project or learning goals by posting a pair programming request. Let us know your preferred tech, when you're free, and what you're looking for in a coding partner.
+          </p>
+
+          <%= image_tag "post.svg", class: "block w-2/6 w-40 h-40" %>
+        </div>
+      </div>
+
+      <div class="w-2/3 mt-20 flex flex-col">
+        <div class="w-5/6 border-2 border-black p-4 font-bold bg-[#bc95d4] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h2 class="text-lg">Review Received Applications</h2>
+        </div>
+
+        <div class="pt-4 pb-2 flex mt-6 px-4">
+          <%= image_tag "wait.svg", class: "block w-2/6 w-40 h-40" %>
+
+          <p class="block w-4/6">
+            Your request is live, and applications are coming in. Take some time to review profiles and find the right match for your project. The perfect coding companion is just around the corner.
+          </p>
+        </div>
+      </div>
+
+      <div class="w-2/3 flex flex-col mt-20">
+        <div class="w-5/6 self-end border-2 border-black p-4 font-bold bg-[#bc95d4] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <h2 class="text-lg">Accept one of the applications</h2>
+        </div>
+
+        <div class="pt-4 pb-2 flex mt-6 px-4">
+          <p class="block w-4/6">
+            Review applications and choose the one that fits your project. Confirm your coding teammate and get ready to start working together. It's as simple as that!
+          </p>
+
+          <%= image_tag "wait.svg", class: "block w-2/6 w-40 h-40" %>
+        </div>
+      </div>
+
+      <%= image_tag "arrow.svg", class: "absolute -bottom-32 right-50 w-24 h-24" %>
+    </div>
+  </div>
+
+  <h2 class="mt-24 text-6xl font-bold font-handwritten">Start pairin!</h2>
+
+  <div class="w-full flex justify-center mt-8">
+    <%= image_tag "pair.svg", class: "block w-80 h-80" %>
+  </div>
+
+  <div class="mt-24 rounded-lg">
     <button
       role="button"
       aria-label="Click to perform an action"
-      class="flex cursor-pointer items-center rounded-md border-2 border-black bg-[#c9dcd8] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+      class="flex cursor-pointer items-center rounded-md border-2 border-black bg-[#c9dcd8] px-36 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
     >
       Sign up!
     </button>
