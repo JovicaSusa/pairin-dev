@@ -9,10 +9,12 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        "handwritten": ["Yellowtail"]
+        "sans": ["Cabin", "sans-serif"],
+        "handwritten": ["Yellowtail"],
+        "headline": ["Work Sans"]
       },
       animation: {
-        marquee: "marquee 30s linear infinite",
+        marquee: "marquee 120s linear infinite",
         appearThenFade: "appearThenFade 5s linear"
       },
       keyframes: {
