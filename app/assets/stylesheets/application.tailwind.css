@@ -4,3 +4,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+#how-it-works {
+  scroll-margin-top: 200px;
+}
