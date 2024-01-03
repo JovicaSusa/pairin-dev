@@ -17,7 +17,7 @@
                   aria-label="Click to perform an action"
                   class="flex font-headline text-2xl md:text-base cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
                 >
-                  Sign me in
+                  Sign Up Now
                 </button>
               <% end %>
             </div>
@@ -217,34 +217,42 @@
       <p class="mt-8 md:mt-12 mb-4 tracking-wide text-xl md:text-base">
         We're currently in the beta phase, and our community is in its early stages of growth.
         You can help us by becoming one of our inaugural members.
-        Join now to be part of the foundation and help shape the future of our community!"
+        Join now to be part of the foundation and help shape the future of our community!
       </p>
     </div>
 
-    <button
-      role="button"
-      aria-label="Click to perform an action"
-      class="flex font-headline text-2xl md:text-base cursor-pointer mt-4 md:mt-0 items-center rounded-md border-2 border-black bg-[#c9dcd8] px-36 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-    >
-      I want to try!
-    </button>
+    <%= link_to new_user_registration_path do %>
+      <button
+        role="button"
+        aria-label="Click to perform an action"
+        class="flex font-headline text-2xl md:text-base cursor-pointer mt-4 md:mt-0 items-center rounded-md border-2 border-black bg-[#c9dcd8] px-12 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+      >
+        Count Me In
+      </button>
+    <% end %>
   </div>
 </div>
 
 <div class="flex h-40 w-full border-t-2 border-black bg-[#bc95d4] font-bold">
-  <div class="w-1/3 flex flex-col justify-center items-center">
-    <p>Start pairin</p>
+  <div class="w-1/3 flex flex-col items-center mt-6">
+    <div>
+      <p class="font-headline">Start pairin</p>
 
-    <p><%= link_to "Sign up", new_user_registration_path %><p>
+      <p><%= link_to "Sign up", new_user_registration_path %><p>
+      <p><%= link_to "Log in", new_user_session_path %><p>
+    </div>
   </div>
-  <div class="flex w-1/3 justify-center items-center">
-    <span class="block font-headline">PAIRIN</span>
+  <div class="flex flex-col w-1/3 mt-2 items-center">
+    <%= image_tag "logo.svg", class: "w-24 h-24" %>
+    <span class="block font-handwritten">made with love by Manufaktura Koda</span>
   </div>
-  <div class="w-1/3 flex flex-col justify-center items-center">
-    <p>Don't be stranger</p>
+  <div class="w-1/3 flex flex-col mt-6 items-center">
+    <div class="text-right">
+      <p class="font-headline">Don't be a stranger</p>
 
-    <p>Twitter</p>
-    <p>Discord</p>
-    <p>Mastodon</p>
+      <p>Twitter</p>
+      <p>Discord</p>
+      <p>Mastodon</p>
+    </div>
   </div>
 </div>
