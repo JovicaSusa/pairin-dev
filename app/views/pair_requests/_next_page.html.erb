@@ -1,0 +1,10 @@
+<% if @pagy.next %>
+  <%= turbo_frame_tag(
+        "pair-requests-page-#{@pagy.next}",
+        # autoscroll: true,
+        loading: :lazy,
+        src: pagy_url_for(@pagy, @pagy.next),
+        target: "_top"
+      ) do %>
+  <% end %>
+<% end %>

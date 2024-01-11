@@ -1,9 +1,13 @@
 class PairRequestsController < ApplicationController
   def index
-    @pair_requests = PairRequest.where.not(user_id: current_user.id).all
+    @pagy, @pair_requests = pagy_countless(PairRequest.where.not(user_id: current_user.id).all)
+
+    render "scrollable_list" if params[:page]
   end
 
   def search
-    @pair_requests = PairRequest.joins(:tags).where(tags: { name: params[:query][:tag] })
+    @pagy, @pair_requests = pagy_countless(PairRequest.joins(:tags).where(tags: { name: params[:query][:tag] }))
+
+    render "scrollable_list" if params[:page]
   end
 end
