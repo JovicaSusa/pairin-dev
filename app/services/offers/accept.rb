@@ -14,8 +14,8 @@ module Offers
 
         session = Session.create!(
           sessionable: pair_request,
-          start_at: selected_period.start_at,
-          end_at: selected_period.end_at)
+          start_at: period.start_at,
+          end_at: period.end_at)
 
         session.participations.create!(participant: offerer, role: Participation::ROLE_PAIR)
         session.participations.create!(participant: pair_request.user, role: Participation::ROLE_INITIATOR)
@@ -28,6 +28,6 @@ module Offers
 
     private
 
-    delegate :pair_request, :offerer, :selected_period, to: :offer
+    delegate :pair_request, :offerer, :period, to: :offer
   end
 end

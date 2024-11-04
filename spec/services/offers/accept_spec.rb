@@ -20,8 +20,8 @@ RSpec.describe Offers::Accept, type: :unit do
       session = Session.last
 
       expect(session.sessionable).to eq(offer.pair_request)
-      expect(session.start_at).to eq(offer.selected_period.start_at)
-      expect(session.end_at).to eq(offer.selected_period.end_at)
+      expect(session.start_at).to eq(offer.period.start_at)
+      expect(session.end_at).to eq(offer.period.end_at)
     end
 
     it "creates expected participants" do
