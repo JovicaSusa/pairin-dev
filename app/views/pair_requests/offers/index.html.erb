@@ -1,11 +1,36 @@
-<div class="flex justify-center">
-  <h3>Offers beaches</h3>
+<div class="text-center">
+  <h3 class="text-3xl mt-12">Offers</h3>
 
-  <% @offers.each do |offer| %>
-    <div class="">
-      <p><%= offer.message %></p>
-      <p><%= offer.offerer.email %></p>
-      <%= button_to "Accept", accept_pair_request_offer_path(offer.pair_request.id, offer.id) %>
-    </div>
-  <% end %>
+  <div class="md:flex md:flex-col md:items-center px-4 mt-8">
+    <% @offers.each do |offer| %>
+      <div class="bg-blue-100 md:w-1/2 px-4 text-left pt-2 pb-4 rounded-md mb-8">
+        <div class="border-black border-b-2">
+          <div>
+            <%= offer.offerer.email %>
+          </div>
+          <div>
+            <%= offer.period.start_at %> - <%= offer.period.end_at %>
+          </div>
+        </div>
+        <div
+          data-controller="read-more"
+          data-read-more-more-text-value="Read more"
+          data-read-more-less-text-value="Read less"
+          class="bg-white px-2 py-4"
+        >
+          <p class="read-more-content" data-read-more-target="content"><%= offer.message %></p>
+          <button data-read-more-target="btn" data-action="read-more#toggle">Read more</button>
+        </div>
+        <div class="flex justify-center mt-6">
+          <%=
+            button_to "Accept",
+            accept_pair_request_offer_path(offer.pair_request.id, offer.id),
+            {
+              class: "flex font-headline cursor-pointer items-center rounded-md border-2 border-black bg-yellow-300 px-5 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+            }
+          %>
+        </div>
+      </div>
+    <% end %>
+  </div>
 </div>

@@ -6,6 +6,8 @@ class Period < ApplicationRecord
 
   before_validation :set_end_at # TODO: Move this somewhere else(to pair request cntrl)
 
+  scope :future, -> { where(start_at: Time.zone.now..) }
+
   private
 
   def set_end_at

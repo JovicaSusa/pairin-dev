@@ -23,7 +23,7 @@ module Offers
 
       Success(offer)
     rescue ActiveRecord::RecordInvalid => e
-      Failure(offer)
+      Failure(offer: offer, error: e)
     end
 
     private

@@ -12,3 +12,10 @@ html {
 #how-it-works {
   scroll-margin-top: 200px;
 }
+
+.read-more-content {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--read-more-line-clamp, 2)
+}
