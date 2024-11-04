@@ -1,5 +1,14 @@
 @import "slim-select/dist/slimselect.css";
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600&family=Work+Sans:wght@400;500;600;800&family=Yellowtail&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+#how-it-works {
+  scroll-margin-top: 200px;
+}
