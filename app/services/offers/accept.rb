@@ -22,7 +22,7 @@ module Offers
       end
 
       Success(offer)
-    rescue ActiveRecord::RecordInvalid
+    rescue ActiveRecord::RecordInvalid => e
       Failure(offer)
     end
 
