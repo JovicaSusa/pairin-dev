@@ -1,5 +1,5 @@
 <div class="nested-form-wrapper" data-new-record="<%= f.object.new_record? %>">
-  <%= f.input :start_at, as: :datetime %>
+  <%= f.input :start_at, as: :string, input_html: { data: { controller: "datepicker" } } %>
 
   <button type="button" data-action="nested-form#remove">Remove period</button>
 

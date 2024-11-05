@@ -8,6 +8,7 @@
     "@stimulus-components/read-more": "^5.0.0",
     "autoprefixer": "^10.4.16",
     "esbuild": "^0.19.7",
+    "flatpickr": "^4.6.13",
     "postcss": "^8.4.31",
     "slim-select": "^2.7.1",
     "stimulus-rails-nested-form": "^4.1.0",
