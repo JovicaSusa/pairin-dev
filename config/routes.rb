@@ -23,5 +23,6 @@ Rails.application.routes.draw do
 
   namespace :users do
     resources :pair_requests
+    resources :offers, only: [:index]
   end
 end
