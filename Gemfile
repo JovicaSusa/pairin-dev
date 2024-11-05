@@ -64,6 +64,10 @@ group :development, :test do
   gem "pry"
 end
 
+group :test do
+  gem "capybara-screenshot"
+end
+
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
@@ -77,3 +81,5 @@ end
 
 
 gem "devise", "~> 4.9"
+
+gem "pagy", "~> 6.2"

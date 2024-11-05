@@ -13,13 +13,16 @@ Rails.application.routes.draw do
 
   resources :pair_requests, only: [:index] do
     scope module: 'pair_requests' do
-      resources :offers, only: [:index, :new,:create] do
+      resources :offers, only: [:index, :new, :create] do
         post "accept", on: :member
       end
     end
+
+    get :search, on: :collection
   end
 
   namespace :users do
     resources :pair_requests
+    resources :offers, only: [:index]
   end
 end

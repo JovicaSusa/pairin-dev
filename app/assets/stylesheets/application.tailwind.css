@@ -1,5 +1,22 @@
 @import 'flatpickr/dist/themes/confetti.css';
+@import "slim-select/dist/slimselect.css";
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600&family=Work+Sans:wght@400;500;600;800&family=Yellowtail&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+#how-it-works {
+  scroll-margin-top: 200px;
+}
+
+.read-more-content {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--read-more-line-clamp, 2)
+}
