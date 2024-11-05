@@ -13,6 +13,8 @@
       <%= f.input :description, as: :text, wrapper_html: { class: "w-full mt-4" } %>
       <%= f.input :duration, wrapper_html: { class: "w-full mt-4" } %>
 
+      <%= f.combobox :tag_id, Tag.all.map { |tag| [tag.name, tag.id] } %>
+
       <div data-controller="nested-form" data-nested-form-wrapper-selector-value=".nested-form-wrapper">
         <template data-nested-form-target="template">
           <%= f.simple_fields_for :periods, @pair_request.periods.build, child_index: 'NEW_RECORD' do |period_fields| %>

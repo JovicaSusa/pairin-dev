@@ -18,3 +18,6 @@ application.register("searchable-select", SearchableSelectController)
 
 import ReadMore from "./read_more_controller"
 application.register('read-more', ReadMore)
+
+import HwComboboxController from "@josefarias/hotwire_combobox"
+application.register("hw-combobox", HwComboboxController)
