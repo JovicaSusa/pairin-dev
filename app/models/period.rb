@@ -11,7 +11,9 @@ class Period < ApplicationRecord
   private
 
   def set_end_at
-    self.end_at = self.start_at.advance(minutes: self.periodable.duration)
+    return if start_at.nil?
+
+    self.end_at = start_at.advance(minutes: self.periodable.duration || 0)
   end
 
   def dates_in_future
