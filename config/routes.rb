@@ -17,10 +17,12 @@ Rails.application.routes.draw do
         post "accept", on: :member
       end
     end
+
     get :search, on: :collection
   end
 
   namespace :users do
     resources :pair_requests
+    resources :offers, only: [:index]
   end
 end

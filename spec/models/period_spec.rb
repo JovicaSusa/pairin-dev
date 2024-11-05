@@ -11,4 +11,19 @@ RSpec.describe Period, type: :model do
       end
     end
   end
+
+  describe "scopes" do
+    describe ".future" do
+      subject(:future) { described_class.future }
+
+      let!(:past_period) { create(:period, start_at: 1.minute.from_now) }
+      let!(:future_period) { create(:period, start_at: 3.minutes.from_now) }
+
+      it "returns only future periods" do
+        travel 2.minutes do
+          expect(future).to contain_exactly(future_period)
+        end
+      end
+    end
+  end
 end
