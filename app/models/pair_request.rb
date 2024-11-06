@@ -12,4 +12,16 @@ class PairRequest < ApplicationRecord
 
   accepts_nested_attributes_for :periods, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :taggings, reject_if: :all_blank, allow_destroy: true
+
+  after_create :setup_activity
+
+  private
+
+  def setup_activity
+    Activity.create!(
+      receiver: user,
+      title: ["You have create an activity", "Wohoo, you have just created an pair request", "Your pair request is visible now"].sample,
+      content: "Your new pair request is visible now by community. Hope you'll start receiving offers in no time"
+    )
+  end
 end
