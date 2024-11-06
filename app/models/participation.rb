@@ -7,15 +7,11 @@ class Participation < ApplicationRecord
 
   validates :role, inclusion: { in: [ROLE_INITIATOR, ROLE_PAIR] }
 
-  after_create :setup_activity
+  after_commit :setup_activity
 
   private
 
   def setup_activity
-    Activity.create!(
-        receiver: participant,
-        title: ["New session scheduled"].sample,
-        content: "Happy Pairin! Have fun"
-      )
+    ActivitySetup.call(self)
   end
 end

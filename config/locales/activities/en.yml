@@ -1,0 +1,20 @@
+en:
+  activities:
+    sent_offer:
+      titles:
+        - Offer is on the way.
+        - Offer delivered!
+        - Title Three
+      content:
+        text_one:
+          - First
+          - Second
+          - Third
+        text_two:
+          - First
+          - Second
+          - Third
+        text_three:
+          - Warm up your fingers :)
+          - Hope you'll be pairin in no time
+          - Hope you'll get good news soon
