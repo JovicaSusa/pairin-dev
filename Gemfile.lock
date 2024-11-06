@@ -132,6 +132,10 @@ GEM
       i18n (>= 1.8.11, < 2)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    hotwire_combobox (0.3.2)
+      rails (>= 7.0.7.2)
+      stimulus-rails (>= 1.2)
+      turbo-rails (>= 1.2)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     io-console (0.6.0)
@@ -312,6 +316,7 @@ DEPENDENCIES
   dry-monads
   factory_bot_rails
   faker
+  hotwire_combobox
   jbuilder
   jsbundling-rails
   pagy (~> 6.2)

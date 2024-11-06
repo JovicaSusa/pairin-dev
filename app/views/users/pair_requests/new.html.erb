@@ -34,6 +34,7 @@
             <%= render "tagging_form", f: tagging_fields %>
           <% end %>
         </template>
+
         <%= f.simple_fields_for :taggings do |tagging_fields| %>
           <%= render "tagging_form", f: tagging_fields %>
         <% end %>
