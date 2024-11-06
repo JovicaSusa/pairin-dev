@@ -1,7 +1,7 @@
 <div class="nested-form-wrapper" data-new-record="<%= f.object.new_record? %>">
   <%= f.combobox :tag_id,
     Tag.all.map { |tag| [tag.name, tag.id] },
-    name_when_new: "pair_request[taggings_attributes][name]"
+    name_when_new: "pair_request[taggings_attributes][#{rand(10)}][tag_attributes][name]"
   %>
 
   <button type="button" data-action="nested-form#remove">Remove tag</button>

@@ -3,7 +3,7 @@ class PairRequest < ApplicationRecord
   has_many :offers, dependent: nil # TODO: Reconsider
   has_many :periods, as: :periodable, dependent: :destroy
   has_many :sessions, as: :sessionable
-  has_many :taggings, as: :taggable
+  has_many :taggings, as: :taggable, inverse_of: :taggable
   has_many :tags, through: :taggings
 
 
