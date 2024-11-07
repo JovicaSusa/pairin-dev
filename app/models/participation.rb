@@ -1,4 +1,6 @@
 class Participation < ApplicationRecord
+  include ActivityGeneratable
+
   belongs_to :participable, polymorphic: true
   belongs_to :participant, class_name: "User"
 
@@ -6,12 +8,4 @@ class Participation < ApplicationRecord
   ROLE_PAIR = "pair".freeze
 
   validates :role, inclusion: { in: [ROLE_INITIATOR, ROLE_PAIR] }
-
-  after_commit :setup_activity
-
-  private
-
-  def setup_activity
-    ActivitiesSetup::Proxy.call(self)
-  end
 end

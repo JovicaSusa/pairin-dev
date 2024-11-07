@@ -1,4 +1,6 @@
 class PairRequest < ApplicationRecord
+  include ActivityGeneratable
+
   belongs_to :user
   has_many :offers, dependent: nil # TODO: Reconsider
   has_many :periods, as: :periodable, dependent: :destroy
@@ -12,12 +14,4 @@ class PairRequest < ApplicationRecord
 
   accepts_nested_attributes_for :periods, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :taggings, reject_if: :all_blank, allow_destroy: true
-
-  after_commit :setup_activity
-
-  private
-
-  def setup_activity
-    ActivitiesSetup::Proxy.call(self)
-  end
 end
