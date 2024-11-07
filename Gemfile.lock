@@ -123,6 +123,8 @@ GEM
       dry-core (~> 1.0, < 2)
       zeitwerk (~> 2.6)
     erubi (1.12.0)
+    et-orbi (1.2.11)
+      tzinfo
     factory_bot (6.4.2)
       activesupport (>= 5.0.0)
     factory_bot_rails (6.4.2)
@@ -130,6 +132,9 @@ GEM
       railties (>= 5.0.0)
     faker (3.2.2)
       i18n (>= 1.8.11, < 2)
+    fugit (1.10.1)
+      et-orbi (~> 1, >= 1.2.7)
+      raabro (~> 1.4)
     globalid (1.2.1)
       activesupport (>= 6.1)
     hotwire_combobox (0.3.2)
@@ -138,6 +143,10 @@ GEM
       turbo-rails (>= 1.2)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
+    importmap-rails (2.0.3)
+      actionpack (>= 6.0.0)
+      activesupport (>= 6.0.0)
+      railties (>= 6.0.0)
     io-console (0.6.0)
     irb (1.9.1)
       rdoc
@@ -162,6 +171,11 @@ GEM
     method_source (1.0.0)
     mini_mime (1.1.5)
     minitest (5.20.0)
+    mission_control-jobs (0.2.1)
+      importmap-rails
+      rails (~> 7.1)
+      stimulus-rails
+      turbo-rails
     msgpack (1.7.2)
     mutex_m (0.2.0)
     net-imap (0.4.6)
@@ -196,6 +210,7 @@ GEM
     public_suffix (5.0.4)
     puma (6.4.0)
       nio4r (~> 2.0)
+    raabro (1.4.0)
     racc (1.7.3)
     rack (3.0.8)
     rack-session (2.0.0)
@@ -274,6 +289,12 @@ GEM
     simple_form (5.3.0)
       actionpack (>= 5.2)
       activemodel (>= 5.2)
+    solid_queue (0.3.1)
+      activejob (>= 7.1)
+      activerecord (>= 7.1)
+      concurrent-ruby (~> 1.2.2)
+      fugit (~> 1.10.1)
+      railties (>= 7.1)
     stimulus-rails (1.3.0)
       railties (>= 6.0.0)
     stringio (3.0.9)
@@ -319,6 +340,7 @@ DEPENDENCIES
   hotwire_combobox
   jbuilder
   jsbundling-rails
+  mission_control-jobs (~> 0.2.1)
   pagy (~> 6.2)
   pg (~> 1.1)
   propshaft
@@ -329,6 +351,7 @@ DEPENDENCIES
   rspec-rails
   selenium-webdriver
   simple_form
+  solid_queue (~> 0.3.1)
   stimulus-rails
   turbo-rails
   tzinfo-data
