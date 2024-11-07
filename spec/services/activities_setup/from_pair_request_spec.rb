@@ -10,8 +10,8 @@ RSpec.describe ActivitiesSetup::FromPairRequest, type: :unit do
 
       expect(Activity.last).to have_attributes(
         receiver_id: 42,
-        title: "Fix me",
-        content: "Fix me, too"
+        title: in_array(I18n.t("activities.pair_request_created.titles")),
+        content: in_array(I18n.t("activities.pair_request_created.content"))
       )
     end
   end

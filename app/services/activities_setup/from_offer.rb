@@ -12,34 +12,37 @@ module ActivitiesSetup
     def call
       if record.previously_new_record?
         Activity.create!(
-          receiver: record.offerer,
-          title: ["Your offer has been sent, good luck", "You are first one to make an offer to..., good luck"].sample,
-          content: "We have sent an offer"
+          receiver: offerer,
+          title: I18n.t("activities.sent_offer.titles").sample,
+          content: I18n.t("activities.sent_offer.content").sample,
         )
 
         Activity.create!(
-          receiver: record.pair_request.user,
-          title: ["Offer incoming", "New Offer for ya", "We told you, you'l have an offer soon. And guess what"].sample,
-          content: "You have received an offer"
+          receiver: pair_request.user,
+          title: I18n.t("activities.received_offer.titles").sample,
+          content: I18n.t("activities.received_offer.content").sample,
         )
       else
         return unless record.accepted_at_previously_changed?(from: nil)
 
         Activity.create!(
-          receiver: record.offerer,
-          title: ["Your offer just got accepted", "Way the go, you're offer just got accepted"].sample,
-          content: "Happy Pairin! Have fun"
+          receiver: offerer,
+          title: I18n.t("activities.offer_accepted.titles").sample,
+          content: I18n.t("activities.offer_accepted.content").sample,
         )
 
-        pair_request.offers.excluding(self).each do |offer|
+        pair_request.offers.excluding(record).each do |offer|
           Activity.create!(
             receiver: offer.offerer,
-            title: ["Ouch", "Better luck next time"].sample,
-            content: "Sorry, but this and that"
+            title: I18n.t("activities.offer_not_accepted.titles").sample,
+            content: I18n.t("activities.offer_not_accepted.content").sample,
           )
         end
       end
-
     end
+
+    private
+
+    delegate :pair_request, :offerer, to: :record
   end
 end

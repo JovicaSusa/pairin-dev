@@ -12,8 +12,8 @@ module ActivitiesSetup
     def call
       Activity.create!(
         receiver: record.user,
-        title: ["Fix me"].sample,
-        content: "Fix me, too"
+        title: I18n.t("activities.pair_request_created.titles").sample,
+        content: I18n.t("activities.pair_request_created.content").sample
       )
     end
   end

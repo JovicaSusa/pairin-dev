@@ -12,8 +12,8 @@ module ActivitiesSetup
     def call
       Activity.create!(
         receiver: record.participant,
-        title: ["Fix me"].sample,
-        content: "Fix me, too"
+        title: I18n.t("activities.session_scheduled.titles").sample,
+        content: I18n.t("activities.session_scheduled.content").sample
       )
     end
   end

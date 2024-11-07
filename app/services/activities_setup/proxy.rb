@@ -3,12 +3,6 @@ module ActivitiesSetup
     attr_reader :record
     private :record
 
-    HANDLERS = {
-      PairRequest => FromPairRequest,
-      Offer => FromOffer,
-      Participation => FromParticipation
-    }.freeze
-
     def initialize(record)
       @record = record
     end
@@ -16,7 +10,7 @@ module ActivitiesSetup
     def self.call(...) = new(...).call
 
     def call
-      HANDLERS[record.class].call(record)
+      ActivitiesSetup.const_get("From#{record.class}").call(record)
     end
   end
 end

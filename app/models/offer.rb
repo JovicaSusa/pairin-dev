@@ -13,6 +13,6 @@ class Offer < ApplicationRecord
   private
 
   def setup_activity
-    ActivitySetup.call(self)
+    ActivitiesSetup::Proxy.call(self)
   end
 end

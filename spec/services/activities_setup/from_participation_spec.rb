@@ -10,8 +10,8 @@ RSpec.describe ActivitiesSetup::FromParticipation, type: :unit do
 
       expect(Activity.last).to have_attributes(
         receiver_id: 42,
-        title: "Fix me",
-        content: "Fix me, too"
+        title: in_array(I18n.t("activities.session_scheduled.titles")),
+        content: in_array(I18n.t("activities.session_scheduled.content"))
       )
     end
   end

@@ -2,19 +2,138 @@ en:
   activities:
     sent_offer:
       titles:
-        - Offer is on the way.
-        - Offer delivered!
-        - Title Three
+        - Your Offer Has Been Sent!
+        - An Offer Is on Its Way to the Other Side!
+        - You've Made an Offer—Let's See What Happens!
+        - You've Just Sent an Offer. Let's Wait for the Response!
+        - Your Proposal Has Been Delivered!
+        - You've Sent an Offer! Now It's Time to Wait!
+        - Offer Sent! Let's See How They Respond!
+        - The Offer Is Now in Their Hands!
+        - Your Offer Has Been Successfully Sent!
+        - You've Put Your Offer Out There. Fingers Crossed!
       content:
-        text_one:
-          - First
-          - Second
-          - Third
-        text_two:
-          - First
-          - Second
-          - Third
-        text_three:
-          - Warm up your fingers :)
-          - Hope you'll be pairin in no time
-          - Hope you'll get good news soon
+        - You've just sent an offer to your potential match. Let's see if they'll accept it!
+        - Your offer has been sent successfully! Now, it's time to see what comes next.
+        - Congratulations! You've made an offer. Let's wait and see how the other party responds.
+        - Your offer is on its way! Check back soon for their response.
+        - The offer you've sent is now in the hands of your recipient. Stay tuned for updates!
+        - You've sent your offer and the ball is now in their court. We'll notify you once they respond.
+        - Your offer has been delivered successfully! Let's hope for a positive response.
+        - You've made your move! Now all we can do is wait for the response.
+        - The recipient has received your offer! Keep an eye out for their reply.
+        - Your offer is out there! Fingers crossed that they accept!
+    received_offer:
+      titles:
+        - Guess What? You've Got a New Offer!
+        - You've Just Received an Exciting Offer!
+        - A New Offer Is Waiting for You!
+        - Someone Has Made You an Offer!
+        - An Offer Has Just Landed in Your Inbox!
+        - The Wait is Over! You've Got an Offer!
+        - You've Got a New Opportunity to Consider!
+        - A New Offer Just Came in for You!
+        - An Exciting Offer Awaits Your Response!
+        - Someone Just Sent You an Offer!
+      content:
+        - You've received a new offer! Open it now and see what they're offering.
+        - A new offer has arrived! Will you accept or decline it? The choice is yours.
+        - Someone has sent you a great offer! Take a moment to review the details.
+        - You've got a new offer to consider! Check it out and decide if it's right for you.
+        - An offer just landed in your inbox! Don't keep them waiting—review it now!
+        - Your inbox has a new offer! See what opportunities await.
+        - Someone is eager to work with you! Open your offer and explore the possibilities.
+        - You've got an exciting new offer to review! Will you say yes?
+        - A new offer has come in just for you! It's time to take a look and decide.
+        - Take a look! You've received a fresh offer with a potential opportunity.
+    session_scheduled:
+      titles:
+        - Your Session Has Been Scheduled!
+        - It's Official! Your Session Is Set!
+        - Your Upcoming Session is Ready to Go!
+        - The Date is Set for Your Session!
+        - You've Successfully Scheduled a Session!
+        - Mark Your Calendar—Your Session is Coming!
+        - Your Session Is Confirmed and Locked In!
+        - The Session You've Been Waiting for Is Now Scheduled!
+        - Get Ready! Your Session is Booked!
+        - Your Session Has Been Secured!
+      content:
+        - Your session has been scheduled and is confirmed! Be ready for a productive meeting.
+        - Great news! Your session is officially on the calendar. Time to get ready.
+        - Your session is locked in! We'll remind you as the date approaches.
+        - You've successfully scheduled your session. See you there!
+        - Your upcoming session is all set. Prepare for a great experience.
+        - Your session is now officially scheduled! Get ready for a productive meeting.
+        - Your session has been booked! Mark the date and be prepared.
+        - It's official—your session is scheduled! Looking forward to seeing you there.
+        - The session is set! We've reserved your spot, now just get ready for the date.
+        - You're all set for your upcoming session! Don't forget to check the details.
+    offer_accepted:
+      titles:
+        - Success! Your Offer Has Been Accepted!
+        - Great News! Your Offer Was Accepted!
+        - You've Got the Green Light—Offer Accepted!
+        - Your Offer Has Been Given the Thumbs Up!
+        - Congratulations! Your Offer Was Accepted!
+        - You've Sealed the Deal—Offer Accepted!
+        - You've Got the Go-Ahead—Offer Accepted!
+        - The Wait is Over—Your Offer Was Accepted!
+        - Offer Accepted! Time to Celebrate!
+        - The Offer is Officially Accepted!
+      content:
+        - Fantastic! Your offer has been accepted. You're one step closer to success.
+        - Great news! Your offer has been accepted. Let's move forward together!
+        - You did it! Your offer has been accepted. Time to celebrate the win!
+        - Your offer has been given the green light! Ready to move forward?
+        - The recipient has accepted your offer! Let's get started on the next steps.
+        - Congratulations! Your offer was accepted. Time to make things happen!
+        - You've got the green light! Your offer was accepted, and now it's official.
+        - Your offer has been accepted. Time to dive into the details and get to work!
+        - Great news! Your offer was accepted, and things are moving forward.
+    offer_not_accepted:
+      titles:
+        - Oops! Your Offer Was Not Accepted.
+        - Unfortunately, Your Offer Was Declined.
+        - Your Offer Wasn't Accepted—Better Luck Next Time!
+        - Sadly, Your Offer Was Not Accepted.
+        - Your Offer Was Rejected. What's Next?
+        - The Offer Was Not Accepted This Time.
+        - Your Offer Wasn't Accepted, But Keep Trying!
+        - The Answer Is No—Your Offer Was Declined.
+        - Unfortunately, Your Offer Didn't Make It.
+        - Looks Like Your Offer Wasn't Accepted.
+      content:
+        - Unfortunately, your offer wasn't accepted. Don't worry, there's always next time!
+        - The recipient has declined your offer. But don't give up, new opportunities are around the corner.
+        - It looks like your offer wasn't accepted. Stay positive and keep trying!
+        - Sadly, your offer has been rejected. But don't worry, you'll have more chances ahead!
+        - Your offer wasn't accepted, but keep pushing forward—there are more opportunities waiting.
+        - The offer wasn't accepted this time, but it's all part of the journey. Keep moving forward.
+        - Unfortunately, your offer didn't go through. Try again or explore other options.
+        - The recipient declined your offer. Keep refining and try again!
+        - Your offer wasn't accepted, but don't let that stop you. There are more chances to explore.
+        - Looks like your offer didn't make it this time. Stay persistent, and another opportunity will come.
+    pair_request_created:
+      titles:
+        - A New Pair Request is Waiting for You!
+        - Someone Wants to Connect with You!
+        - A New Opportunity is Here!
+        - Your Pairing Request Has Been Sent!
+        - A New Pairing Request Has Arrived!
+        - You've Got a New Request to Pair Up!
+        - Guess What? A New Pairing Request is In!
+        - Your Next Connection is Just One Click Away!
+        - A New Pair Request is Ready for Review!
+        - A Connection Request is Waiting for Your Response!
+      content:
+        - You've received a new pair request! Check it out and decide if you'd like to connect.
+        - Someone has sent you a request to pair up. Are you interested in this new connection?
+        - A new pairing request just came in! Don't wait too long to decide.
+        - You've got a new opportunity to partner up. Open the request and review it now!
+        - A new request has been sent to you. Will you accept this connection or pass?
+        - A potential connection wants to team up with you! Take a moment to see what it's all about.
+        - Someone is eager to work with you! Review the request and make your decision.
+        - New pair request alert! Don't miss out on this chance to connect.
+        - Someone's interested in pairing up with you. Open the request now to see more!
+        - You've got a new request for a connection! Check it out and make your move.

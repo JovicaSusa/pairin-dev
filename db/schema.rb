@@ -18,6 +18,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_06_103522) do
     t.text "content"
     t.bigint "receiver_id", null: false
     t.string "title"
+    t.datetime "seen_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["receiver_id"], name: "index_activities_on_receiver_id"
