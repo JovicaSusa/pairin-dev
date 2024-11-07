@@ -30,7 +30,7 @@ RSpec.describe "generates expected activites", type: :system do
     it "displays expected activity" do
       visit users_pair_requests_path
 
-      click_link "Offers"
+      within("#pair_requests") { click_link "Offers" }
       click_button "Accept"
 
       visit activities_path
@@ -52,6 +52,46 @@ RSpec.describe "generates expected activites", type: :system do
       click_button "Send offer"
 
       visit activities_path
+    end
+  end
+
+  context "when offer accepted" do
+    let(:pair_request) { create(:pair_request) }
+    let(:offer) { build(:offer, offerer: current_user, pair_request:) }
+
+    before do
+      Activity.suppress { offer.save! }
+      Offers::Accept.call(offer)
+    end
+
+    it "displays expected activities" do
+      visit activities_path
+
+      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
+      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.content"))
+      expect(page).to have_one_of_the_texts(I18n.t("activities.offer_accepted.titles"))
+      expect(page).to have_one_of_the_texts(I18n.t("activities.offer_accepted.content"))
+    end
+  end
+
+  context "when offer rejected" do
+    let(:pair_request) { create(:pair_request) }
+    let(:current_user_offer) { build(:offer, offerer: current_user, pair_request:) }
+    let(:accepted_offer) { build(:offer, pair_request:) }
+
+    before do
+      Activity.suppress do
+        current_user_offer.save!
+        accepted_offer.save!
+      end
+      accepted_offer.update!(accepted_at: Time.zone.now)
+    end
+
+    it "displays expected activities" do
+      visit activities_path
+
+      expect(page).to have_one_of_the_texts(I18n.t("activities.offer_not_accepted.titles"))
+      expect(page).to have_one_of_the_texts(I18n.t("activities.offer_not_accepted.content"))
     end
   end
 end
