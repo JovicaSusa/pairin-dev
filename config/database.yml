@@ -78,7 +78,12 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  database: pairin_production
-  username: pairin
-  password: <%= ENV["PAIRIN_DATABASE_PASSWORD"] %>
+  primary: &primary_production
+    <<: *default
+    database: pairin_production
+    username: pairin
+    password: <%= ENV["PAIRIN_DATABASE_PASSWORD"] %>
+  queue:
+    <<: *primary_production
+    database: pairin_production_queue
+    migrations_paths: db/queue_migrate
