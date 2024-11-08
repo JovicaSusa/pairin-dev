@@ -1,4 +1,6 @@
 class PairRequest < ApplicationRecord
+  include ActivityGeneratable
+
   belongs_to :user
   has_many :offers, dependent: nil # TODO: Reconsider
   has_many :periods, as: :periodable, dependent: :destroy
