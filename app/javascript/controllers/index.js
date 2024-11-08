@@ -24,3 +24,6 @@ application.register('read-more', ReadMore)
 
 import HwComboboxController from "@josefarias/hotwire_combobox"
 application.register("hw-combobox", HwComboboxController)
+
+import Dropdown from '@stimulus-components/dropdown'
+application.register('dropdown', Dropdown)

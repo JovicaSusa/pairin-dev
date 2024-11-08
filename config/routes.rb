@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   root "home#index"
 
   resources :sessions, only: [:index]
+  resources :profiles, only: [:show, :update]
 
   resources :pair_requests, only: [:index] do
     scope module: 'pair_requests' do
