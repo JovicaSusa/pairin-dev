@@ -7,4 +7,9 @@ class Offer < ApplicationRecord
   validates :pair_request_id, uniqueness: { scope: :offerer_id }
 
   scope :future, -> { joins(:period).merge(Period.future) }
+  scope :accepted, -> { where.not(accepted_at: nil) }
+
+  def accepted?
+    accepted_at?
+  end
 end

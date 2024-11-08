@@ -5,5 +5,9 @@ FactoryBot.define do
     period_id { pair_request.periods.first&.id }
 
     message { Faker::Lorem.sentence(word_count: 5) }
+
+    trait :accepted do
+      accepted_at { Time.current }
+    end
   end
 end
