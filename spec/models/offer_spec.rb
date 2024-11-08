@@ -20,4 +20,13 @@ RSpec.describe Offer, type: :model do
       end
     end
   end
+
+  describe ".accepted" do
+    subject(:accepted) { described_class.accepted }
+
+    let!(:accepted_offer) { create(:offer, :accepted) }
+    let!(:not_accepted_offer) { create(:offer) }
+
+    it { is_expected.to contain_exactly(accepted_offer) }
+  end
 end

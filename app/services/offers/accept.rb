@@ -9,7 +9,7 @@ module Offers
     def self.call(...) = new(...).call
 
     def call
-      return Failure(:another_offer_accepted) if pair_request.has_accepted_offer?
+      return Failure(:no_longer_acceptable) if pair_request.has_accepted_offer?
 
       ApplicationRecord.transaction do
         offer.update!(accepted_at: Time.current)
