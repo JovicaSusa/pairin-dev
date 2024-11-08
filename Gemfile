@@ -69,6 +69,7 @@ end
 
 group :test do
   gem "capybara-screenshot"
+  gem "cuprite"
 end
 
 group :development do
