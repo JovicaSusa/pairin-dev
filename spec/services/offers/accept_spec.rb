@@ -35,17 +35,27 @@ RSpec.describe Offers::Accept, type: :unit do
     end
 
     context "when failure" do
-      before { allow(Session).to receive(:create!).and_raise(ActiveRecord::RecordInvalid) }
+      context "when pair request already have accepted offer" do
+        before { create(:offer, :accepted, pair_request: offer.pair_request) }
 
-      it "returns failure" do
-        expect(call.success?).to be false
+        it "returns failure" do
+          expect(call.success?).to be false
+        end
       end
 
-      it "doesn't create none of records" do
-        expect { call }
-          .to not_change { offer.reload.accepted_at }.from(nil)
-          .and not_change { Session.count }
-          .and not_change { Participation.count }
+      context "when there's an error" do
+        before { allow(Session).to receive(:create!).and_raise(ActiveRecord::RecordInvalid) }
+
+        it "returns failure" do
+          expect(call.success?).to be false
+        end
+
+        it "doesn't create none of records" do
+          expect { call }
+            .to not_change { offer.reload.accepted_at }.from(nil)
+            .and not_change { Session.count }
+            .and not_change { Participation.count }
+        end
       end
     end
   end
