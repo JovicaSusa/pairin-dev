@@ -3,8 +3,8 @@
 
   <div class="md:flex md:flex-col md:items-center px-4 mt-8">
     <% @offers.each do |offer| %>
-      <div class="relative bg-blue-100 md:w-1/2 rounded-md mb-8">
-        <% if offer.pair_request.has_accepted_offer? && !offer.accepted? %>
+      <div class="relative bg-blue-100 md:w-1/2 rounded-md mb-8 border-2 border-black">
+        <% if display_overlay?(offer) %>
           <div class="absolute w-full h-full bg-black opacity-20"></div>
         <% end %>
         <div class="border-black border-b-2 px-4 text-left pt-2 pb-4">

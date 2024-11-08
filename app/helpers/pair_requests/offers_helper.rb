@@ -1,5 +1,9 @@
 module PairRequests::OffersHelper
   def hide_accept_btn?(offer)
-    offer.accepted? || offer.pair_request.has_accepted_offer?
+    offer.pair_request.has_accepted_offer?
+  end
+
+  def display_overlay?(offer)
+    offer.pair_request.has_accepted_offer? && !offer.accepted?
   end
 end
