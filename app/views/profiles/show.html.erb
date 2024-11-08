@@ -1,0 +1,40 @@
+<div>
+  <%= simple_form_for(
+    @user,
+    url: profile_path(@user.id),
+    html: { class: "flex flex-col items-center" }
+  ) do |f| %>
+    <%= f.combobox :language,
+      I18nData.languages.invert.to_a,
+      input_html: {
+        class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+      }
+    %>
+    <%= f.input :about,
+      type: :text,
+      input_html: {
+        class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+      }
+    %>
+    <%= f.input :date_of_birth,
+      as: :string,
+      input_html: {
+        data: { controller: "datepicker" },
+        class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+      }
+    %>
+    <%= f.combobox :level,
+      User::LEVELS.map { |l| [l.capitalize, l] } %>
+    <%= f.combobox :country,
+      I18nData.countries.invert.to_a %>
+    <%= f.input :programming_since,
+      as: :string,
+      input_html: {
+        data: { controller: "datepicker" },
+        class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+      }
+    %>
+
+    <%= f.button :submit, "Save Changes", class: "mt-6 flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
+  <% end %>
+</div>

@@ -87,3 +87,7 @@ end
 gem "devise", "~> 4.9"
 
 gem "pagy", "~> 6.2"
+
+gem "i18n_data", "~> 1.1"
+
+gem "shrine", "~> 3.6"
