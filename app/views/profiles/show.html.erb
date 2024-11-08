@@ -1,4 +1,7 @@
 <div>
+  <% if @user.image_url %>
+    <%= image_tag @user.image_url(:small) %>
+  <% end %>
   <%= simple_form_for(
     @user,
     url: profile_path(@user.id),
@@ -20,6 +23,13 @@
       as: :string,
       input_html: {
         data: { controller: "datepicker" },
+        class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+      }
+    %>
+    <%= f.hidden_field :image, value: @user.cached_image_data, id: nil %>
+    <%= f.input :image,
+      as: :file,
+      input_html: {
         class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
       }
     %>

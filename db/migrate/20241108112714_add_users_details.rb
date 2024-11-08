@@ -7,6 +7,7 @@ class AddUsersDetails < ActiveRecord::Migration[7.1]
       t.datetime :date_of_birth
       t.string :level
       t.datetime :programming_since
+      t.text :image_data
     end
   end
 end

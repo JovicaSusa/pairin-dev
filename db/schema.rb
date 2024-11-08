@@ -100,6 +100,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_08_112714) do
     t.datetime "date_of_birth"
     t.string "level"
     t.datetime "programming_since"
+    t.text "image_data"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["language"], name: "index_users_on_language"

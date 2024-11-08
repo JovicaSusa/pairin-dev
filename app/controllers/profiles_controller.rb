@@ -15,7 +15,7 @@ class ProfilesController < ApplicationController
 
   def profile_attributes
     params.require(:user).permit(
-      :about, :programming_since, :date_of_birth, :country, :language, :level
+      :about, :programming_since, :date_of_birth, :country, :language, :level, :image
     )
   end
 end
