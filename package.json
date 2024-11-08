@@ -6,6 +6,7 @@
     "@hotwired/turbo-rails": "^7.3.0",
     "@josefarias/hotwire_combobox": "^0.3.2",
     "@stimulus-components/read-more": "^5.0.0",
+    "@stimulus-components/reveal": "^5.0.0",
     "autoprefixer": "^10.4.16",
     "esbuild": "^0.19.7",
     "flatpickr": "^4.6.13",

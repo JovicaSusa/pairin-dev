@@ -4,11 +4,13 @@ class ProfilesController < ApplicationController
   end
 
   def update
-    user = User.find(params[:id])
+    @user = User.find(params[:id])
 
-    user.update!(profile_attributes)
-
-    redirect_to profile_url(user.id), notice: "You're profile has been updated!"
+    if @user.update(profile_attributes)
+      redirect_to profile_url(@user.id), notice: "You're profile has been updated!"
+    else
+      render :show, status: :unprocessable_entity
+    end
   end
 
   private
