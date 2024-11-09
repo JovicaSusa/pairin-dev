@@ -102,8 +102,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_08_112714) do
     t.datetime "programming_since"
     t.text "image_data"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
+    t.index ["country"], name: "index_users_on_country"
+    t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["language"], name: "index_users_on_language"
+    t.index ["programming_since"], name: "index_users_on_programming_since"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
