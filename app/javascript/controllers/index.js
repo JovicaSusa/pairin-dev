@@ -16,9 +16,6 @@ application.register("removals", RemovalsController)
 import NestedForm from "stimulus-rails-nested-form"
 application.register("nested-form", NestedForm)
 
-import SearchableSelectController from "./searchable_select_controller"
-application.register("searchable-select", SearchableSelectController)
-
 import ReadMore from "./read_more_controller"
 application.register('read-more', ReadMore)
 

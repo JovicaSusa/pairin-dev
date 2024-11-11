@@ -92,3 +92,5 @@ gem "i18n_data", "~> 1.1"
 
 gem "shrine", "~> 3.6"
 gem "image_processing", "~> 1.8"
+
+gem "ransack", "~> 4.2"

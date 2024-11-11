@@ -16,4 +16,10 @@ class User < ApplicationRecord
   validates :language, inclusion: { in: I18nData.languages.keys }, allow_nil: true
   validates :country, inclusion: { in: I18nData.countries.keys }, allow_nil: true
   validates :level, inclusion: { in: LEVELS }, allow_nil: true
+
+  class << self
+    def ransackable_attributes(auth_object=nil)
+      ["level", "language"]
+    end
+  end
 end

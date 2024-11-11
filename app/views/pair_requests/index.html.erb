@@ -1,17 +1,21 @@
-<div class="flex justify-center">
-  <%= simple_form_for :query, url: search_pair_requests_path, method: :get do |f| %>
-    <%= f.input :tag,
-                collection: Tag.all.map { |p| [p.name, p.name] },
-                label: false,
-                input_html: { multiple: true, data: { controller: "searchable-select" } } %>
+<div class="flex flex-col items-center">
+  <div class="mb-8">
+    <%= simple_form_for @q, url: search_pair_requests_path, method: :get do |f| %>
+      <%= f.combobox :tags_name_eq, Tag.all.map { |p| [p.name, p.name] } %>
+      <%= f.input :duration_eq %>
+      <%= f.combobox :user_level_eq, User::LEVELS.map { |p| [p, p.capitalize] } %>
+      <%= f.combobox :user_language_eq, I18nData.languages.map { |p, v| [v, p] } %>
+      <%= f.input :periods_start_at_gteq, as: :string, input_html: { data: { controller: "datepicker" } } %>
+      <%= f.input :periods_end_at_lteq, as: :string, input_html: { data: { controller: "datepicker" } } %>
 
-    <%= f.submit "Go", data: { turbo_frame: "pair-requests" } %>
-  <% end %>
+      <%= f.submit "Go", data: { turbo_frame: "pair-requests" } %>
+    <% end %>
+  </div>
 
   <%= turbo_frame_tag "pair-requests" do %>
     <div class="grid grid-rows-<%= @pair_requests.count %> gap-y-4 md:w-1/2 mt-6 px-2">
       <%= render @pair_requests %>
-      <%= render partial: "next_page" %>
+      <%= render partial: "pair_requests/next_page" %>
     </div>
   <% end %>
 </div>
