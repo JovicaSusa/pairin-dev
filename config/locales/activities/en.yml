@@ -97,7 +97,7 @@ en:
         - Unfortunately, Your Offer Was Declined.
         - Your Offer Wasn't Accepted—Better Luck Next Time!
         - Sadly, Your Offer Was Not Accepted.
-        - Your Offer Was Rejected. What's Next?
+        - Your Offer Was Rejected.
         - The Offer Was Not Accepted This Time.
         - Your Offer Wasn't Accepted, But Keep Trying!
         - The Answer Is No—Your Offer Was Declined.
@@ -116,24 +116,6 @@ en:
         - Looks like your offer didn't make it this time. Stay persistent, and another opportunity will come.
     pair_request_created:
       titles:
-        - A New Pair Request is Waiting for You!
-        - Someone Wants to Connect with You!
-        - A New Opportunity is Here!
-        - Your Pairing Request Has Been Sent!
-        - A New Pairing Request Has Arrived!
-        - You've Got a New Request to Pair Up!
-        - Guess What? A New Pairing Request is In!
-        - Your Next Connection is Just One Click Away!
-        - A New Pair Request is Ready for Review!
-        - A Connection Request is Waiting for Your Response!
+        - Your pair request is now live!
       content:
-        - You've received a new pair request! Check it out and decide if you'd like to connect.
-        - Someone has sent you a request to pair up. Are you interested in this new connection?
-        - A new pairing request just came in! Don't wait too long to decide.
-        - You've got a new opportunity to partner up. Open the request and review it now!
-        - A new request has been sent to you. Will you accept this connection or pass?
-        - A potential connection wants to team up with you! Take a moment to see what it's all about.
-        - Someone is eager to work with you! Review the request and make your decision.
-        - New pair request alert! Don't miss out on this chance to connect.
-        - Someone's interested in pairing up with you. Open the request now to see more!
-        - You've got a new request for a connection! Check it out and make your move.
+        - Thanks for keeping community alive. Hope you'll get first responses soon!
