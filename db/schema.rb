@@ -14,6 +14,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_08_112714) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "activities", force: :cascade do |t|
+    t.text "content"
+    t.bigint "receiver_id", null: false
+    t.string "title"
+    t.datetime "seen_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["receiver_id"], name: "index_activities_on_receiver_id"
+  end
+
   create_table "offers", force: :cascade do |t|
     t.bigint "offerer_id", null: false
     t.bigint "pair_request_id", null: false
@@ -110,6 +120,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_08_112714) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "activities", "users", column: "receiver_id"
   add_foreign_key "offers", "pair_requests"
   add_foreign_key "offers", "users", column: "offerer_id"
   add_foreign_key "pair_requests", "users"

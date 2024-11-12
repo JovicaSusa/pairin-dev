@@ -1,4 +1,6 @@
 class Offer < ApplicationRecord
+  include ActivityGeneratable
+
   belongs_to :offerer, class_name: "User"
   belongs_to :pair_request
   belongs_to :period

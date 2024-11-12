@@ -1,4 +1,6 @@
 RSpec.describe PairRequest, type: :model do
+  it_behaves_like "activity generatable", :pair_request
+
   describe "#has_accepted_offer?" do
     subject(:has_accepted_offer?) { pair_request.has_accepted_offer? }
 
