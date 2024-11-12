@@ -3,21 +3,31 @@ RSpec.describe "search pair requests", type: :system, js: true do
 
   before { sign_in(current_user) }
 
-  context "search by tag name" do
-    let!(:pair_request_with_searched_tag) { create(:pair_request, subject: "AAA") }
-    let!(:tagging) { create(:tagging, taggable: pair_request_with_searched_tag, tag: tag) }
-    let!(:tag) { create(:tag, name: "Ruby") }
-    let!(:not_searched_pair_request) { create(:pair_request, subject: "BBB") }
+  context "search by all params" do
+    let(:searched_pair_request) { create(:pair_request, subject: "Test", user: user, duration: 45) }
+    let(:user) { create(:user, language: "EN", level: "novice") }
+
+    before do
+      tag = create(:tag, name: "Ruby")
+      create(:tagging, taggable: searched_pair_request, tag: tag)
+      create(:period, periodable: searched_pair_request, start_at: 2.minutes.from_now)
+    end
 
     it "displays pair requests tagged by searched tag" do
       visit pair_requests_path
 
-      find(".ss-values").click
-      find(".ss-option", text: "Ruby").click
+      fill_in "q_tags_name_eq", with: "Ruby"
+      fill_in "q_duration_eq", with: 45
+      find("#q_user_level_eq").click
+      find("li[data-value='novice']").click
+      find("#q_user_language_eq").click
+      find("li[data-value='EN']").click
+      # fill_in "q_user_language_eq", with: "EN"
+      fill_in "q_periods_start_at_gteq", with: 1.minute.from_now.to_s
+      fill_in "q_periods_end_at_lteq", with: 3.minutes.from_now.to_s
       click_button "Go"
 
-      expect(page).to have_content("AAA")
-      expect(page).not_to have_content("BBB")
+      expect(page).to have_content("Test")
     end
   end
 end

@@ -8,6 +8,12 @@ class Period < ApplicationRecord
 
   scope :future, -> { where(start_at: Time.zone.now..) }
 
+  class << self
+    def ransackable_attributes(auth_object=nil)
+      ["start_at", "end_at"]
+    end
+  end
+
   private
 
   def set_end_at
