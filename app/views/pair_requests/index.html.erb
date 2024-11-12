@@ -3,7 +3,7 @@
     <%= simple_form_for @q, url: search_pair_requests_path, method: :get do |f| %>
       <%= f.combobox :tags_name_eq, Tag.all.map { |p| [p.name, p.name] } %>
       <%= f.input :duration_eq %>
-      <%= f.combobox :user_level_eq, User::LEVELS.map { |p| [p, p.capitalize] } %>
+      <%= f.combobox :user_level_eq, User::LEVELS.map { |p| [p.titleize, p] } %>
       <%= f.combobox :user_language_eq, I18nData.languages.map { |p, v| [v, p] } %>
       <%= f.input :periods_start_at_gteq, as: :string, input_html: { data: { controller: "datepicker" } } %>
       <%= f.input :periods_end_at_lteq, as: :string, input_html: { data: { controller: "datepicker" } } %>
