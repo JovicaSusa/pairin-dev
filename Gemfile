@@ -69,6 +69,7 @@ end
 
 group :test do
   gem "capybara-screenshot"
+  gem "cuprite"
 end
 
 group :development do
@@ -90,3 +91,9 @@ gem "pagy", "~> 6.2"
 gem "solid_queue", "~> 0.3.1"
 
 gem "mission_control-jobs", "~> 0.2.1"
+gem "i18n_data", "~> 1.1"
+
+gem "shrine", "~> 3.6"
+gem "image_processing", "~> 1.8"
+
+gem "ransack", "~> 4.2"

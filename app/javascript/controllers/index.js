@@ -16,11 +16,14 @@ application.register("removals", RemovalsController)
 import NestedForm from "stimulus-rails-nested-form"
 application.register("nested-form", NestedForm)
 
-import SearchableSelectController from "./searchable_select_controller"
-application.register("searchable-select", SearchableSelectController)
-
 import ReadMore from "./read_more_controller"
 application.register('read-more', ReadMore)
 
 import HwComboboxController from "@josefarias/hotwire_combobox"
 application.register("hw-combobox", HwComboboxController)
+
+import Dropdown from '@stimulus-components/dropdown'
+application.register('dropdown', Dropdown)
+
+import RevealController from '@stimulus-components/reveal'
+application.register('reveal', RevealController)

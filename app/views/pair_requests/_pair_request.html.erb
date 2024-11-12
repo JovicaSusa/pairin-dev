@@ -12,7 +12,7 @@
       </div>
     <% end %>
   </div>
-  <div class="">
+  <div>
     <% if pair_request.offers.pluck(:offerer_id).include?(current_user.id) %>
       <p>You have already sent an offer</p>
     <% else %>

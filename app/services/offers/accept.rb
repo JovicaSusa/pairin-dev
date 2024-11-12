@@ -9,6 +9,8 @@ module Offers
     def self.call(...) = new(...).call
 
     def call
+      return Failure(:no_longer_acceptable) if pair_request.has_accepted_offer?
+
       ApplicationRecord.transaction do
         offer.update!(accepted_at: Time.current)
 

@@ -1,0 +1,88 @@
+<div class="flex justify-center">
+  <div class="w-1/2">
+    <%= simple_form_for(
+      @user,
+      url: profile_path(@user.id),
+      html: { class: "flex flex-col items-center" }
+    ) do |f| %>
+      <% if @user.image %>
+        <div class="w-32 h-32 border-black border-4 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+          <%= image_tag @user.image_url(:small) %>
+        </div>
+      <% end %>
+
+      <div data-controller="reveal">
+        <button data-action="click->reveal#toggle" type="button" class="btn">Upload Image</button>
+
+        <%= f.hidden_field :image, value: @user.cached_image_data, id: nil %>
+        <%= f.input :image,
+          as: :file,
+          input_html: {
+            class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+          },
+          wrapper_html: {
+            class: "hidden",
+            data: {
+              "reveal-target": "item"
+            },
+          }
+        %>
+      </div>
+
+      <%= f.input :about,
+        type: :text,
+        input_html: {
+          class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+        },
+        wrapper_html: {
+          class: "w-full"
+        }
+      %>
+      <div class="w-full flex">
+        <%= f.input :date_of_birth,
+          as: :string,
+          input_html: {
+            data: { controller: "datepicker" },
+            class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+          },
+          wrapper_html: {
+            class: "w-1/2 mr-2"
+          }
+        %>
+        <%= f.input :programming_since,
+          as: :string,
+          input_html: {
+            data: { controller: "datepicker" },
+            class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+          },
+          wrapper_html: {
+            class: "w-1/2 ml-2"
+          }
+        %>
+      </div>
+      <div class="flex mt-4">
+        <div class="w-1/3">
+          <%= f.combobox :language,
+            I18nData.languages.invert.to_a,
+            input_html: {
+              class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+            }
+          %>
+        </div>
+        <div class="w-1/3">
+          <%= f.combobox :country,
+            I18nData.countries.invert.to_a %>
+        </div>
+        <div class="w-1/3">
+          <%= f.combobox :level,
+            User::LEVELS.map { |l| [l.capitalize, l] } %>
+        </div>
+      </div>
+
+      <%= f.button :submit,
+        "Save Changes",
+        class: "mt-6 flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+      %>
+    <% end %>
+  </div>
+</div>

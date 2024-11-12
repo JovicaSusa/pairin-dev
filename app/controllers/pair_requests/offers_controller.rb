@@ -1,6 +1,6 @@
 class PairRequests::OffersController < ApplicationController
   def index
-    @offers = Offer.where(pair_request_id: params[:pair_request_id]).future
+    @offers = Offer.where(pair_request_id: params[:pair_request_id]).future.order(:accepted_at)
   end
 
   def new
