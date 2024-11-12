@@ -4,6 +4,10 @@ FactoryBot.define do
 
     message { Faker::Lorem.sentence(word_count: 5) }
 
+    trait :accepted do
+      accepted_at { Time.current }
+    end
+
     after(:build) do |offer|
       pair_request = create(:pair_request)
       period = create(:period, periodable: pair_request)
