@@ -22,4 +22,7 @@
       <%= link_to "Profile", profile_path(current_user&.id), class: "uppercase font-handwritten" %>
     </div>
   <% end %>
+  <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+    <%= link_to "Log out", destroy_user_session_path, "data-turbo-method": :delete, class: "uppercase font-handwritten" %>
+  </div>
 </aside>

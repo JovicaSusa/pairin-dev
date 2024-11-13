@@ -1,4 +1,6 @@
 class ProfilesController < ApplicationController
+  include Authenticated
+
   def show
     @user = current_user
   end

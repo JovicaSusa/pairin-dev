@@ -1,6 +1,12 @@
 class PairRequests::OffersController < ApplicationController
+  include Authenticated
+
   def index
-    @offers = Offer.where(pair_request_id: params[:pair_request_id]).future.order(:accepted_at)
+    pair_request = current_user.pair_requests.find_by(id: params[:pair_request_id])
+
+    authorize pair_request, policy_class: PairRequests::OfferPolicy
+
+    @offers = pair_request.offers.future.order(:accepted_at)
   end
 
   def new
@@ -23,6 +29,8 @@ class PairRequests::OffersController < ApplicationController
 
   def accept
     offer = Offer.find(params[:id])
+
+    authorize offer, policy_class: PairRequests::OfferPolicy
 
     Offers::Accept
       .call(offer)
