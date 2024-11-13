@@ -88,7 +88,7 @@ gem "devise", "~> 4.9"
 
 gem "pagy", "~> 6.2"
 
-gem "solid_queue", "~> 0.3.1"
+gem "solid_queue", ">= 1.0"
 
 gem "mission_control-jobs", "~> 0.2.1"
 gem "i18n_data", "~> 1.1"
