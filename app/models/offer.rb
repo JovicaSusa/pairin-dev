@@ -14,4 +14,20 @@ class Offer < ApplicationRecord
   def accepted?
     accepted_at?
   end
+
+  def expired?
+    period.start_at > Time.current
+  end
+
+  def status
+    if accepted?
+      "ACCEPTED"
+    elsif pair_request.has_accepted_offer?
+      "ACCEPTED OTHER"
+    elsif expired?
+      "EXPIRED"
+    else
+      "PENDING"
+    end
+  end
 end

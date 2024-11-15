@@ -39,11 +39,11 @@
       </figure>
 
       <div>
-        <p><%= pair_request.user.email %></p>
+        <p><%= pair_request.user.name %></p>
         <span class="text-sm">
-          <%= pair_request.user.country %>
+          <%= pair_request.user.profession %>
           <span class="text-xl font-bold">.</span>
-          <%= pair_request.user.level %>
+          <%= pair_request.user.level.titleize %>
         </span>
       </div>
     </div>

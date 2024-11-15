@@ -4,7 +4,7 @@
       <div class="w-32 h-32 border-black border-4 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
         <%= image_tag @user.image_url %>
       </div>
-      <h3 class="text-5xl font-bold"><%= @user.email %></h3>
+      <h3 class="text-5xl font-bold"><%= @user.name %></h3>
     </div>
 
     <%= simple_form_for(
@@ -30,13 +30,32 @@
         %>
       </div>
 
+      <div class="w-full flex mt-4 gap-x-4">
+        <%= f.input :name,
+          input_html: {
+            class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+          },
+          wrapper_html: {
+            class: "w-1/2"
+          }
+        %>
+        <%= f.input :profession,
+          input_html: {
+            class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+          },
+          wrapper_html: {
+            class: "w-1/2"
+          }
+        %>
+      </div>
+
       <%= f.input :about,
         type: :text,
         input_html: {
           class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
         },
         wrapper_html: {
-          class: "w-full"
+          class: "w-full mt-4"
         }
       %>
 

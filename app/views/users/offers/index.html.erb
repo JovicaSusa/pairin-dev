@@ -7,16 +7,34 @@
     <div class="mt-12">
       <% @offers.each do |offer| %>
         <div class="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div class="border-b-2 border-black py-4 px-2 rounded-t-md bg-green">
-            <div class="px-2 py-1">
-              <p>
-                <span class="font-bold">Pair Programming Request:</span>
-                <%= offer.pair_request.subject %>
-              </p>
-              <p>
-                <span class="font-bold">Selected Period:</span>
-                <%= offer.period.start_at.to_fs(:short) %> - <%= offer.period.end_at.to_fs(:short) %>
-              </p>
+          <div class="flex gap-x-2 border-b-2 border-black py-4 px-2 rounded-t-md bg-green">
+            <div class="w-1/2">
+              <div>
+                <p class="font-bold"><%= offer.pair_request.subject %></p>
+              </div>
+              <div class="flex items-center gap-x-2 pt-2">
+                <div class="rounded-xl text-sm border-2 border-black bg-orange px-2 font-semibold">
+                  <%= offer.period.start_at.to_fs(:short) %>
+                </div>
+                <span class="block font-bold">:</span>
+                <div class="rounded-xl text-sm border-2 border-black bg-orange px-2 font-semibold">
+                  <%= offer.period.end_at.to_fs(:short) %>
+                </div>
+              </div>
+            </div>
+            <div class="w-1/2 flex items-center gap-x-2">
+              <figure class="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
+                <%= image_tag offer.pair_request.user.image_url %>
+              </figure>
+
+              <div>
+                <p><%= offer.pair_request.user.name %></p>
+                <span class="text-sm">
+                  <%= offer.pair_request.user.profession %>
+                  <span class="text-xl font-bold">.</span>
+                  <%= offer.pair_request.user.level.titleize %>
+                </span>
+              </div>
             </div>
           </div>
           <div
@@ -27,6 +45,9 @@
           >
             <p class="read-more-content" data-read-more-target="content"><%= offer.message %></p>
             <button data-read-more-target="btn" data-action="read-more#toggle">Read more</button>
+          </div>
+          <div class="flex justify-end px-2">
+            <div class="border-2 border-black rounded-xl px-2"><%= offer.status %></div>
           </div>
         </div>
       <% end %>

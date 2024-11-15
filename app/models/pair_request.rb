@@ -8,9 +8,10 @@ class PairRequest < ApplicationRecord
   has_many :taggings, as: :taggable
   has_many :tags, through: :taggings
 
-
   validates :description, :subject, :duration, presence: true
   validates :duration, numericality: { greater_than: 0 }
+
+  scope :active, -> { joins(:periods).merge(Period.future) }
 
   accepts_nested_attributes_for :periods, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :taggings, reject_if: :all_blank, allow_destroy: true
