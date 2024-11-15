@@ -112,7 +112,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_15_082033) do
     t.datetime "programming_since"
     t.text "image_data"
     t.string "name"
-    t.string "title"
+    t.string "profession"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["country"], name: "index_users_on_country"
     t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
