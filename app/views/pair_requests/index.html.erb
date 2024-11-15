@@ -1,21 +1,78 @@
 <div class="flex flex-col items-center">
-  <div class="mb-8">
-    <%= simple_form_for @q, url: search_pair_requests_path, method: :get do |f| %>
-      <%= f.combobox :tags_name_eq, Tag.all.map { |p| [p.name, p.name] } %>
-      <%= f.input :duration_eq %>
-      <%= f.combobox :user_level_eq, User::LEVELS.map { |p| [p.titleize, p] } %>
-      <%= f.combobox :user_language_eq, I18nData.languages.map { |p, v| [v, p] } %>
-      <%= f.input :periods_start_at_gteq, as: :string, input_html: { data: { controller: "datepicker" } } %>
-      <%= f.input :periods_end_at_lteq, as: :string, input_html: { data: { controller: "datepicker" } } %>
-
-      <%= f.submit "Go", data: { turbo_frame: "pair-requests" } %>
-    <% end %>
-  </div>
-
-  <%= turbo_frame_tag "pair-requests" do %>
-    <div class="grid grid-rows-<%= @pair_requests.count %> gap-y-4 md:w-1/2 mt-6 px-2">
-      <%= render @pair_requests %>
-      <%= render partial: "pair_requests/next_page" %>
+  <div class="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
+    <div class="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed text-center">
+      <h3 class="text-5xl font-bold">Pair Programming Requests</h3>
     </div>
-  <% end %>
+
+    <div data-controller="reveal">
+      <button data-action="click->reveal#toggle" type="button" class="btn">filter</button>
+
+      <div data-reveal-target="item" class="hidden">
+        <%= simple_form_for @q, url: search_pair_requests_path, method: :get, html: { class: "md:flex md:flex-wrap md:justify-between md:gap-y-4" } do |f| %>
+          <div class="md:w-5/12">
+            <%= f.label :tags_name_eq, "Tags" %>
+            <%= f.combobox :tags_name_eq, Tag.all.map { |p| [p.name, p.name] } %>
+          </div>
+
+          <div class="md:w-5/12">
+            <%= f.input :duration_eq,
+              label: "Duration",
+              required: false,
+              input_html: {
+                class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+              }
+            %>
+          </div>
+          <div class="md:w-5/12">
+            <%= f.label :user_level_eq, "User level" %>
+            <%= f.combobox :user_level_eq, User::LEVELS.map { |p| [p.titleize, p] } %>
+          </div>
+          <div class="md:w-5/12">
+            <%= f.label :user_language_eq, "User language" %>
+            <%= f.combobox :user_language_eq, I18nData.languages.map { |p, v| [v, p] } %>
+          </div>
+          <div class="md:w-5/12">
+            <%= f.input :periods_start_at_gteq,
+              as: :string,
+              label: "Session starting from",
+              required: false,
+              input_html: {
+                data: {
+                  controller: "datepicker",
+                  class: "w-full rounded-md border-2  p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+                }
+              }
+            %>
+          </div>
+          <div class="md:w-5/12">
+            <%= f.input :periods_end_at_lteq,
+              as: :string,
+              required: false,
+              label: "Session starting to",
+              input_html: {
+                data: {
+                  controller: "datepicker",
+                  class: "w-full rounded-md border-2  p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+                }
+              }
+            %>
+          </div>
+
+          <div class="md:w-full flex justify-center">
+            <%= f.submit "Go",
+              data: { turbo_frame: "pair-requests" },
+              class: "mt-6 flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+            %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="mt-12">
+      <%= turbo_frame_tag "pair-requests" do %>
+        <%= render @pair_requests %>
+        <%= render partial: "pair_requests/next_page" %>
+      <% end %>
+    </div>
+  </div>
 </div>

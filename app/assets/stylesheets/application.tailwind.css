@@ -1,6 +1,6 @@
 @import 'flatpickr/dist/themes/confetti.css';
-@import "slim-select/dist/slimselect.css";
-@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600&family=Work+Sans:wght@400;500;600;800&family=Yellowtail&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600&family=Work+Sans:wght@400;500;600;800');
+@import '@stimulus-components/reveal/src/app.css';
 
 @tailwind base;
 @tailwind components;
@@ -19,4 +19,52 @@ html {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: var(--read-more-line-clamp, 2)
+}
+
+.input-primary {
+  @apply w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none;
+}
+
+.hw-combobox__input {
+  border-radius: 0.375rem;
+  border-width: 2px;
+  border-color: #000000;
+  outline-style: none;
+  width: 100%;
+  font-weight: 700;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+  padding: 10px;
+}
+
+.hw-combobox__input:focus,
+.hw-combobox__input:focus-visible,
+.hw-combobox__input:focus-within {
+  border: none;
+  outline-style: none;
+}
+
+.hw-combobox__main__wrapper {
+  width: 100%;
+  border-width: 2px;
+  border-color: #000000;
+  position: relative;
+  background-color: white;
+  padding: 0 calc(var(--hw-handle-width) + var(--hw-padding--slimmer)) 0 var(--hw-padding--thick);
+  --tw-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+  --tw-shadow-colored: 4px 4px 0px 0px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+
+  &:focus-within {
+    box-shadow: none
+  }
+
+  &:has(.hw-combobox__input--invalid) {
+    box-shadow: none
+  }
+}
+
+.hw-combobox {
+  width: 100%;
 }

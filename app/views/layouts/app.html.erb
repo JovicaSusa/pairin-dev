@@ -12,13 +12,13 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   </head>
 
-  <body class="bg-[#c9dcd8]">
-    <div class="overflow-y-scroll h-screen flex">
-      <div class="w-2/12">
+  <body class="bg-yellow-50">
+    <div class="overflow-y-scroll h-screen md:flex">
+      <div class="md:w-2/12">
         <%= render "layouts/nav" %>
       </div>
 
-      <div class="w-10/12">
+      <div class="md:w-10/12 px-4">
         <div class="flash">
           <%= render "layouts/flash" %>
         </div>
