@@ -16,7 +16,7 @@ class Offer < ApplicationRecord
   end
 
   def expired?
-    period.start_at > Time.current
+    period.start_at < Time.current
   end
 
   def status

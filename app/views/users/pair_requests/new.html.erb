@@ -9,83 +9,85 @@
       url: users_pair_requests_path,
       html: { class: "flex flex-col items-center pb-12 mt-12 border-b-4 border-dashed border-black" }
     ) do |f| %>
-    <div class="flex w-full gap-x-4">
-      <%= f.input :subject,
-        required: false,
-        wrapper_html: {
-          class: "w-3/4"
-        },
-        input_html: {
-          class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-        }
-      %>
-      <%= f.input :duration,
-        required: false,
-        wrapper_html: {
-          class: "w-1/4"
-        },
-        input_html: {
-          class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-        }
-      %>
-    </div>
-    <div class="w-full">
-      <%= f.input :description,
-        required: false,
-        as: :text,
-        wrapper_html: {
-          class: "w-full mt-4"
-        },
-        input_html: {
-          class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-        }
-      %>
-    </div>
+      <div class="flex w-full gap-x-4">
+        <%= f.input :subject,
+          required: false,
+          wrapper_html: {
+            class: "w-3/4"
+          },
+          input_html: {
+            class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+          }
+        %>
+        <%= f.input :duration,
+          required: false,
+          label: "Duration(in min)",
+          wrapper_html: {
+            class: "w-1/4"
+          },
+          input_html: {
+            class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+          }
+        %>
+      </div>
+      <div class="w-full">
+        <%= f.input :description,
+          required: false,
+          as: :text,
+          wrapper_html: {
+            class: "w-full mt-4"
+          },
+          input_html: {
+            class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+          }
+        %>
+      </div>
 
-    <div class="flex w-full gap-x-4">
-      <div class="w-1/2" data-controller="nested-form" data-nested-form-wrapper-selector-value=".nested-form-wrapper">
-        <template data-nested-form-target="template">
-          <%= f.simple_fields_for :periods, @pair_request.periods.build, child_index: 'NEW_RECORD' do |period_fields| %>
+      <div class="flex w-full gap-x-4">
+        <div class="w-1/2" data-controller="nested-form" data-nested-form-wrapper-selector-value=".nested-form-wrapper">
+          <template data-nested-form-target="template">
+            <%= f.simple_fields_for :periods, @pair_request.periods.build, child_index: 'NEW_RECORD' do |period_fields| %>
+              <%= render "period_form", f: period_fields %>
+            <% end %>
+          </template>
+          <%= f.simple_fields_for :periods do |period_fields| %>
             <%= render "period_form", f: period_fields %>
           <% end %>
-        </template>
-        <%= f.simple_fields_for :periods do |period_fields| %>
-          <%= render "period_form", f: period_fields %>
-        <% end %>
 
-        <div data-nested-form-target="target"></div>
+          <div data-nested-form-target="target"></div>
 
-        <button
-          class="rounded-xl border-2 border-black bg-orange px-2 font-semibold mt-4"
-          type="button"
-          data-action="nested-form#add">
-            Add period
-        </button>
-      </div>
+          <button
+            class="rounded-xl border-2 border-black bg-orange px-2 font-semibold mt-4"
+            type="button"
+            data-action="nested-form#add">
+              Add period
+          </button>
+        </div>
 
-      <div class="w-1/2" data-controller="nested-form" data-nested-form-wrapper-selector-value=".nested-form-wrapper">
-        <template data-nested-form-target="template">
-          <%= f.simple_fields_for :taggings, @pair_request.taggings.build, child_index: 'NEW_RECORD' do |tagging_fields| %>
+        <div class="w-1/2" data-controller="nested-form" data-nested-form-wrapper-selector-value=".nested-form-wrapper">
+          <template data-nested-form-target="template">
+            <%= f.simple_fields_for :taggings, @pair_request.taggings.build, child_index: 'NEW_RECORD' do |tagging_fields| %>
+              <%= render "tagging_form", f: tagging_fields %>
+            <% end %>
+          </template>
+
+          <%= f.simple_fields_for :taggings do |tagging_fields| %>
             <%= render "tagging_form", f: tagging_fields %>
           <% end %>
-        </template>
 
-        <%= f.simple_fields_for :taggings do |tagging_fields| %>
-          <%= render "tagging_form", f: tagging_fields %>
-        <% end %>
+          <div data-nested-form-target="target"></div>
 
-        <div data-nested-form-target="target"></div>
-
-        <button
-          class="rounded-xl border-2 border-black bg-orange px-2 font-semibold mt-4"
-          type="button"
-          data-action="nested-form#add">
-            Add tag
-        </button>
+          <button
+            class="rounded-xl border-2 border-black bg-orange px-2 font-semibold mt-4"
+            type="button"
+            data-action="nested-form#add">
+              Add tag
+          </button>
+        </div>
       </div>
-    </div>
 
       <%= f.button :submit, class: "mt-12 flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
+
     <% end %>
   <% end %>
 </div>

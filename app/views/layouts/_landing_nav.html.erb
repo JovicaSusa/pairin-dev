@@ -1,18 +1,15 @@
-<div data-controller="home" class="w-full border-b-4 border-black bg-yellow-50 font-bold sticky top-0 z-10">
+<div data-controller="home" class="w-full border-b-4 px-2 border-black bg-yellow-50 font-bold sticky top-0 z-10">
   <div class="flex flex-col max-w-screen-xl py-2 mx-auto md:items-center md:justify-between md:flex-row md:px-6 lg:px-8">
     <div class="flex items-center justify-between lg:justify-start">
       <div class="flex items-center justify-center space-x-2">
-        <%= link_to root_path, class: "flex flex-col justify-center items-center" do %>
-          <%= image_tag "logo.svg", class: "w-fit h-12" %>
+        <%= link_to root, class: "flex flex-col justify-center items-center" do %>
+          <%= image_tag "logo.svg", class: "w-fit h-8 md:h-12" %>
           <span class="text-xl font-bold">pairin</span>
         <% end %>
       </div>
 
       <button data-action="click->home#toggleNav" class="rounded-lg md:hidden focus:outline-none focus:shadow-outline">
-        <svg fill="currentColor" viewBox="0 0 20 20" class="w-8 h-8">
-          <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" style="display: none"></path>
-        </svg>
+        <%= image_tag "hamburger.svg", class: "w-8 h-8 md:h-20" %>
       </button>
     </div>
 
@@ -24,7 +21,7 @@
           </li>
         <% else %>
           <li>
-            <%= link_to "Login", new_user_session_path, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-yellow-300 hover:text-yellow-500" %>
+            <%= link_to "Login", new_user_session_path, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-black" %>
           </li>
         <% end %>
       </ul>

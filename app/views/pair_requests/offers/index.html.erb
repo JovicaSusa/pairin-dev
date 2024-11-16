@@ -6,7 +6,7 @@
 
     <div class="mt-12">
       <% @offers.each do |offer| %>
-        <div class="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div class="relative mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <% if display_overlay?(offer) %>
             <div class="absolute w-full h-full bg-black opacity-20"></div>
           <% end %>

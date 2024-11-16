@@ -7,12 +7,12 @@
     <div class="mt-12">
       <% @offers.each do |offer| %>
         <div class="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div class="flex gap-x-2 border-b-2 border-black py-4 px-2 rounded-t-md bg-green">
-            <div class="w-1/2">
-              <div>
+          <div class="border-b-2 border-black px-2 rounded-t-md bg-green">
+            <div class="w-full flex flex-wrap items-center pt-2">
+              <div class="w-full md:w-8/12">
                 <p class="font-bold"><%= offer.pair_request.subject %></p>
               </div>
-              <div class="flex items-center gap-x-2 pt-2">
+              <div class="w-full md:w-4/12 flex items-center gap-x-2 pt-2 md:pt-0">
                 <div class="rounded-xl text-sm border-2 border-black bg-orange px-2 font-semibold">
                   <%= offer.period.start_at.to_fs(:short) %>
                 </div>
@@ -22,7 +22,7 @@
                 </div>
               </div>
             </div>
-            <div class="w-1/2 flex items-center gap-x-2">
+            <div class="mt-2 flex items-center gap-x-2">
               <figure class="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
                 <%= image_tag offer.pair_request.user.image_url %>
               </figure>

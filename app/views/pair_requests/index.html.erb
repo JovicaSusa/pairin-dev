@@ -4,10 +4,12 @@
       <h3 class="text-5xl font-bold">Pair Programming Requests</h3>
     </div>
 
-    <div data-controller="reveal">
-      <button data-action="click->reveal#toggle" type="button" class="btn">filter</button>
+    <div class="mt-12" data-controller="reveal">
+      <button class="w-full flex justify-end mb-2" data-action="click->reveal#toggle" type="button" class="btn">
+        <%= image_tag "preferences.svg" %>
+      </button>
 
-      <div data-reveal-target="item" class="hidden">
+      <div class="mb-12 hidden" data-reveal-target="item">
         <%= simple_form_for @q, url: search_pair_requests_path, method: :get, html: { class: "md:flex md:flex-wrap md:justify-between md:gap-y-4" } do |f| %>
           <div class="md:w-5/12">
             <%= f.label :tags_name_eq, "Tags" %>
@@ -66,9 +68,7 @@
           </div>
         <% end %>
       </div>
-    </div>
 
-    <div class="mt-12">
       <%= turbo_frame_tag "pair-requests" do %>
         <%= render @pair_requests %>
         <%= render partial: "pair_requests/next_page" %>
