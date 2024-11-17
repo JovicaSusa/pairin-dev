@@ -43,7 +43,7 @@
         <span class="text-sm">
           <%= pair_request.user.profession %>
           <span class="text-xl font-bold">.</span>
-          <%= pair_request.user.level.titleize %>
+          <%= pair_request.user.level&.titleize %>
         </span>
       </div>
     </div>

@@ -32,7 +32,7 @@
                 <span class="text-sm">
                   <%= offer.pair_request.user.profession %>
                   <span class="text-xl font-bold">.</span>
-                  <%= offer.pair_request.user.level.titleize %>
+                  <%= offer.pair_request.user.level&.titleize %>
                 </span>
               </div>
             </div>
