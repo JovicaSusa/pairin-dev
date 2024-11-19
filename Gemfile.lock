@@ -117,6 +117,7 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.5.0)
+    dotenv (3.1.4)
     down (5.4.2)
       addressable (~> 2.8)
     drb (2.2.0)
@@ -141,6 +142,7 @@ GEM
       concurrent-ruby (~> 1.1)
       webrick (~> 1.7)
       websocket-driver (~> 0.7)
+    ffi (1.17.0-aarch64-linux-gnu)
     ffi (1.17.0-arm64-darwin)
     ffi (1.17.0-x86_64-darwin)
     ffi (1.17.0-x86_64-linux-gnu)
@@ -182,6 +184,7 @@ GEM
     method_source (1.0.0)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.8)
     minitest (5.20.0)
     msgpack (1.7.2)
     mutex_m (0.2.0)
@@ -195,11 +198,8 @@ GEM
     net-smtp (0.4.0)
       net-protocol
     nio4r (2.6.1)
-    nokogiri (1.15.5-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.15.5-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.15.5-x86_64-linux)
+    nokogiri (1.15.5)
+      mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     orm_adapter (0.5.0)
     pagy (6.2.0)
@@ -336,6 +336,7 @@ GEM
     zeitwerk (2.6.12)
 
 PLATFORMS
+  aarch64-linux
   arm64-darwin-23
   x86_64-darwin-21
   x86_64-linux
@@ -348,6 +349,7 @@ DEPENDENCIES
   cuprite
   debug
   devise (~> 4.9)
+  dotenv
   dry-monads
   factory_bot_rails
   faker
@@ -375,7 +377,7 @@ DEPENDENCIES
   web-console
 
 RUBY VERSION
-   ruby 3.2.2p53
+   ruby 3.3.1p55
 
 BUNDLED WITH
    2.4.10
