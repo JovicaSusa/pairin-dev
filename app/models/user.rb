@@ -6,7 +6,7 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :confirmable
+        #  :confirmable NOTE: Disable for now
 
   has_many :pair_requests, dependent: :destroy # TODO: Reconsider dependent option
   has_many :offers, foreign_key: :offerer_id, dependent: nil # TODO: Reconsider dependent option
