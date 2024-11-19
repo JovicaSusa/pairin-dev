@@ -1,6 +1,6 @@
 @import 'flatpickr/dist/themes/confetti.css';
-@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600&family=Work+Sans:wght@400;500;600;800');
 @import '@stimulus-components/reveal/src/app.css';
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600&family=Work+Sans:wght@400;500;600;800');
 
 @tailwind base;
 @tailwind components;
