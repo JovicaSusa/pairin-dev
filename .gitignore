@@ -42,3 +42,4 @@
 .vscode/
 
 /public/uploads/
+.kamal/secrets
