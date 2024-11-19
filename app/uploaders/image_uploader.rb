@@ -4,7 +4,7 @@ class ImageUploader < Shrine
   plugin :default_url
 
   Attacher.default_url do |**options|
-    "/assets/images/logo.svg"
+    ActionController::Base.helpers.asset_path('logo.svg')
   end
 
   Attacher.derivatives do |original|
