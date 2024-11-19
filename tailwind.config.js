@@ -8,9 +8,14 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        orange: "#FF8B37",
+        purple: "#7B5FF1",
+        green: "#55D087",
+        background: "#E3E3FF"
+      },
       fontFamily: {
         "sans": ["Cabin", "sans-serif"],
-        "handwritten": ["Yellowtail"],
         "headline": ["Work Sans"]
       },
       animation: {

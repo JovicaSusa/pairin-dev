@@ -1,28 +1,61 @@
-<aside class="h-screen w-2/12 absolute bg-blue-100 border-r-4 border-black">
+<aside class="hidden md:block h-screen w-2/12 font-sans absolute border-r-4 border-black border-dashed">
   <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
     <%= image_tag "logo.svg", class: "w-12 h-12" %>
   </div>
-  <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-    <%= link_to "Activities", activities_path, class: "uppercase font-handwritten" %>
+  <div class="<%= active_link_class(activities_path) %> border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+    <%= link_to "Community", activities_path %>
   </div>
-  <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-    <%= link_to "Pair Requests", pair_requests_path, class: "uppercase font-handwritten" %>
+  <div class="<%= active_link_class(pair_requests_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+    <%= link_to "Search", pair_requests_path %>
   </div>
-  <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-    <%= link_to "Offers", users_offers_path, class: "uppercase font-handwritten" %>
+  <div class="<%= active_link_class(users_offers_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+    <%= link_to "Applied", users_offers_path %>
   </div>
-  <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-    <%= link_to "You pair requests", users_pair_requests_path, class: "uppercase font-handwritten" %>
+  <div class="<%= active_link_class(users_pair_requests_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+    <%= link_to "Pairin requests", users_pair_requests_path %>
   </div>
-  <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-    <%= link_to "Activity", root_path, class: "uppercase font-handwritten" %>
+  <div class="<%= active_link_class(profile_path(current_user.id)) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+    <%= link_to "Profile", profile_path(current_user.id) %>
   </div>
-  <% if current_user %>
-    <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-      <%= link_to "Profile", profile_path(current_user&.id), class: "uppercase font-handwritten" %>
-    </div>
-  <% end %>
-  <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-    <%= link_to "Log out", destroy_user_session_path, "data-turbo-method": :delete, class: "uppercase font-handwritten" %>
+  <div class="<%= active_link_class(sessions_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+    <%= link_to "Sessions", sessions_path %>
+  </div>
+  <div class="border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+    <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete } %>
   </div>
 </aside>
+
+<div data-controller="home" class="md:hidden w-full">
+  <div data-controller="reveal relative">
+    <button data-action="click->reveal#toggle" type="button" class="absolute top-2 right-2">
+      <%= image_tag "hamburger.svg", class: "w-8 h-8" %>
+    </button>
+
+    <div data-reveal-target="item" class="hidden w-full">
+      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        <%= image_tag "logo.svg", class: "w-12 h-12" %>
+      </div>
+      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        <%= link_to "Activities", activities_path %>
+      </div>
+      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        <%= link_to "Pair Requests", pair_requests_path %>
+      </div>
+      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        <%= link_to "Offers", users_offers_path %>
+      </div>
+      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        <%= link_to "You pair requests", users_pair_requests_path %>
+      </div>
+      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        <%= link_to "Activity", root_path %>
+      </div>
+      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        <%= link_to "Profile", profile_path(current_user.id) %>
+      </div>
+      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete } %>
+      </div>
+    </div>
+  </div>
+</div>

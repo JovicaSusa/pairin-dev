@@ -1,11 +1,11 @@
 <div class="flex justify-center">
-  <div class="w-1/2">
-    <div class="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed">
-      <h3 class="w-1/2 text-2xl font-bold">Your requests</h3>
-      <div class="w-1/2 flex justify-end">
+  <div class="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
+    <div class="flex w-full flex-wrap items-center justify-center mt-12 pb-8 border-b-4 border-black border-dashed">
+      <h3 class="w-full md:w-1/2 text-5xl font-bold">Your requests</h3>
+      <div class="md:w-1/2 mt-4 md:mt-0 flex justify-end">
         <%= link_to "New Request",
                     new_users_pair_request_path,
-                    class: "flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none",
+                    class: "flex cursor-pointer items-center rounded-md border-2 border-black bg-orange px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none",
                     data: { turbo_frame: dom_id(PairRequest) } %>
       </div>
     </div>
@@ -14,10 +14,10 @@
       <%= turbo_frame_tag PairRequest.new %>
     </div>
 
-    <%= turbo_frame_tag "pair_requests" do %>
-      <ul>
+    <div class="mt-12">
+      <%= turbo_frame_tag "pair_requests" do %>
         <%= render @pair_requests %>
-      </ul>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 </div>

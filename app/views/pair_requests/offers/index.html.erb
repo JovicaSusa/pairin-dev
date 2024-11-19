@@ -1,41 +1,56 @@
-<div class="text-center">
-  <h3 class="text-3xl mt-12">Offers</h3>
+<div class="flex flex-col items-center">
+  <div class="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
+    <div class="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed text-center">
+      <h3 class="text-5xl font-bold">Applications</h3>
+    </div>
 
-  <div class="md:flex md:flex-col md:items-center px-4 mt-8">
-    <% @offers.each do |offer| %>
-      <div class="relative bg-blue-100 md:w-1/2 rounded-md mb-8 border-2 border-black">
-        <% if display_overlay?(offer) %>
-          <div class="absolute w-full h-full bg-black opacity-20"></div>
-        <% end %>
-        <div class="border-black border-b-2 px-4 text-left pt-2 pb-4">
-          <div>
-            <%= offer.offerer.email %>
+    <div class="mt-12">
+      <% @offers.each do |offer| %>
+        <div class="relative mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <% if display_overlay?(offer) %>
+            <div class="absolute w-full h-full bg-black opacity-20"></div>
+          <% end %>
+          <div class="flex items-center gap-x-2 px-4 pt-4">
+            <figure class="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
+                <%= image_tag offer.offerer.image_url %>
+              </figure>
+              <%= offer.offerer.email %>
           </div>
-          <div>
-            <%= offer.period.start_at %> - <%= offer.period.end_at %>
+          <div class="max-h-fit px-2 py-4">
+            <div data-controller="read-more" data-read-more-more-text-value="Read more" data-read-more-less-text-value="Read less">
+              <p class="read-more-content" data-read-more-target="content">
+                <%= offer.message %>
+              </p>
+
+              <button data-read-more-target="btn" data-action="read-more#toggle">Read more</button>
+            </div>
+          </div>
+          <div class="px-4 md:flex md:items-center">
+            <div class="md:w-1/2 flex items-center gap-x-2">
+              <div class="rounded-xl border-2 border-black bg-orange px-2 font-semibold">
+                <%= offer.period.start_at.to_fs(:short) %>
+              </div>
+              <span class="block font-bold">:</span>
+              <div class="rounded-xl border-2 border-black bg-orange px-2 font-semibold">
+                <%= offer.period.end_at.to_fs(:short) %>
+              </div>
+            </div>
+            <div class="md:w-1/2 md:flex md:justify-end">
+              <% unless hide_accept_btn?(offer) %>
+                <div class="flex justify-center mt-6">
+                  <%=
+                    button_to "Accept",
+                    accept_pair_request_offer_path(offer.pair_request.id, offer.id),
+                    {
+                      class: "flex font-headline cursor-pointer items-center rounded-md border-2 border-black bg-purple px-5 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+                    }
+                  %>
+                </div>
+              <% end %>
+            </div>
           </div>
         </div>
-        <div
-          data-controller="read-more"
-          data-read-more-more-text-value="Read more"
-          data-read-more-less-text-value="Read less"
-          class="bg-white px-2 py-4"
-        >
-          <p class="read-more-content" data-read-more-target="content"><%= offer.message %></p>
-          <button data-read-more-target="btn" data-action="read-more#toggle">Read more</button>
-        </div>
-        <% unless hide_accept_btn?(offer) %>
-          <div class="flex justify-center mt-6">
-            <%=
-              button_to "Accept",
-              accept_pair_request_offer_path(offer.pair_request.id, offer.id),
-              {
-                class: "flex font-headline cursor-pointer items-center rounded-md border-2 border-black bg-yellow-300 px-5 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-              }
-            %>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 </div>

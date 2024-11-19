@@ -2,7 +2,7 @@ class PairRequestsController < ApplicationController
   include Authenticated
   def index
     @q = PairRequest.ransack(params[:q])
-    @pagy, @pair_requests = pagy_countless(PairRequest.where.not(user_id: current_user.id).all)
+    @pagy, @pair_requests = pagy_countless(PairRequest.active.where.not(user_id: current_user.id).all)
 
     render "scrollable_list" if params[:page]
   end

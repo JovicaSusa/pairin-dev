@@ -1,12 +1,26 @@
-<div class="flex flex-col w-full items-center">
-  <div class="w-1/2 mt-4">
-    <h3 class="text-center border-b-4 border-black border-dashed py-4 font-bold text-4xl">Make an offer</h3>
-  </div>
+<div class="flex flex-col items-center">
+  <div class="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
+    <div class="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed text-center">
+      <h3 class="text-5xl font-bold">Send application</h3>
+    </div>
 
-  <%= simple_form_for @offer, url: pair_request_offers_path, html: { class: "flex flex-col items-center" } do |f| %>
-    <%= f.error :pair_request_id %>
-    <%= f.input :message, as: :text, wrapper_html: { class: "w-full" } %>
-    <%= f.select :period_id, @pair_request.periods.all.map { |p| [p.start_at, p.id] } %>
-    <%= f.button :submit, "Send offer", class: "mt-6 flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
-  <% end %>
+    <%= simple_form_for @offer, url: pair_request_offers_path, html: { class: "flex flex-col items-start mt-12" } do |f| %>
+      <%= f.error :pair_request_id %>
+      <%= f.input :message,
+        required: false,
+        as: :text,
+        wrapper_html: { class: "w-full" },
+        input_html: { class: "input-primary" }
+      %>
+      <label>
+        <span class="font-bold">Select period</span>
+        <%= f.combobox :period_id,
+          @offer.pair_request.periods.map { |p| ["#{p.start_at.to_fs(:short)} : #{p.end_at.to_fs(:short)}", p.id] } %>
+      </label>
+
+      <div class="w-full flex justify-center">
+        <%= f.button :submit, "Apply", class: "mt-12 flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
+      </div>
+    <% end %>
+  </div>
 </div>
