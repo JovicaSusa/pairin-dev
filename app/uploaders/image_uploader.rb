@@ -4,7 +4,7 @@ class ImageUploader < Shrine
   plugin :default_url
 
   Attacher.default_url do |**options|
-    "/uploads/store/#{name}/default.png"
+    "/assets/images/logo.svg"
   end
 
   Attacher.derivatives do |original|
