@@ -98,3 +98,5 @@ gem "image_processing", "~> 1.8"
 gem "ransack", "~> 4.2"
 
 gem "pundit", "~> 2.4"
+
+gem "honeybadger", "~> 5.23"

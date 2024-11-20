@@ -21,7 +21,9 @@ servers:
 # Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
 proxy:
   ssl: true
-  host: pairin.dev
+  hosts:
+    - www.pairin.dev
+    - pairin.dev
   app_port: 3000
 
 # Credentials for your image host.
@@ -67,8 +69,8 @@ ssh:
 
 # Use a persistent storage volume.
 #
-# volumes:
-#   - "storage:/rails/storage"
+volumes:
+  - uploads:/rails/public/uploads
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old
