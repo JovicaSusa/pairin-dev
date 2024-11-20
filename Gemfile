@@ -100,3 +100,5 @@ gem "ransack", "~> 4.2"
 gem "pundit", "~> 2.4"
 
 gem "honeybadger", "~> 5.23"
+
+gem "aws-sdk-s3", "~> 1.172"
