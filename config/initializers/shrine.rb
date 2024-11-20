@@ -1,5 +1,6 @@
 require "shrine"
 require "shrine/storage/file_system"
+require "shrine/storage/s3"
 
 permanent_storage =
   if Rails.env.production?
