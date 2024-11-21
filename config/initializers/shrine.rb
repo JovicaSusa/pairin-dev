@@ -15,7 +15,7 @@ permanent_storage =
   end
 
 Shrine.storages = {
-  cache: Shrine::Storage::FileSystem.new("public", prefix: "uploads/cache"),
+  cache: Shrine::Storage::FileSystem.new("tmp", prefix: "uploads/cache"),
   store: permanent_storage
 }
 
