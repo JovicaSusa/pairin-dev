@@ -7,8 +7,8 @@ permanent_storage =
     Shrine::Storage::S3.new(
       bucket: "pairin",
       region: "eu-north-1",
-      access_key_id: Rails.application.credentials.aws_access_key_id,
-      secret_access_key: Rails.application.credentials.secret_access_key
+      access_key_id: Rails.application.credentials.aws.access_key_id,
+      secret_access_key: Rails.application.credentials.aws.secret_access_key
     )
   else
     Shrine::Storage::FileSystem.new("public", prefix: "uploads")
