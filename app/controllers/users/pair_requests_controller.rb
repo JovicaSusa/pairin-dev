@@ -9,6 +9,16 @@ class Users::PairRequestsController < ApplicationController
     @pair_request = current_user.pair_requests.build
   end
 
+  def update
+    @pair_request = current_user.pair_requests.find(params[:id])
+
+    if @pair_request.update(pair_request_update_params)
+      respond_to do |format|
+        format.turbo_stream
+      end
+    end
+  end
+
   def create
     @pair_request = current_user.pair_requests.build(pair_request_params)
 
@@ -23,6 +33,10 @@ class Users::PairRequestsController < ApplicationController
   end
 
   private
+
+  def pair_request_update_params
+    params.require(:pair_request).permit(:call_link)
+  end
 
   def pair_request_params
     params
