@@ -1,4 +1,4 @@
-require "image_processing/mini_magick"
+require "image_processing/vips"
 
 class ImageUploader < Shrine
   plugin :default_url
@@ -8,10 +8,8 @@ class ImageUploader < Shrine
   end
 
   Attacher.derivatives do |original|
-    magick = ImageProcessing::MiniMagick.source(original)
-
     {
-      small:  magick.resize_to_limit!(300, 300),
+      small: ImageProcessing::Vips.source(original).resize_to_limit!(400, 400)
     }
   end
 end
