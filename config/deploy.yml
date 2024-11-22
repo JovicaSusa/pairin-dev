@@ -97,6 +97,7 @@ accessories:
         POSTGRES_DB: pairin_production
       secret:
         - POSTGRES_PASSWORD
+        - POSTGRES_URL
     files:
       - db/production_setup.sql:/docker-entrypoint-initdb.d/setup.sql
     directories:
