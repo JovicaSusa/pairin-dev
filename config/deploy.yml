@@ -89,8 +89,8 @@ asset_path: /rails/public/assets
 accessories:
   db:
     image: postgres:16-alpine
-    host: 88.99.190.226
-    port: 5432
+    roles:
+      - web
     env:
       clear:
         POSTGRES_USER: pairin
