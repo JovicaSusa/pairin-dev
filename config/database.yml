@@ -79,7 +79,5 @@ test:
 #
 production:
   <<: *default
-  database: pairin_production
-  username: pairin
+  url: <%= ENV["POSTGRES_URL"] %>
   password: <%= ENV["POSTGRES_PASSWORD"] %>
-  host: <%= ENV["DB_HOST"] %>

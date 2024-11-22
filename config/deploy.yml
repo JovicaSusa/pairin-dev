@@ -53,7 +53,7 @@ env:
     RAILS_LOG_TO_STDOUT: true
   secret:
     - RAILS_MASTER_KEY
-    - POSTGRES_PASSWORD
+    - POSTGRES_URL
     - KAMAL_REGISTRY_PASSWORD
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
@@ -89,14 +89,15 @@ asset_path: /rails/public/assets
 accessories:
   db:
     image: postgres:16-alpine
-    host: 88.99.190.226
-    port: 5432
+    roles:
+      - web
     env:
       clear:
         POSTGRES_USER: pairin
         POSTGRES_DB: pairin_production
       secret:
         - POSTGRES_PASSWORD
+        - POSTGRES_URL
     files:
       - db/production_setup.sql:/docker-entrypoint-initdb.d/setup.sql
     directories:
