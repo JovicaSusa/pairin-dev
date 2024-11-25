@@ -30,4 +30,35 @@ RSpec.describe Session, type: :model do
       end
     end
   end
+
+  describe "holder" do
+    subject(:holder) { session.holder }
+
+    let(:session) { build(:session) }
+    let(:session) { build(:session, sessionable: pair_request) }
+    let(:pair_request) { build(:pair_request, user: holder) }
+    let(:holder) { build(:user) }
+
+    it { is_expected.to eq holder }
+  end
+
+  describe "hold_by_user?" do
+    subject(:hold_by_user?) { session.hold_by_user?(user) }
+
+    let(:user) { build(:user) }
+    let(:session) { build(:session, sessionable: pair_request) }
+    let(:pair_request) { build(:pair_request, user: holder) }
+
+    context "when hold by given user" do
+      let(:holder) { user }
+
+      it { is_expected.to be true }
+    end
+
+    context "when hold by other user" do
+      let(:holder) { build(:user) }
+
+      it { is_expected.to be false }
+    end
+  end
 end

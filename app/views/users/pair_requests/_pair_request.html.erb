@@ -22,7 +22,7 @@
       <div class="flex justify-center pt-2 pb-4">
         <%= simple_form_for(
           pair_request,
-          url: users_pair_request_path(pair_request),
+          url: add_call_link_users_pair_request_path(pair_request),
           html: { class: "flex flex-col md:flex-row w-full gap-y-4 md:gap-x-2 px-2 items-center md:items-end justify-between" }
         ) do |f| %>
           <%= f.simple_fields_for :sessions do |ff| %>

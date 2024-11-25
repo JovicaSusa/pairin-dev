@@ -8,6 +8,8 @@ class SessionsController < ApplicationController
   def update
     @session = current_user.sessions.find(params[:id])
 
+    authorize @session
+
     if @session.update(session_params)
       respond_to do |format|
         format.turbo_stream { flash.now[:notice] = "Call link successfuly added!" }

@@ -4,6 +4,7 @@ class Session < ApplicationRecord
   has_many :participants, through: :participations
 
   validates :start_at, :end_at, presence: true
+  validates :call_link, presence: true, on: :update
   validate :dates_in_future, :dates_in_order
 
   scope :future, -> { where(start_at: Time.current..) }
