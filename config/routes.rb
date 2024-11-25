@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
-  resources :sessions, only: [:index]
+  resources :sessions, only: [:index, :update]
   resources :profiles, only: [:show, :update]
 
   resources :pair_requests, only: [:index] do

@@ -5,40 +5,7 @@
     </div>
 
     <div class="mt-12">
-      <% @sessions.each do |session| %>
-        <div class="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div class="border-b-2 border-black py-4 px-2 rounded-t-md bg-green">
-            <h3 class="font-bold text-xl"><%= session.sessionable.subject %></h3>
-          </div>
-          <div class="md:flex items-center max-h-fit px-2 py-4">
-            <div class="md:w-1/2 flex items-center gap-x-2">
-              <figure class="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
-                <%= image_tag session.sessionable.user.image_url %>
-              </figure>
-
-              <div>
-                <p><%= session.sessionable.user.name %></p>
-                <span class="text-sm">
-                  <%= session.sessionable.user.profession %>
-                  <span class="text-xl font-bold">.</span>
-                  <%= session.sessionable.user.level&.titleize %>
-                </span>
-              </div>
-            </div>
-            <div class="w-full mt-4 md:mt-0 md:w-4/12">
-              <div class="w-full flex md:items-center md:justify-end gap-x-1 mt-1">
-                <div class="rounded-xl text-sm border-2 border-black px-2 font-semibold">
-                  <%= session.start_at.to_fs(:short) %>
-                </div>
-                <span class="block font-bold">:</span>
-                <div class="rounded-xl text-sm border-2 border-black px-2 font-semibold">
-                  <%= session.end_at.to_fs(:short) %>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      <% end %>
+      <%= render @sessions %>
     </div>
   </div>
 </div>

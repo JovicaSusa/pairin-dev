@@ -25,7 +25,7 @@ class Users::PairRequestsController < ApplicationController
     if @pair_request.save
       respond_to do |format|
         format.html { redirect_to users_pair_requests_path, notice: "Request posted! Good luck" }
-        format.turbo_stream
+        format.turbo_stream { flash.now[:notice] = "Successfuly added!" }
       end
     else
       render :new, status: :unprocessable_entity
@@ -35,7 +35,7 @@ class Users::PairRequestsController < ApplicationController
   private
 
   def pair_request_update_params
-    params.require(:pair_request).permit(:call_link)
+    params.require(:pair_request).permit(sessions_attributes: [:call_link, :id])
   end
 
   def pair_request_params

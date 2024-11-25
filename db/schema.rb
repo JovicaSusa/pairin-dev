@@ -44,7 +44,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_22_141007) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "duration", null: false
-    t.text "call_link"
     t.index ["user_id"], name: "index_pair_requests_on_user_id"
   end
 
@@ -74,6 +73,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_22_141007) do
     t.datetime "end_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "call_link"
     t.index ["sessionable_type", "sessionable_id"], name: "index_sessions_on_sessionable"
   end
 

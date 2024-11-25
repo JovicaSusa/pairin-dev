@@ -8,6 +8,14 @@ class Session < ApplicationRecord
 
   scope :future, -> { where(start_at: Time.current..) }
 
+  def hold_by_user?(user)
+    holder == user
+  end
+
+  def holder
+    sessionable.user
+  end
+
   private
 
   def dates_in_future
