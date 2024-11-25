@@ -152,6 +152,12 @@ GEM
       railties (>= 5.0.0)
     faker (3.2.2)
       i18n (>= 1.8.11, < 2)
+    faraday (2.12.1)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.0)
+      net-http (>= 0.5.0)
     ferrum (0.15)
       addressable (~> 2.5)
       concurrent-ruby (~> 1.1)
@@ -186,6 +192,7 @@ GEM
     jmespath (1.6.2)
     jsbundling-rails (1.2.1)
       railties (>= 6.0.0)
+    json (2.8.2)
     launchy (2.5.2)
       addressable (~> 2.8)
     listen (3.9.0)
@@ -200,6 +207,11 @@ GEM
       net-imap
       net-pop
       net-smtp
+    mailjet (1.8.0)
+      activesupport (>= 5.0.0)
+      faraday (~> 2.1)
+      rack (>= 1.4.0)
+      yajl-ruby
     marcel (1.0.2)
     matrix (0.4.2)
     method_source (1.0.0)
@@ -209,6 +221,8 @@ GEM
     minitest (5.20.0)
     msgpack (1.7.2)
     mutex_m (0.2.0)
+    net-http (0.5.0)
+      uri
     net-imap (0.4.6)
       date
       net-protocol
@@ -345,6 +359,7 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uri (1.0.2)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.2.1)
@@ -359,6 +374,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yajl-ruby (1.4.3)
     zeitwerk (2.7.1)
 
 PLATFORMS
@@ -386,6 +402,7 @@ DEPENDENCIES
   image_processing (~> 1.8)
   jbuilder
   jsbundling-rails
+  mailjet (~> 1.8)
   pagy (~> 6.2)
   pg (~> 1.1)
   propshaft
