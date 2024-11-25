@@ -17,6 +17,10 @@ class Session < ApplicationRecord
     sessionable.user
   end
 
+  def other_participant(participant)
+    participants.where.not(id: participant.id).first
+  end
+
   private
 
   def dates_in_future
