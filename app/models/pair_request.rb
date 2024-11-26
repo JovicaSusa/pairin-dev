@@ -15,6 +15,7 @@ class PairRequest < ApplicationRecord
 
   accepts_nested_attributes_for :periods, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :taggings, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :sessions, reject_if: :new_record?
 
   class << self
     def ransackable_associations(auth_object=nil)

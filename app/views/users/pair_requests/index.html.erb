@@ -16,7 +16,9 @@
 
     <div class="mt-12">
       <%= turbo_frame_tag "pair_requests" do %>
-        <%= render @pair_requests %>
+        <% @pair_requests.each do |pair_request| %>
+          <%= render partial: "/users/pair_requests/pair_request", locals: { pair_request: pair_request } %>
+        <% end %>
       <% end %>
     </div>
   </div>
