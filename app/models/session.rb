@@ -18,7 +18,7 @@ class Session < ApplicationRecord
   end
 
   def other_participant(participant)
-    participants.where.not(id: participant.id).first
+    (participants - [participant]).first
   end
 
   private

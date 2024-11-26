@@ -27,7 +27,7 @@ class Users::PairRequestsController < ApplicationController
 
     authorize @pair_request, policy_class: Users::PairRequestPolicy
 
-    if @pair_request.update(pair_request_update_params)
+    if @pair_request.update(add_call_link_params)
       respond_to do |format|
         format.turbo_stream { flash.now[:notice] = "Successfuly added!" }
       end
@@ -36,7 +36,7 @@ class Users::PairRequestsController < ApplicationController
 
   private
 
-  def pair_request_update_params
+  def add_call_link_params
     params.require(:pair_request).permit(sessions_attributes: [:call_link, :id])
   end
 
