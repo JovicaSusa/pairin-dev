@@ -102,3 +102,5 @@ gem "pundit", "~> 2.4"
 gem "honeybadger", "~> 5.23"
 
 gem "aws-sdk-s3", "~> 1.172"
+
+gem "mailjet", "~> 1.8"
