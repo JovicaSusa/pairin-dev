@@ -34,6 +34,10 @@ RSpec.describe Offers::Accept, type: :unit do
       expect(pair.participant).to eq(offer.offerer)
     end
 
+    it "informs participants" do
+      expect { call }.to change { ActionMailer::Base.deliveries.count }.by(2)
+    end
+
     context "when failure" do
       context "when pair request already have accepted offer" do
         before { create(:offer, :accepted, pair_request: offer.pair_request) }
