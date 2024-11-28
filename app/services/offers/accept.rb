@@ -52,7 +52,7 @@ module Offers
         SessionMailer.with(
           session: session,
           participant: participant
-        ).session_scheduled_email.deliver_now
+        ).session_scheduled_email.deliver_later
       end
     end
   end

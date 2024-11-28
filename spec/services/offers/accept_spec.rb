@@ -35,7 +35,7 @@ RSpec.describe Offers::Accept, type: :unit do
     end
 
     it "informs participants" do
-      expect { call }.to change { ActionMailer::Base.deliveries.count }.by(2)
+      expect { call }.to have_enqueued_mail(SessionMailer, :session_scheduled_email).twice
     end
 
     context "when failure" do
