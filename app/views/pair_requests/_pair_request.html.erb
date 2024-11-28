@@ -1,27 +1,63 @@
-<div class="border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-  <div class="border-b-2 border-black">
+<div class="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+  <div class="border-b-2 border-black py-4 px-2 rounded-t-md bg-green">
     <h3 class="font-bold text-xl"><%= pair_request.subject %></h3>
   </div>
-  <div class="">
-    <p class="font-semibold"><%= pair_request.description %></p>
+  <div class="md:flex max-h-fit px-2 py-4">
+    <div class="w-full md:w-8/12" data-controller="read-more" data-read-more-more-text-value="Read more" data-read-more-less-text-value="Read less">
+      <p class="read-more-content" data-read-more-target="content">
+        <%= pair_request.description %>
+      </p>
+
+      <button data-read-more-target="btn" data-action="read-more#toggle">Read more</button>
+    </div>
+
+    <div class="w-full mt-4 md:mt-0 md:w-4/12">
+      <% pair_request.periods.each do |period| %>
+        <div class="w-full flex md:items-center md:justify-end gap-x-1 mt-1">
+          <div class="rounded-xl text-sm border-2 border-black px-2 font-semibold">
+            <%= period.start_at.to_fs(:short) %>
+          </div>
+          <span class="block font-bold">:</span>
+          <div class="rounded-xl text-sm border-2 border-black px-2 font-semibold">
+            <%= period.end_at.to_fs(:short) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
-  <div class="flex justify-start space-x-2 w-full">
+  <div class="flex w-full overflow-x-scroll justify-start space-x-2 py-2 px-2 mb-6">
     <% pair_request.tags.each do |tag| %>
-      <div class="w-min rounded-full border-2 border-black bg-[#bc95d4] px-3 py-1.5 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none">
+      <div class="max-w-max whitespace-nowrap rounded-full border-2 border-black bg-orange px-2 py-1 text-xs 2xl:text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none">
         <%= tag.name %>
       </div>
     <% end %>
   </div>
-  <div>
-    <% if pair_request.offers.pluck(:offerer_id).include?(current_user.id) %>
-      <p>You have already sent an offer</p>
-    <% else %>
-      <%= link_to(
-        "Make an offer",
-        new_pair_request_offer_path(pair_request.id),
-        class: "flex cursor-pointer items-center rounded-md border-2 border-black bg-[#bc95d4] px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none",
-        data: { turbo: false }
-      ) %>
-    <% end %>
+  <div class="px-4 md:flex md:items-center">
+    <div class="md:w-1/2 flex items-center gap-x-2">
+      <figure class="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
+        <%= image_tag pair_request.user.image_url %>
+      </figure>
+
+      <div>
+        <p><%= pair_request.user.name %></p>
+        <span class="text-sm">
+          <%= pair_request.user.profession %>
+          <span class="text-xl font-bold">.</span>
+          <%= pair_request.user.level&.titleize %>
+        </span>
+      </div>
+    </div>
+    <div class="md:w-1/2 mt-4 md:mt-0 md:flex md:justify-end">
+      <% if pair_request.offers.pluck(:offerer_id).include?(current_user.id) %>
+        <p>You have already sent an offer</p>
+      <% else %>
+        <%= link_to(
+          "Apply",
+          new_pair_request_offer_path(pair_request.id),
+          class: "flex md:w-1/2 cursor-pointer items-center justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none",
+          data: { turbo: false }
+        ) %>
+      <% end %>
+    </div>
   </div>
 </div>

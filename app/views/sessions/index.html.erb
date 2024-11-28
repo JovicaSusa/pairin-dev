@@ -1,3 +1,11 @@
-<% @sessions.each do |session| %>
-  <p class="block font-bold"><%= session.sessionable.subject %></p>
-<% end %>
+<div class="flex flex-col items-center">
+  <div class="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
+    <div class="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed text-center">
+      <h3 class="text-5xl font-bold">Sessions</h3>
+    </div>
+
+    <div class="mt-12">
+      <%= render @sessions %>
+    </div>
+  </div>
+</div>

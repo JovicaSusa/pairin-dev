@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "3.2.2"
+ruby "3.3.1"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.2"
@@ -65,6 +65,7 @@ group :development, :test do
   gem "faker"
   gem "selenium-webdriver"
   gem "pry"
+  gem 'dotenv'
 end
 
 group :test do
@@ -81,6 +82,7 @@ group :development do
 
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
+  gem "rails_live_reload"
 end
 
 
@@ -97,3 +99,11 @@ gem "shrine", "~> 3.6"
 gem "image_processing", "~> 1.8"
 
 gem "ransack", "~> 4.2"
+
+gem "pundit", "~> 2.4"
+
+gem "honeybadger", "~> 5.23"
+
+gem "aws-sdk-s3", "~> 1.172"
+
+gem "mailjet", "~> 1.8"

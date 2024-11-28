@@ -8,24 +8,41 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-Array.new(20) { Faker::Internet.email }.map do |email|
-  user = User.create!(email: email, confirmed_at: Time.zone.now, password: "Password33*")
+unless Rails.env.production?
+  Array.new(20) { Faker::Internet.email }.map do |email|
+    user = User.create!(email: email, confirmed_at: Time.zone.now, password: "Password33*")
 
-  user.pair_requests.create!(
-    subject: Faker::ProgrammingLanguage.name,
-    description: Faker::Hacker.say_something_smart,
-    duration: rand(30..120)
-  )
-end
+    user.pair_requests.create!(
+      subject: Faker::ProgrammingLanguage.name,
+      description: Faker::Hacker.say_something_smart,
+      duration: [30, 45, 60, 90, 120, 150].sample
+    )
+    user.pair_requests.create!(
+      subject: Faker::ProgrammingLanguage.name,
+      description: Faker::Hacker.say_something_smart,
+      duration: [30, 45, 60, 90, 120, 150].sample
+    )
+  end
 
-PairRequest.all.map do |pr|
-  pr.periods.create!(
-    start_at: Time.zone.now.advance(days: rand(1..30))
-  )
+  User.all.map do |user|
+    pr1, pr2 = user.pair_requests
 
-  users = User.where.not(id: pr.user_id).sample(10)
+    pr1.periods.create!(
+      start_at: Time.zone.now.advance(days: rand(1..30))
+    )
+    pr2.periods.create!(
+      start_at: Time.zone.now.advance(days: rand(1..30))
+    )
 
-  users.map do |user|
-    pr.offers.create!(offerer: user, message: Faker::Hacker.say_something_smart, period: pr.periods.future.first)
+    users = User.where.not(id: pr.user_id).sample(10)
+
+    users.first(5).map do |user|
+      pr1.offers.create!(offerer: user, message: Faker::Hacker.say_something_smart, period: pr1.periods.future.first)
+    end
+    users.last(5).map do |user|
+      pr2.offers.create!(offerer: user, message: Faker::Hacker.say_something_smart, period: pr2.periods.future.first)
+    end
+
+    Offers::Accept.call(pr1.offers.first)
   end
 end

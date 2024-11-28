@@ -1,4 +1,6 @@
 class ProfilesController < ApplicationController
+  include Authenticated
+
   def show
     @user = current_user
   end
@@ -17,7 +19,7 @@ class ProfilesController < ApplicationController
 
   def profile_attributes
     params.require(:user).permit(
-      :about, :programming_since, :date_of_birth, :country, :language, :level, :image
+      :about, :programming_since, :date_of_birth, :country, :language, :level, :image, :name, :profession
     )
   end
 end

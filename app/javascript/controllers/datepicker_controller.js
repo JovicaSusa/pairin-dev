@@ -4,6 +4,13 @@ import flatpickr from "flatpickr"
 // Connects to data-controller="datepicker"
 export default class extends Controller {
   connect() {
-    flatpickr(this.element, {enableTime: true})
+    flatpickr(
+      this.element, {
+        enableTime: true,
+        altInput: true,
+        altInputClass: "input-primary",
+        disableMobile: true
+      }
+    )
   }
 }

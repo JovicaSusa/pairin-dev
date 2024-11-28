@@ -1,5 +1,44 @@
-<li>
-  <span class="block"><%= pair_request.subject %></span>
-  <span class="block"><%= pair_request.description %></span>
-  <span class="block"><%= link_to "Offers", pair_request_offers_path(pair_request.id), data: { turbo: false } %></span>
-</li>
+<%= turbo_frame_tag dom_id(pair_request) do %>
+  <div class="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+    <div class="w-full border-b-2 flex flex-col md:flex-row justify-center items-center md:justify-between border-black py-4 px-2 rounded-t-md bg-green">
+      <h3 class="font-bold text-xl"><%= pair_request.subject %></h3>
+      <%= link_to "See applications",
+        pair_request_offers_path(pair_request.id),
+        data: { turbo: false },
+        class: "block flex cursor-pointer w-2/3 md:w-2/6 items-center justify-center rounded-md border-2 border-black px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+      %>
+    </div>
+    <div class="max-h-fit px-2 py-4">
+      <div data-controller="read-more" data-read-more-more-text-value="Read more" data-read-more-less-text-value="Read less">
+        <p class="read-more-content" data-read-more-target="content">
+          <%= pair_request.description %>
+        </p>
+
+        <button data-read-more-target="btn" data-action="read-more#toggle">Read more</button>
+      </div>
+    </div>
+
+    <% if pair_request.has_accepted_offer? %>
+      <div class="flex justify-center pt-2 pb-4">
+        <%= simple_form_for(
+          pair_request,
+          url: add_call_link_users_pair_request_path(pair_request),
+          html: { class: "flex flex-col md:flex-row w-full gap-y-4 md:gap-x-2 px-2 items-center md:items-end justify-between" }
+        ) do |f| %>
+          <%= f.simple_fields_for :sessions do |ff| %>
+            <div class="flex flex-col justify-end w-full">
+              <%= ff.label "Call link", class: "font-bold" %>
+              <%= ff.input_field :call_link,
+                label_field: "hey",
+                required: false,
+                class: "w-full rounded-md border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+              %>
+            </div>
+
+            <%= f.button :submit, "Add", class: "w-3/4 md:w-1/4 flex cursor-pointer justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

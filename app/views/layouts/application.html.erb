@@ -6,25 +6,19 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= combobox_style_tag %>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   </head>
 
-  <body class="bg-[#c9dcd8]">
-    <div class="overflow-y-scroll h-screen flex">
-      <div class="w-2/12">
-        <%= render "layouts/nav" %>
-      </div>
-
-      <div class="w-10/12">
-        <div class="flash">
-          <%= render "layouts/flash" %>
-        </div>
-
-        <%= yield %>
-      </div>
+  <body class="bg-yellow-50">
+    <div class="flash">
+      <%= render "layouts/flash" %>
     </div>
+
+    <%= render "layouts/landing_nav" %>
+
+    <%= yield %>
   </body>
 </html>

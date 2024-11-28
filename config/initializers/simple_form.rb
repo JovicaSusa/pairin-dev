@@ -53,10 +53,10 @@ SimpleForm.setup do |config|
 
     ## Inputs
     b.use :label, class: "font-semibold block"
-    b.use :input, error_class: 'bg-rose-100'
+    b.use :input, error_class: 'bg-orange'
     # b.use :label_input, class: "font-bold"
     b.use :hint,  wrap_with: { tag: :span, class: "hint block" }
-    b.use :error, wrap_with: { tag: :span, class: "text-sm font-semibold text-rose-400 block" }
+    b.use :error, wrap_with: { tag: :span, class: "text-sm font-semibold text-orange mt-2 block" }
 
     ## full_messages_for
     # If you want to display the full error message for the attribute, you can

@@ -1,31 +1,56 @@
-<div class="text-center">
-  <h3 class="text-3xl mt-12">Offers</h3>
+<div class="flex flex-col items-center px-4 mt-8">
+  <div class="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
+    <div class="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed text-center">
+      <h3 class="text-5xl font-bold">Applications</h3>
+    </div>
 
-  <div class="md:flex md:flex-col md:items-center px-4 mt-8">
-    <% @offers.each do |offer| %>
-      <div class="bg-blue-100 md:w-1/2 px-4 text-left pt-2 pb-4 rounded-md mb-8">
-        <div class="border-black border-b-2">
-          <div>
-            <p>
-              <%= offer.pair_request.subject %>
-            </p>
+    <div class="mt-12">
+      <% @offers.each do |offer| %>
+        <div class="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div class="border-b-2 border-black px-2 rounded-t-md bg-green">
+            <div class="w-full flex flex-wrap items-center pt-2">
+              <div class="w-full md:w-8/12">
+                <p class="font-bold"><%= offer.pair_request.subject %></p>
+              </div>
+              <div class="w-full md:w-4/12 flex items-center gap-x-2 pt-2 md:pt-0">
+                <div class="rounded-xl text-sm border-2 border-black bg-orange px-2 font-semibold">
+                  <%= offer.period.start_at.to_fs(:short) %>
+                </div>
+                <span class="block font-bold">:</span>
+                <div class="rounded-xl text-sm border-2 border-black bg-orange px-2 font-semibold">
+                  <%= offer.period.end_at.to_fs(:short) %>
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 flex items-center gap-x-2">
+              <figure class="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
+                <%= image_tag offer.pair_request.user.image_url %>
+              </figure>
+
+              <div>
+                <p><%= offer.pair_request.user.name %></p>
+                <span class="text-sm">
+                  <%= offer.pair_request.user.profession %>
+                  <span class="text-xl font-bold">.</span>
+                  <%= offer.pair_request.user.level&.titleize %>
+                </span>
+              </div>
+            </div>
           </div>
-          <div>
-            <p>
-              <%= offer.period.start_at %> - <%= offer.period.end_at %>
-            </p>
+          <div
+            data-controller="read-more"
+            data-read-more-more-text-value="Read more"
+            data-read-more-less-text-value="Read less"
+            class="px-2 py-4"
+          >
+            <p class="read-more-content" data-read-more-target="content"><%= offer.message %></p>
+            <button data-read-more-target="btn" data-action="read-more#toggle">Read more</button>
+          </div>
+          <div class="flex justify-end px-2">
+            <div class="border-2 border-black rounded-xl px-2"><%= offer.status %></div>
           </div>
         </div>
-        <div
-          data-controller="read-more"
-          data-read-more-more-text-value="Read more"
-          data-read-more-less-text-value="Read less"
-          class="bg-white px-2 py-4"
-        >
-          <p class="read-more-content" data-read-more-target="content"><%= offer.message %></p>
-          <button data-read-more-target="btn" data-action="read-more#toggle">Read more</button>
-        </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 </div>

@@ -8,9 +8,9 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Defines the root path route ("/")
-  root "activities#index"
+  root "home#index"
 
-  resources :sessions, only: [:index]
+  resources :sessions, only: [:index, :update]
   resources :profiles, only: [:show, :update]
 
   resources :pair_requests, only: [:index] do
@@ -24,7 +24,9 @@ Rails.application.routes.draw do
   end
 
   namespace :users do
-    resources :pair_requests
+    resources :pair_requests, expect: [:edit, :update] do
+      patch :add_call_link, on: :member
+    end
     resources :offers, only: [:index]
   end
 

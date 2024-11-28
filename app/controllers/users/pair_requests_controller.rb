@@ -1,4 +1,6 @@
 class Users::PairRequestsController < ApplicationController
+  include Authenticated
+
   def index
     @pair_requests = current_user.pair_requests.order(created_at: :desc)
   end
@@ -20,7 +22,23 @@ class Users::PairRequestsController < ApplicationController
     end
   end
 
+  def add_call_link
+    @pair_request = current_user.pair_requests.find(params[:id])
+
+    authorize @pair_request, policy_class: Users::PairRequestPolicy
+
+    if @pair_request.update(add_call_link_params)
+      respond_to do |format|
+        format.turbo_stream { flash.now[:notice] = "Successfuly added!" }
+      end
+    end
+  end
+
   private
+
+  def add_call_link_params
+    params.require(:pair_request).permit(sessions_attributes: [:call_link, :id])
+  end
 
   def pair_request_params
     params

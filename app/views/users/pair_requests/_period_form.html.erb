@@ -1,7 +1,25 @@
 <div class="nested-form-wrapper" data-new-record="<%= f.object.new_record? %>">
-  <%= f.input :start_at, as: :string, input_html: { data: { controller: "datepicker" } } %>
+  <label>
+    <span class="font-bold">Start at</span>
 
-  <button type="button" data-action="nested-form#remove">Remove period</button>
+    <div class="flex gap-x-1">
+      <%= f.input :start_at,
+        label: false,
+        required: false,
+        as: :string,
+        wrapper_html: {
+          class: "w-10/12"
+        },
+        input_html: {
+          data: {
+            controller: "datepicker"
+          }
+        }
+      %>
+
+      <button type="button" data-action="nested-form#remove" class="w-2/12 font-bold">X</button>
+    </div>
+  </label>
 
   <%= f.hidden_field :_destroy %>
 </div>

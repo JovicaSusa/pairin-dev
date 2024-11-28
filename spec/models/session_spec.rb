@@ -30,4 +30,57 @@ RSpec.describe Session, type: :model do
       end
     end
   end
+
+  describe "holder" do
+    subject(:holder) { session.holder }
+
+    let(:session) { build(:session) }
+    let(:session) { build(:session, sessionable: pair_request) }
+    let(:pair_request) { build(:pair_request, user: holder) }
+    let(:holder) { build(:user) }
+
+    it { is_expected.to eq holder }
+  end
+
+  describe "hold_by_user?" do
+    subject(:hold_by_user?) { session.hold_by_user?(user) }
+
+    let(:user) { build(:user) }
+    let(:session) { build(:session, sessionable: pair_request) }
+    let(:pair_request) { build(:pair_request, user: holder) }
+
+    context "when hold by given user" do
+      let(:holder) { user }
+
+      it { is_expected.to be true }
+    end
+
+    context "when hold by other user" do
+      let(:holder) { build(:user) }
+
+      it { is_expected.to be false }
+    end
+  end
+
+  describe "#other_participant" do
+    subject(:other_participant) { session.other_participant(participant) }
+
+    let(:session) { create(:session) }
+    let(:participant_1) { create(:user) }
+    let(:participant_2) { create(:user) }
+    let!(:participation_1) { create(:participation, participable: session, participant: participant_1) }
+    let!(:participation_2) { create(:participation, participable: session, participant: participant_2) }
+
+    context "when participant_1 given" do
+      let(:participant) { participant_1 }
+
+      it { is_expected.to eq(participant_2) }
+    end
+
+    context "when participant_2 given" do
+      let(:participant) { participant_2 }
+
+      it { is_expected.to eq(participant_1) }
+    end
+  end
 end
