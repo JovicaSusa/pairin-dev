@@ -29,9 +29,6 @@ gem "cssbundling-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-# Use Redis adapter to run Action Cable in production
-gem "redis", ">= 4.0.1"
-
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 
@@ -90,6 +87,9 @@ gem "devise", "~> 4.9"
 
 gem "pagy", "~> 6.2"
 
+gem "solid_queue", ">= 1.0"
+
+gem "mission_control-jobs", "~> 0.2.1"
 gem "i18n_data", "~> 1.1"
 
 gem "shrine", "~> 3.6"
