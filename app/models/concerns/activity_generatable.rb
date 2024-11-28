@@ -10,6 +10,6 @@ module ActivityGeneratable
   private
 
   def generate_activities
-    ActivitiesSetup::Proxy.call(self)
+    ActivitiesGenerationJob.perform_later(self, previous_changes)
   end
 end

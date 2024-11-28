@@ -20,8 +20,13 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
-  <<: *default
-  database: pairin_development
+  primary: &primary_development
+    <<: *default
+    database: pairin_development
+  queue:
+    <<: *primary_development
+    database: pairin_development_queue
+    migrations_paths: db/queue_migrate
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -78,6 +83,11 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  url: <%= ENV["POSTGRES_URL"] %>
-  password: <%= ENV["POSTGRES_PASSWORD"] %>
+  primary: &primary_production
+    <<: *default
+    url: <%= ENV["POSTGRES_URL"] %>/pairin_production
+    password: <%= ENV["POSTGRES_PASSWORD"] %>
+  queue:
+    <<: *primary_production
+    url: <%= ENV["POSTGRES_URL"] %>/pairin_production_queue
+    migrations_paths: db/queue_migrate
