@@ -85,9 +85,9 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    url: <%= ENV["POSTGRES_URL"] %>
+    url: <%= ENV["POSTGRES_URL"] %>/pairin_production
     password: <%= ENV["POSTGRES_PASSWORD"] %>
   queue:
     <<: *primary_production
-    database: pairin_production_queue
+    url: <%= ENV["POSTGRES_URL"] %>/pairin_production_queue
     migrations_paths: db/queue_migrate
