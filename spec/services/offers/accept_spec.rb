@@ -34,6 +34,10 @@ RSpec.describe Offers::Accept, type: :unit do
       expect(pair.participant).to eq(offer.offerer)
     end
 
+    it "informs participants" do
+      expect { call }.to have_enqueued_mail(SessionMailer, :session_scheduled_email).twice
+    end
+
     context "when failure" do
       context "when pair request already have accepted offer" do
         before { create(:offer, :accepted, pair_request: offer.pair_request) }

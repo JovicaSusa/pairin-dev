@@ -104,3 +104,5 @@ gem "honeybadger", "~> 5.23"
 gem "aws-sdk-s3", "~> 1.172"
 
 gem "mailjet", "~> 1.8"
+
+gem "dry-operation", "~> 1.0"
