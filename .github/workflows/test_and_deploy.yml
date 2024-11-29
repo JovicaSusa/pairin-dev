@@ -56,7 +56,7 @@ jobs:
         run: bin/rails rspec
 
 
-  deploy:
-    name: Deploy
-    needs: test
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+  # deploy:
+  #   name: Deploy
+  #   needs: test
+  #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
