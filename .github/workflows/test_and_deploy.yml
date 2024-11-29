@@ -54,6 +54,9 @@ jobs:
           bin/rails db:setup
       - name: Run tests
         run: bin/rails rspec
+        env:
+          MISSION_CONTROL_NAME: test
+          MISSION_CONTROL_PASSWORD: test
 
 
   # deploy:
