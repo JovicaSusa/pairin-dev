@@ -51,7 +51,9 @@ jobs:
         run: |
           yarn install --pure-lockfile
       - name: Setup test database
-        run:
+        run: |
           bin/rails db:setup
+      - name: Precompilte assets
+        run: bin/rails assets:precompile
       - name: Run tests
         run: bundle exec rspec
