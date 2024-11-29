@@ -1,0 +1,62 @@
+name: Test and Deploy
+
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-20.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pairin_test
+        ports: ["54320:5432"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install system packages
+        run: |
+          sudo apt-get update -qq && sudo apt-get install libvips-dev
+      - name: Setup Ruby and install gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node_version: 20.4.0
+      - name: Find yarn cache location
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: JS package cache
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install packages
+        run: |
+          yarn install --pure-lockfile
+      - name: Setup test database
+        env:
+          RAILS_ENV: test
+        run:
+          bin/rails db:setup
+      - name: Run tests
+        run: bin/rails rspec
+
+
+  deploy:
+    name: Deploy
+    needs: test
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
