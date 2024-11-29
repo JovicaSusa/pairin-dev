@@ -2,12 +2,10 @@ RSpec.describe ActivitiesSetup::FromOffer, type: :unit do
   describe ".call" do
     subject(:call) { described_class.call(record, previous_changes) }
 
-    let(:record) { build(:offer, offerer: user, pair_request: pair_request) }
-    let(:pair_request) { build(:pair_request, user: user) }
+    let(:record) { create(:offer, offerer: user, pair_request: pair_request) }
+    let(:pair_request) { create(:pair_request, user: user) }
     let(:user) { create(:user) }
     let(:previous_changes) { changes }
-
-    before { pair_request.offers << record }
 
     context "when record created" do
       let(:changes) { { id: [nil, "1"] } }
@@ -33,11 +31,7 @@ RSpec.describe ActivitiesSetup::FromOffer, type: :unit do
     context "when record updated" do
       context "when offer just got accepted" do
         let(:changes) { { accepted_at: [nil, Time.current] } }
-        let(:offer_not_accepted) { build(:offer) }
-
-        before do
-          pair_request.offers << offer_not_accepted
-        end
+        let!(:offer_not_accepted) { create(:offer, pair_request:) }
 
         it "creates expected activities" do
           expect { call }.to change { Activity.count }.by(2)

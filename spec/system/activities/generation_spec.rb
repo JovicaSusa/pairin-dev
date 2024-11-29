@@ -1,4 +1,6 @@
 RSpec.describe "generates expected activites", type: :system do
+  include ActiveJob::TestHelper
+
   let(:current_user) { create(:user) }
 
   before { sign_in(current_user) }
@@ -14,7 +16,9 @@ RSpec.describe "generates expected activites", type: :system do
       fill_in "Duration", with: 45
       fill_in "Start at", with: "2024-11-14 12:00"
 
-      click_button "Create Pair request"
+      perform_enqueued_jobs do
+        click_button "Create Pair request"
+      end
 
       visit activities_path
 
@@ -30,8 +34,11 @@ RSpec.describe "generates expected activites", type: :system do
     it "displays expected activity" do
       visit users_pair_requests_path
 
-      within("#pair_requests") { click_link "Offers" }
-      click_button "Accept"
+      within("#pair_requests") { click_link "See applications" }
+
+      perform_enqueued_jobs do
+        click_button "Accept"
+      end
 
       visit activities_path
 
@@ -46,10 +53,12 @@ RSpec.describe "generates expected activites", type: :system do
     it "creates expected activity" do
       visit pair_requests_path
 
-      click_link "Make an offer"
+      click_link "Apply"
       fill_in "Message", with: "Let's hack!"
 
-      click_button "Send offer"
+      perform_enqueued_jobs do
+        click_button "Apply"
+      end
 
       visit activities_path
     end
@@ -60,8 +69,10 @@ RSpec.describe "generates expected activites", type: :system do
     let(:offer) { build(:offer, offerer: current_user, pair_request:) }
 
     before do
-      Activity.suppress { offer.save! }
-      Offers::Accept.call(offer)
+      perform_enqueued_jobs do
+        Activity.suppress { offer.save! }
+        Offers::Accept.call(offer)
+      end
     end
 
     it "displays expected activities" do
@@ -80,11 +91,13 @@ RSpec.describe "generates expected activites", type: :system do
     let(:accepted_offer) { build(:offer, pair_request:) }
 
     before do
-      Activity.suppress do
-        current_user_offer.save!
-        accepted_offer.save!
+      perform_enqueued_jobs do
+        Activity.suppress do
+          current_user_offer.save!
+          accepted_offer.save!
+        end
+        accepted_offer.update!(accepted_at: Time.zone.now)
       end
-      accepted_offer.update!(accepted_at: Time.zone.now)
     end
 
     it "displays expected activities" do
