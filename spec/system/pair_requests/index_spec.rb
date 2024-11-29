@@ -25,7 +25,7 @@ RSpec.describe "display pair requests", type: :system do
     it "doesn't display button to make an offer for request with an offer from current user" do
       visit pair_requests_path
 
-      expect(page).to have_content("Make an offer")
+      expect(page).to have_content("Apply")
       expect(page).to have_content("You have already sent an offer")
     end
   end

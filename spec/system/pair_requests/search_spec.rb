@@ -16,13 +16,13 @@ RSpec.describe "search pair requests", type: :system, js: true do
     it "displays pair requests tagged by searched tag" do
       visit pair_requests_path
 
+      find(:element, "data-testid": "search-btn").click
       fill_in "q_tags_name_eq", with: "Ruby"
       fill_in "q_duration_eq", with: 45
       find("#q_user_level_eq").click
       find("li[data-value='novice']").click
       find("#q_user_language_eq").click
       find("li[data-value='EN']").click
-      # fill_in "q_user_language_eq", with: "EN"
       fill_in "q_periods_start_at_gteq", with: 1.minute.from_now.to_s
       fill_in "q_periods_end_at_lteq", with: 3.minutes.from_now.to_s
       click_button "Go"

@@ -5,11 +5,11 @@
     </div>
 
     <div class="mt-12" data-controller="reveal">
-      <button class="relative group overflow-hidden items-center w-full flex justify-end mb-2" data-action="click->reveal#toggle" type="button">
+      <button data-testid="search-btn" class="relative group overflow-hidden items-center w-full flex justify-end mb-2" data-action="click->reveal#toggle" type="button">
         <span class="absolute block font-bold top-0 -right-[60px] transition ease-in-out duration-500 group-hover:-translate-x-24">
           Filter
         </span>
-        <%= image_tag "preferences.svg", class: "z-10 bg-yellow-50" %>
+        <%= image_tag "preferences.svg", alt: "filter", class: "z-10 bg-yellow-50" %>
       </button>
 
       <div class="mb-12 hidden" data-reveal-target="item">
