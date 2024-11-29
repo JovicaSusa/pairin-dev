@@ -12,6 +12,8 @@ env:
   MISSION_CONTROL_NAME: test
   MISSION_CONTROL_PASSWORD: test
   RAILS_ENV: test
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
 
 jobs:
   test:
