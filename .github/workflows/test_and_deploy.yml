@@ -55,9 +55,3 @@ jobs:
           bin/rails db:setup
       - name: Run tests
         run: bin/rails rspec
-
-
-  # deploy:
-  #   name: Deploy
-  #   needs: test
-  #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
