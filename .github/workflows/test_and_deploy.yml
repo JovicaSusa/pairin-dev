@@ -59,6 +59,7 @@ jobs:
         run: bundle exec rspec
   deploy:
     name: Deploy
+    runs-on: ubuntu-20.04
     needs: test
     env:
       DOCKER_BUILDKIT: 1
