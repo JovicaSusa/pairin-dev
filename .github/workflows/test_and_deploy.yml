@@ -61,6 +61,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-20.04
     needs: test
+    timeout-minutes: 20
     env:
       DOCKER_BUILDKIT: 1
     steps:
@@ -72,7 +73,7 @@ jobs:
       - name: Setup SSH with a passphrase
         uses: webfactory/ssh-agent@v0.7.0
         with:
-          ssh-private-key: $${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
