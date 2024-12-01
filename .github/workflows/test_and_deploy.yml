@@ -57,3 +57,33 @@ jobs:
         run: bin/rails assets:precompile
       - name: Run tests
         run: bundle exec rspec
+  deploy:
+    name: Deploy
+    needs: test
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Setup SSH with a passphrase
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: $${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Deploy
+        env:
+          VERSION: ${{ github.sha }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          MAILJET_API_KEY: ${{ secrets.MAILJET_API_KEY }}
+          MAILJET_SECRET_KEY: ${{ secrets.MAILJET_SECRET_KEY }}
+          MISSION_CONTROL_NAME: ${{ secrets.MISSION_CONTROL_NAME }}
+          MISSION_CONTROL_PASSWORD: ${{ secrets.MISSION_CONTROL_PASSWORD }}
+        run: bundle exec kamal deploy --version=$VERSION
