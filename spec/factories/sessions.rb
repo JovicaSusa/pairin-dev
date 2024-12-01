@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory(:session) do
     transient do
-      with_participants { true }
+      with_holder { true }
+      with_partner { true }
     end
 
     sessionable factory: :pair_request
@@ -9,11 +10,17 @@ FactoryBot.define do
     end_at { 115.minutes.from_now }
 
     after(:create) do |session, evaluator|
-      if evaluator.with_participants
+      if evaluator.with_holder || evaluator.with_partner
         pair_request = session.sessionable
         offer = create(:offer, :accepted, pair_request: session.sessionable)
-        create(:participation, participant: pair_request.user, participable: session)
-        create(:participation, participant: offer.offerer, participable: session)
+
+        if evaluator.with_holder
+          create(:participation, participant: pair_request.user, participable: session)
+        end
+
+        if evaluator.with_partner
+          create(:participation, participant: offer.offerer, participable: session)
+        end
       end
     end
   end

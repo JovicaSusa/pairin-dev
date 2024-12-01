@@ -11,8 +11,8 @@ RSpec.describe "create pair request offer", type: :system do
 
     click_link "Apply"
     fill_in "Message", with: "Let's hack!"
-    find_field("offer_period_id").click
-    find_field("#{period.start_at.to_fs(:short)} : #{period.end_at.to_fs(:short)}").click
+    find(".hw-combobox__handle").click
+    find(".hw-combobox__option").click
 
     click_button "Apply"
 

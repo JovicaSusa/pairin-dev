@@ -8,9 +8,11 @@ RSpec.describe "search pair requests", type: :system, js: true do
     let(:user) { create(:user, language: "EN", level: "novice") }
 
     before do
-      tag = create(:tag, name: "Ruby")
-      create(:tagging, taggable: searched_pair_request, tag: tag)
-      create(:period, periodable: searched_pair_request, start_at: 2.minutes.from_now)
+      travel_to("2024-11-11T00:00") do
+        tag = create(:tag, name: "Ruby")
+        create(:tagging, taggable: searched_pair_request, tag: tag)
+        create(:period, periodable: searched_pair_request, start_at: "2024-11-11T12:00")
+      end
     end
 
     it "displays pair requests tagged by searched tag" do
@@ -23,8 +25,9 @@ RSpec.describe "search pair requests", type: :system, js: true do
       find("li[data-value='novice']").click
       find("#q_user_language_eq").click
       find("li[data-value='EN']").click
-      fill_in "q_periods_start_at_gteq", with: 1.minute.from_now.to_s
-      fill_in "q_periods_end_at_lteq", with: 3.minutes.from_now.to_s
+      page.execute_script("document.querySelector('#q_periods_start_at_gteq')._flatpickr.setDate(new Date('2024-11-11T11:59'))")
+      page.execute_script("document.querySelector('#q_periods_end_at_lteq')._flatpickr.setDate(new Date('2024-11-11T12:46'))")
+
       click_button "Go"
 
       expect(page).to have_content("Test")
