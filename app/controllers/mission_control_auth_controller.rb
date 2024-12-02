@@ -1,3 +1,12 @@
 class MissionControlAuthController < ApplicationController
-  http_basic_authenticate_with name: ENV["MISSION_CONTROL_NAME"], password: ENV["MISSION_CONTROL_PASSWORD"]
+  before_action :authenticate_with_basic
+
+  private
+
+  def authenticate_with_basic
+    http_basic_authenticate_with(
+      name: Rails.application.credentials.dig(:mission_control, :name),
+      password: Rails.application.credentials.dig(:mission_control, :password)
+    )
+  end
 end

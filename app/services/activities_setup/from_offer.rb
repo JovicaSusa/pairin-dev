@@ -42,6 +42,7 @@ module ActivitiesSetup
         title: I18n.t("activities.offer_accepted.titles").sample,
         content: I18n.t("activities.offer_accepted.content").sample,
       )
+
       pair_request.offers.excluding(record).each do |offer|
         Activity.create!(
           receiver: offer.offerer,

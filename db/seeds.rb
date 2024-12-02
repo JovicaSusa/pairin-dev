@@ -8,7 +8,7 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-unless Rails.env.production?
+if Rails.env.development?
   Array.new(20) { Faker::Internet.email }.map do |email|
     user = User.create!(email: email, confirmed_at: Time.zone.now, password: "Password33*")
 

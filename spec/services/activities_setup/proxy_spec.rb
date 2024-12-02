@@ -1,12 +1,14 @@
 RSpec.describe ActivitiesSetup::Proxy, type: :unit do
   describe ".call" do
-    subject(:call) { described_class.call(record) }
+    subject(:call) { described_class.call(record, previous_changes) }
+
+    let(:previous_changes) { {} }
 
     context "when record is PairRequest" do
       let(:record) { build(:pair_request) }
 
       it "calls expected service" do
-        expect(ActivitiesSetup::FromPairRequest).to receive(:call).with(record)
+        expect(ActivitiesSetup::FromPairRequest).to receive(:call).with(record, previous_changes)
 
         call
       end
@@ -16,7 +18,7 @@ RSpec.describe ActivitiesSetup::Proxy, type: :unit do
       let(:record) { build(:offer) }
 
       it "calls expected service" do
-        expect(ActivitiesSetup::FromOffer).to receive(:call).with(record)
+        expect(ActivitiesSetup::FromOffer).to receive(:call).with(record, previous_changes)
 
         call
       end
@@ -26,7 +28,7 @@ RSpec.describe ActivitiesSetup::Proxy, type: :unit do
       let(:record) { build(:participation) }
 
       it "calls expected service" do
-        expect(ActivitiesSetup::FromParticipation).to receive(:call).with(record)
+        expect(ActivitiesSetup::FromParticipation).to receive(:call).with(record, previous_changes)
 
         call
       end

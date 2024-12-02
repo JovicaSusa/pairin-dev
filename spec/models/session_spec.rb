@@ -65,7 +65,7 @@ RSpec.describe Session, type: :model do
   describe "#other_participant" do
     subject(:other_participant) { session.other_participant(participant) }
 
-    let(:session) { create(:session) }
+    let(:session) { create(:session, with_holder: false, with_partner: false) }
     let(:participant_1) { create(:user) }
     let(:participant_2) { create(:user) }
     let!(:participation_1) { create(:participation, participable: session, participant: participant_1) }

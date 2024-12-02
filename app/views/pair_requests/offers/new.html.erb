@@ -14,8 +14,9 @@
       %>
       <label>
         <span class="font-bold">Select period</span>
+
         <%= f.combobox :period_id,
-          @offer.pair_request.periods.map { |p| ["#{p.start_at.to_fs(:short)} : #{p.end_at.to_fs(:short)}", p.id] } %>
+          @pair_request.periods.map { |p| ["#{p.start_at.to_fs(:short)} : #{p.end_at.to_fs(:short)}", p.id] } %>
       </label>
 
       <div class="w-full flex justify-center">

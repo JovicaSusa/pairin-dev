@@ -9,11 +9,14 @@ FactoryBot.define do
     end
 
     after(:build) do |offer|
-      pair_request = create(:pair_request)
-      period = create(:period, periodable: pair_request)
+      if offer.pair_request.nil?
+        pair_request = create(:pair_request)
+        offer.pair_request = pair_request
+      end
 
-      offer.pair_request = pair_request if offer.pair_request.nil?
-      offer.period = period if offer.period.nil?
+      if offer.period.nil?
+        offer.period = create(:period, periodable: offer.pair_request)
+      end
     end
   end
 end
