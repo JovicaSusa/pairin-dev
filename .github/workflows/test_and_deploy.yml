@@ -9,8 +9,6 @@ on:
       - main
 
 env:
-  MISSION_CONTROL_NAME: test
-  MISSION_CONTROL_PASSWORD: test
   RAILS_ENV: test
 
 jobs:
@@ -61,7 +59,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-20.04
     needs: test
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    # if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     timeout-minutes: 20
     env:
       DOCKER_BUILDKIT: 1
