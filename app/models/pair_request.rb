@@ -3,7 +3,7 @@ class PairRequest < ApplicationRecord
 
   belongs_to :user
   has_many :offers, dependent: nil # TODO: Reconsider
-  has_many :periods, as: :periodable, dependent: :destroy
+  has_many :periods, as: :periodable, dependent: :destroy, inverse_of: :periodable
   has_many :sessions, as: :sessionable
   has_many :taggings, as: :taggable
   has_many :tags, through: :taggings
@@ -13,7 +13,7 @@ class PairRequest < ApplicationRecord
 
   scope :active, -> { joins(:periods).merge(Period.future) }
 
-  accepts_nested_attributes_for :periods, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :periods, allow_destroy: true
   accepts_nested_attributes_for :taggings, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :sessions, reject_if: :new_record?
 

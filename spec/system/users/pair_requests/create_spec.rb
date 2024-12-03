@@ -4,13 +4,13 @@ RSpec.describe "users pair requests", type: :system do
   before { sign_in(current_user) }
 
   it "creates pair request for current user" do
-    skip "fix when period is selected with datepicker"
     visit users_pair_requests_path
 
     click_link "New Request"
     fill_in "Subject", with: "AAA"
     fill_in "Description", with: "BBB"
     fill_in "Duration", with: 45
+    page.execute_script("document.querySelector('#pair_request_periods_attributes_0_start_at')._flatpickr.setDate(new Date(new Date().getTime() + 24 * 60 * 60 * 1000))")
 
     click_button "Create Pair request"
 

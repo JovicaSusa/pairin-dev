@@ -1,10 +1,10 @@
 class Period < ApplicationRecord
-  belongs_to :periodable, polymorphic: true
+  belongs_to :periodable, polymorphic: true, inverse_of: :periods
 
   validates :start_at, :end_at, presence: true
   validate :dates_in_future
 
-  before_validation :set_end_at # TODO: Move this somewhere else(to pair request cntrl)
+  before_validation :set_end_at
 
   scope :future, -> { where(start_at: Time.zone.now..) }
 

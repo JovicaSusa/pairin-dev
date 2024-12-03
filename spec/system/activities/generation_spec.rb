@@ -14,7 +14,7 @@ RSpec.describe "generates expected activites", type: :system do
       fill_in "Subject", with: "AAA"
       fill_in "Description", with: "BBB"
       fill_in "Duration", with: 45
-      fill_in "Start at", with: "2024-11-14 12:00"
+      page.execute_script("document.querySelector('#pair_request_periods_attributes_0_start_at')._flatpickr.setDate(new Date(new Date().getTime() + 24 * 60 * 60 * 1000))")
 
       perform_enqueued_jobs do
         click_button "Create Pair request"
