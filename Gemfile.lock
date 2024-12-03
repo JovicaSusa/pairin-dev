@@ -318,6 +318,8 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.1.8)
+    rack-attack (6.7.0)
+      rack (>= 1.0, < 4)
     rack-session (2.0.0)
       rack (>= 3.0.0)
     rack-test (2.1.0)
@@ -496,6 +498,7 @@ DEPENDENCIES
   pry
   puma (>= 5.0)
   pundit (~> 2.4)
+  rack-attack (~> 6.7)
   rails (~> 7.1.2)
   rails_live_reload
   ransack (~> 4.2)
