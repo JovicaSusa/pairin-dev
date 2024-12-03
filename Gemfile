@@ -108,3 +108,5 @@ gem "mailjet", "~> 1.8"
 gem "dry-operation", "~> 1.0"
 
 gem "kamal", "~> 2.3"
+
+gem "rack-attack", "~> 6.7"
