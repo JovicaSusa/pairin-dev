@@ -63,6 +63,7 @@ group :development, :test do
   gem "selenium-webdriver"
   gem "pry"
   gem 'dotenv'
+  gem "bullet"
 end
 
 group :test do
