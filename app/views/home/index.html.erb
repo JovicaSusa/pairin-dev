@@ -6,7 +6,7 @@
       <span class="text-6xl font-bold">time!</span>
     </div>
     <div class="border-b-4 pb-2 border-black border-dashed">
-      <h2 class="mt-4 text-xl tracking-wide">Find pair programming partner quick and easy!</h2>
+      <h1 class="mt-4 text-xl tracking-wide">Find pair programming partner quick and easy!</h1>
     </div>
 
     <div class="flex justify-center w-full max-w-2xl gap-2 mt-16">
@@ -92,12 +92,12 @@
     </h2>
 
     <div class="max-sm:hidden absolute -bottom-8 -left-16">
-      <%= image_tag "arrow.svg", class: "relative w-16 h-16 -scale-x-100 rotate-45" %>
+      <%= image_tag "arrow.svg", alt: "Arrow", class: "relative w-16 h-16 -scale-x-100 rotate-45" %>
       <span class="block  absolute top-0 -left-2 -rotate-45 text-md">do this</span>
     </div>
 
     <div class="max-sm:hidden absolute -bottom-8 -right-16">
-      <%= image_tag "arrow.svg", class: "relative w-16 h-16 -rotate-45" %>
+      <%= image_tag "arrow.svg", alt: "Arrow", class: "relative w-16 h-16 -rotate-45" %>
       <span class=" absolute top-0 -right-2 rotate-45 text-md">or this</span>
     </div>
   </div>
@@ -106,6 +106,7 @@
     <div class="flex gap-y-12 flex-col items-center relative md:border-r-4 md:border-black md:border-dashed">
       <%= render partial: "home/info_card",
           locals: {
+            alt: "Programmer searching for pair programming partners",
             image_name: "search_new.svg",
             title: "Search for Pairing Opportunities",
             text: "Discover pair programming requests from our vibrant community. Customize your search by technology, time availability, or desired experience level to find the perfect match."
@@ -114,6 +115,7 @@
 
       <%= render partial: "home/info_card",
           locals: {
+            alt: "Programmer applying for pair programming",
             image_name: "offer.svg",
             title: "Express Your Interest",
             text: "Once you've found a pairing request that aligns with your preferences, choose your availability and reach out to the requester. Craft a compelling message to increase your chances of being accepted as a programming partner."
@@ -122,13 +124,14 @@
 
       <%= render partial: "home/info_card",
           locals: {
+            alt: "Programmer waiting for outcome of pair programming application",
             image_name: "await.svg",
             title: "Await Approval",
             text: "After expressing your interest and sending out your application, patiently await approval from the requester. During this time, feel free to prepare for the upcoming pair programming session and stay connected with our community."
           }
       %>
 
-      <%= image_tag "arrow.svg", class: "absolute -bottom-32 right-50 w-24 h-24 -scale-x-100 invisible md:visible" %>
+      <%= image_tag "arrow.svg", alt: "Arrow", class: "absolute -bottom-32 right-50 w-24 h-24 -scale-x-100 invisible md:visible" %>
     </div>
 
     <div class="relative flex py-5 items-center my-24 mx-12 md:hidden">
@@ -140,6 +143,7 @@
     <div class="flex flex-col gap-y-12 items-center relative">
       <%= render partial: "home/info_card",
           locals: {
+            alt: "Programmer posting new pair programming request",
             image_name: "post_new.svg",
             title: "Post your pair programming request",
             text: "Share your coding project or learning goals by posting a pair programming request. Let us know your preferred tech, when you're free, and what you're looking for in a coding partner."
@@ -148,6 +152,7 @@
 
       <%= render partial: "home/info_card",
           locals: {
+            alt: "Programmer reviewing pair programming request applications",
             image_name: "review.svg",
             title: "Review Received Applications",
             text: "Your request is live, and applications are coming in. Take some time to review profiles and find the right match for your project. The perfect coding companion is just around the corner."
@@ -156,20 +161,21 @@
 
       <%= render partial: "home/info_card",
           locals: {
+            alt: "Programmer accepting pair programming application",
             image_name: "accept.svg",
             title: "Accept one of the applications",
             text: "Review applications and choose the one that fits your project. Confirm your coding teammate and get ready to start working together. It's as simple as that!"
           }
       %>
 
-      <%= image_tag "arrow.svg", class: "absolute -bottom-32 right-50 w-24 h-24 invisible md:visible" %>
+      <%= image_tag "arrow.svg", alt: "Arrow", class: "absolute -bottom-32 right-50 w-24 h-24 invisible md:visible" %>
     </div>
   </div>
 
   <h2 class="mt-16 md:mt-24 text-6xl font-bold ">Start pairin!</h2>
 
   <div class="w-full flex justify-center mt-12">
-    <%= image_tag "start.svg", class: "block w-80 h-80 md:h-96 md:w-96" %>
+    <%= image_tag "start.svg", alt: "Programmer on the road to success with pair programming", class: "block w-80 h-80 md:h-96 md:w-96" %>
   </div>
 
   <div class="flex flex-col px-4 md:px-0 mt-24 md:mt-44 items-center">
@@ -204,7 +210,7 @@
     </div>
   </div>
   <div class="flex flex-col w-1/2 mt-2 items-center">
-    <%= image_tag "logo.svg", class: "w-24 h-24" %>
+    <%= image_tag "logo.svg", alt: "Pairin.dev logo", class: "w-24 h-24" %>
     <span class="block text-sm">made by Manufaktura Koda</span>
   </div>
 </div>
