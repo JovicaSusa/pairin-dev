@@ -2,11 +2,11 @@ class PairRequests::OffersController < ApplicationController
   include Authenticated
 
   def index
-    pair_request = current_user.pair_requests.find_by(id: params[:pair_request_id])
+    @pair_request = current_user.pair_requests.find_by(id: params[:pair_request_id])
 
-    authorize pair_request, policy_class: PairRequests::OfferPolicy
+    authorize @pair_request, policy_class: PairRequests::OfferPolicy
 
-    @offers = pair_request.offers.future.order(:accepted_at)
+    @offers = @pair_request.offers.includes(:offerer, :period).future.order(:accepted_at)
   end
 
   def new

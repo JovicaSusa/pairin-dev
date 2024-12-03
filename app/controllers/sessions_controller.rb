@@ -2,7 +2,7 @@ class SessionsController < ApplicationController
   include Authenticated
 
   def index
-    @sessions = current_user.sessions.future
+    @sessions = current_user.sessions.includes([sessionable: :user], :participants).future
   end
 
   def update
