@@ -4,7 +4,7 @@
       <h3 class="text-5xl font-bold">Send application</h3>
     </div>
 
-    <%= simple_form_for @offer, url: pair_request_offers_path, html: { class: "flex flex-col items-start mt-12" } do |f| %>
+    <%= simple_form_for @offer, url: pair_request_offers_path(@pair_request), html: { class: "flex flex-col items-start mt-12" } do |f| %>
       <%= f.error :pair_request_id %>
       <%= f.input :message,
         required: false,
@@ -12,11 +12,15 @@
         wrapper_html: { class: "w-full" },
         input_html: { class: "input-primary" }
       %>
-      <label>
+      <label for="offer_period_id">
         <span class="font-bold">Select period</span>
 
         <%= f.combobox :period_id,
-          @pair_request.periods.map { |p| ["#{p.start_at.to_fs(:short)} : #{p.end_at.to_fs(:short)}", p.id] } %>
+          @pair_request.periods.future.map { |p| ["#{p.start_at.to_fs(:short)} : #{p.end_at.to_fs(:short)}", p.id] } %>
+
+        <% if @offer.errors[:period].present? %>
+          <span class="text-sm font-semibold text-orange mt-2 block"><%= @offer.errors[:period].join(",") %></span>
+        <% end %>
       </label>
 
       <div class="w-full flex justify-center">

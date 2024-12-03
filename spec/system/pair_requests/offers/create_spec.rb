@@ -29,6 +29,7 @@ RSpec.describe "create pair request offer", type: :system do
       click_button "Apply"
 
       expect(page).to have_content("can't be blank")
+      expect(page).to have_content("must exist")
     end
   end
 end

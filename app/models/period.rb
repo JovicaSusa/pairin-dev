@@ -1,5 +1,5 @@
 class Period < ApplicationRecord
-  belongs_to :periodable, polymorphic: true
+  belongs_to :periodable, polymorphic: true, inverse_of: :periods
 
   validates :start_at, :end_at, presence: true
   validate :dates_in_future
