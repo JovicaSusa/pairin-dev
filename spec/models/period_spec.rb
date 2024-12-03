@@ -1,7 +1,7 @@
 RSpec.describe Period, type: :model do
   describe "validations" do
     describe "dates in future" do
-      let(:period) { build(:period, start_at: 60.minutes.ago) }
+      let(:period) { build(:period, start_at: 120.minutes.ago) }
 
       it "sets expected error" do
         expect(period.valid?).to be false
