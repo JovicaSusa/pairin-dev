@@ -18,8 +18,42 @@
       </div>
     </div>
 
+    <% if pair_request.sessions.present? %>
+      <div class="px-2 pt-2">
+        <div class="md:flex items-center max-h-fit">
+          <div class="md:w-1/2 flex items-center gap-x-2">
+            <figure class="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
+              <%= image_tag pair_request.offers.accepted.first.offerer.image_url %>
+            </figure>
+
+            <div>
+              <p><%= pair_request.offers.accepted.first.offerer.name %></p>
+              <span class="text-sm">
+                <%= pair_request.offers.accepted.first.offerer.profession %>
+                <span class="text-xl font-bold">.</span>
+                <%= pair_request.offers.accepted.first.offerer.level&.titleize %>
+              </span>
+            </div>
+          </div>
+          <% pair_request.sessions.each do |session| %>
+            <div class="w-full mt-4 md:mt-0 md:w-4/12">
+              <div class="w-full flex md:items-center md:justify-end gap-x-1 mt-1">
+                <div class="rounded-xl text-sm border-2 border-black px-2 font-semibold">
+                  <%= session.start_at.to_fs(:short) %>
+                </div>
+                <span class="block font-bold">:</span>
+                <div class="rounded-xl text-sm border-2 border-black px-2 font-semibold">
+                  <%= session.end_at.to_fs(:short) %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <% if pair_request.has_accepted_offer? %>
-      <div class="flex justify-center pt-2 pb-4">
+      <div class="flex justify-center pt-2">
         <%= simple_form_for(
           pair_request,
           url: add_call_link_users_pair_request_path(pair_request),

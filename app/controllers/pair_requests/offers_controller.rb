@@ -6,7 +6,7 @@ class PairRequests::OffersController < ApplicationController
 
     authorize @pair_request, policy_class: PairRequests::OfferPolicy
 
-    @offers = @pair_request.offers.includes(:offerer, :period).future.order(:accepted_at)
+    @offers = @pair_request.offers.joins(:period).includes(:offerer, :period).order("accepted_at, periods.start_at desc")
   end
 
   def new
