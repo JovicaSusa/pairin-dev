@@ -2,7 +2,7 @@ class Users::PairRequestsController < ApplicationController
   include Authenticated
 
   def index
-    @pair_requests = current_user.pair_requests.order(created_at: :desc)
+    @pair_requests = current_user.pair_requests.includes(:sessions).order(created_at: :desc)
   end
 
   def new
