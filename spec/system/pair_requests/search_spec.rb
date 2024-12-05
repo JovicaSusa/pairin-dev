@@ -26,7 +26,7 @@ RSpec.describe "search pair requests", type: :system, js: true do
       find("#q_user_language_eq").click
       find("li[data-value='EN']").click
       page.execute_script("document.querySelector('#q_periods_start_at_gteq')._flatpickr.setDate(new Date('2024-11-11T11:59'))")
-      page.execute_script("document.querySelector('#q_periods_end_at_lteq')._flatpickr.setDate(new Date('2024-11-11T12:46'))")
+      page.execute_script("document.querySelector('#q_periods_end_at_lteq')._flatpickr.setDate(new Date('2024-11-11T13:46'))")
 
       click_button "Go"
 

@@ -3,7 +3,7 @@
     <h3 class="font-bold text-xl"><%= pair_request.subject %></h3>
   </div>
   <div class="md:flex max-h-fit px-2 py-4">
-    <div class="w-full md:w-8/12" data-controller="read-more" data-read-more-more-text-value="Read more" data-read-more-less-text-value="Read less">
+    <div class="w-full md:w-7/12" data-controller="read-more" data-read-more-more-text-value="Read more" data-read-more-less-text-value="Read less">
       <p class="read-more-content" data-read-more-target="content">
         <%= pair_request.description %>
       </p>
@@ -11,7 +11,7 @@
       <button data-read-more-target="btn" data-action="read-more#toggle">Read more</button>
     </div>
 
-    <div class="w-full mt-4 md:mt-0 md:w-4/12">
+    <div class="w-full mt-4 md:mt-0 md:w-5/12">
       <% pair_request.periods.each do |period| %>
         <div class="w-full flex md:items-center md:justify-end gap-x-1 mt-1">
           <div class="rounded-xl text-sm border-2 border-black px-2 font-semibold">
