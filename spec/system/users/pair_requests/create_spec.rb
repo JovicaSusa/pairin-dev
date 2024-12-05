@@ -4,9 +4,8 @@ RSpec.describe "users pair requests", type: :system do
   before { sign_in(current_user) }
 
   it "creates pair request for current user" do
-    visit users_pair_requests_path
+    visit new_users_pair_request_path
 
-    click_link "New Request"
     fill_in "Subject", with: "AAA"
     fill_in "Description", with: "BBB"
     fill_in "Duration", with: 45
@@ -20,9 +19,8 @@ RSpec.describe "users pair requests", type: :system do
 
   context "when details not provided" do
     it "displays errors" do
-      visit users_pair_requests_path
+      visit new_users_pair_request_path
 
-      click_link "New Request"
       fill_in "Subject", with: ""
       fill_in "Description", with: ""
       fill_in "Duration", with: 0

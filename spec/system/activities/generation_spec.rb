@@ -7,10 +7,8 @@ RSpec.describe "generates expected activites", type: :system do
 
   context "when pair request created" do
     it "displays expected activity" do
-      visit activities_path
-      visit users_pair_requests_path
+      visit new_users_pair_request_path
 
-      click_link "New Request"
       fill_in "Subject", with: "AAA"
       fill_in "Description", with: "BBB"
       fill_in "Duration", with: 45

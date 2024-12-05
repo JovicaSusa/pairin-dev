@@ -1,13 +1,14 @@
-<div class="flex flex-col w-full items-center">
-  <div class="w-1/2 mt-4">
-    <h3 class="text-center border-b-4 border-black border-dashed py-4 font-bold text-4xl">Create a request</h3>
-  </div>
+<div class="flex flex-col items-center">
+  <div class="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
+    <div class="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed text-center">
+      <h3 class="text-5xl font-bold">Create a request</h3>
+    </div>
 
-  <%= turbo_frame_tag @pair_request do %>
+
     <%= simple_form_for(
       @pair_request,
       url: users_pair_requests_path,
-      html: { class: "flex flex-col items-center pb-12 mt-12 border-b-4 border-dashed border-black" }
+      html: { class: "flex flex-col items-center pb-12 mt-12", data: { turbo: false } }
     ) do |f| %>
       <div class="flex w-full gap-x-4">
         <%= f.input :subject,
@@ -87,7 +88,6 @@
       </div>
 
       <%= f.button :submit, class: "mt-12 flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none" %>
-
     <% end %>
-  <% end %>
+  </div>
 </div>
