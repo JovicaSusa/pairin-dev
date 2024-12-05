@@ -4,6 +4,15 @@
 
 import { application } from "./application"
 
+import NestedForm from "stimulus-rails-nested-form"
+application.register("nested-form", NestedForm)
+
+import HwComboboxController from "@josefarias/hotwire_combobox"
+application.register("hw-combobox", HwComboboxController)
+
+import RevealController from '@stimulus-components/reveal'
+application.register('reveal', RevealController)
+
 import DatepickerController from "./datepicker_controller"
 application.register("datepicker", DatepickerController)
 
