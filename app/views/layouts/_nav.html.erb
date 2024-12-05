@@ -1,27 +1,53 @@
 <aside class="hidden md:block h-screen w-2/12 font-sans absolute border-r-4 border-black border-dashed">
-  <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-    <%= image_tag "logo.svg", class: "w-12 h-12" %>
-  </div>
-  <div class="<%= active_link_class(activities_path) %> border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Community", activities_path %>
-  </div>
-  <div class="<%= active_link_class(pair_requests_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Search", pair_requests_path %>
-  </div>
-  <div class="<%= active_link_class(users_offers_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Applied", users_offers_path %>
-  </div>
-  <div class="<%= active_link_class(users_pair_requests_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Pairin requests", users_pair_requests_path %>
-  </div>
-  <div class="<%= active_link_class(profile_path(current_user.id)) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Profile", profile_path(current_user.id) %>
-  </div>
-  <div class="<%= active_link_class(sessions_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Sessions", sessions_path %>
-  </div>
-  <div class="border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete } %>
+  <div class="relative w-full h-[inherit]">
+    <div class="h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+      <%= image_tag "logo.svg", class: "w-12 h-12" %>
+    </div>
+    <div class="<%= active_link_class(pair_requests_path) %> border-t-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+      <%= link_to "Search", pair_requests_path %>
+    </div>
+    <div data-controller="reveal">
+      <div
+        data-action="click->reveal#toggle"
+        class="border-t-4 flex items-center justify-center border-black h-16 cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]"
+      >
+        Pair Requests
+      </div>
+
+      <div
+        data-reveal-target="item"
+        class="<%= (current_page?(new_users_pair_request_path) || current_page?(users_pair_requests_path) ||  current_page?(users_offers_path)) ? '' : 'hidden' %>"
+      >
+        <div class="<%= active_link_class(new_users_pair_request_path) %> border-t-2 flex items-center justify-center border-black h-16 cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+          <%= link_to "New", new_users_pair_request_path %>
+        </div>
+        <div class="<%= active_link_class(users_pair_requests_path) %> border-t-2 flex items-center justify-center border-black h-16 cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+          <%= link_to "Opened", users_pair_requests_path %>
+        </div>
+        <div class="<%= active_link_class(users_offers_path) %> border-t-2 flex items-center justify-center border-black h-16 cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+          <%= link_to "Applied", users_offers_path %>
+        </div>
+      </div>
+    </div>
+    <div class="<%= active_link_class(activities_path) %> border-t-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+      <%= link_to "Feed", activities_path %>
+    </div>
+    <div class="<%= active_link_class(sessions_path) %> border-y-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
+      <%= link_to "Sessions", sessions_path %>
+    </div>
+    <div class="absolute bottom-0 left-0 w-full" data-controller="reveal">
+      <div data-reveal-target="item" class="hidden">
+        <div class="border-t-2 flex items-center justify-center border-black h-16 cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]"><%= link_to "Profile", profile_path(current_user.id) %></div>
+        <div class="border-t-2 flex items-center justify-center border-black h-16 cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]"><%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete } %></div>
+      </div>
+
+      <div
+        data-action="click->reveal#toggle"
+        class="w-full border-t-4 border-black h-16 flex justify-center items-center cursor-pointer"
+      >
+        Account
+      </div>
+    </div>
   </div>
 </aside>
 
@@ -32,29 +58,49 @@
     </button>
 
     <div data-reveal-target="item" class="hidden w-full">
-      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+      <div class="h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
         <%= image_tag "logo.svg", class: "w-12 h-12" %>
       </div>
-      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-        <%= link_to "Activities", activities_path %>
+      <div data-controller="reveal">
+        <div
+          data-action="click->reveal#toggle"
+          class="border-t-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        >
+          Pair Requests
+        </div>
+
+
+        <div data-reveal-target="item" class="hidden">
+          <div class="border-t-2 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+            <%= link_to "New", new_users_pair_request_path %>
+          </div>
+          <div class="border-t-2 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+            <%= link_to "Opened", users_pair_requests_path %>
+          </div>
+          <div class="border-t-2 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+            <%= link_to "Applied", users_offers_path %>
+          </div>
+        </div>
       </div>
-      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-        <%= link_to "Pair Requests", pair_requests_path %>
+      <div class="border-t-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        <%= link_to "Feed", activities_path %>
       </div>
-      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-        <%= link_to "Offers", users_offers_path %>
-      </div>
-      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-        <%= link_to "You pair requests", users_pair_requests_path %>
-      </div>
-      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-        <%= link_to "Activity", root_path %>
-      </div>
-      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-        <%= link_to "Profile", profile_path(current_user.id) %>
-      </div>
-      <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-        <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete } %>
+      <div data-controller="reveal">
+        <div
+          data-action="click->reveal#toggle"
+          class="border-y-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+        >
+          Account
+        </div>
+
+        <div data-reveal-target="item" class="hidden">
+          <div class="border-t-2 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+            <%= link_to "Profile", profile_path(current_user.id) %>
+          </div>
+          <div class="border-y-2 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
+            <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete } %>
+          </div>
+        </div>
       </div>
     </div>
   </div>

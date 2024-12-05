@@ -15,7 +15,6 @@ class Users::PairRequestsController < ApplicationController
     if @pair_request.save
       respond_to do |format|
         format.html { redirect_to users_pair_requests_path, notice: "Request posted! Good luck" }
-        format.turbo_stream
       end
     else
       render :new, status: :unprocessable_entity
