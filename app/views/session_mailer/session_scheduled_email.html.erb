@@ -38,7 +38,7 @@
                       <span style="font-weight: 600">Time:</span>
                     </td>
                     <td style="width: 50%;">
-                      <%= @session.start_at.to_fs(:short) %> - <%= @session.end_at.to_fs(:short) %>
+                      <%= @session.start_at.in_time_zone(@participant.timezone).to_fs(:short) %> - <%= @session.end_at.in_time_zone(@participant.timezone).to_fs(:short) %>
                     </td>
                   </tr>
                   <tr style="display: flex; width: 100%;">

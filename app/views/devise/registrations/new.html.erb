@@ -38,6 +38,8 @@
 
       <input type="text" name="bot_trap" class="opacity-0 absolute top-0 left-0 -z-10 h-0 w-0" />
 
+      <%= f.input :timezone, as: :hidden, input_html: { data: { controller: "register-timezone" } } %>
+
       <div class="form-actions mt-6">
         <%= f.button :submit, "Sign up", class: "mt-6 flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"  %>
       </div>

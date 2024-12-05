@@ -10,17 +10,11 @@ application.register("datepicker", DatepickerController)
 import HomeController from "./home_controller"
 application.register("home", HomeController)
 
+import ReadMoreController from "./read_more_controller"
+application.register("read-more", ReadMoreController)
+
+import RegisterTimezoneController from "./register_timezone_controller"
+application.register("register-timezone", RegisterTimezoneController)
+
 import RemovalsController from "./removals_controller"
 application.register("removals", RemovalsController)
-
-import NestedForm from "stimulus-rails-nested-form"
-application.register("nested-form", NestedForm)
-
-import ReadMore from "./read_more_controller"
-application.register('read-more', ReadMore)
-
-import HwComboboxController from "@josefarias/hotwire_combobox"
-application.register("hw-combobox", HwComboboxController)
-
-import RevealController from '@stimulus-components/reveal'
-application.register('reveal', RevealController)

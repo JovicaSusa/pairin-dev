@@ -1,7 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import flatpickr from "flatpickr"
 
-// Connects to data-controller="datepicker"
 export default class extends Controller {
   connect() {
     flatpickr(
@@ -9,7 +8,9 @@ export default class extends Controller {
         enableTime: true,
         altInput: true,
         altInputClass: "input-primary",
-        disableMobile: true
+        disableMobile: true,
+        dateFormat: "Z",
+        altFormat: "M j, Y h i Kw"
       }
     )
   }
