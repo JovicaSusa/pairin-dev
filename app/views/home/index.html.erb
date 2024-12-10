@@ -1,36 +1,38 @@
-<div class="flex w-full justify-center px-5 py-12 md:px-12 lg:px-16 lg:py-24">
-  <div class="text-center">
-    <div class="font-headline">
-      <span class="text-6xl font-bold">It's</span>
-      <span class="block font-bold bg-orange text-8xl px-4 font-headline">PAIRIN</span>
-      <span class="text-6xl font-bold">time!</span>
-    </div>
-    <div class="border-b-4 pb-2 border-black border-dashed">
-      <h1 class="mt-4 text-xl tracking-wide">Find pair programming partner quick and easy!</h1>
-    </div>
-
-    <div class="flex justify-center w-full max-w-2xl gap-2 mt-16">
-      <div class="mt-3 rounded-lg sm:mt-0">
-        <%= link_to new_user_registration_path do %>
-          <button
-            role="button"
-            aria-label="Click to perform an action"
-            class="flex font-headline text-2xl md:text-base cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-          >
-            Sign Up Now
-          </button>
-        <% end %>
+<div class="w-full flex justify-center">
+  <div class="flex w-full md:w-1/2 justify-center px-5 py-12 md:px-12 lg:px-16 lg:py-24">
+    <div class="text-center">
+      <div class="font-headline">
+        <span class="text-6xl font-bold">It's</span>
+        <span class="block font-bold bg-orange text-8xl px-4 font-headline">PAIRIN</span>
+        <span class="text-6xl font-bold">time!</span>
       </div>
-      <div class="hidden md:block mt-3 sm:mt-0 sm:ml-3">
-        <%= link_to "#how-it-works" do %>
-          <button
-            role="button"
-            aria-label="Click to perform an action"
-            class="flex font-headline cursor-pointer items-center rounded-md border-2 border-black px-5 py-3 font-bold bg-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-          >
-            Show me more
-          </button>
-        <% end %>
+      <div class="border-b-4 pb-2 border-black border-dashed">
+        <h1 class="mt-4 text-xl tracking-wide">Find pair programming partner or coding buddy quick and easy!</h1>
+      </div>
+
+      <div class="flex justify-center w-full max-w-2xl gap-2 mt-12">
+        <div class="mt-3 rounded-lg sm:mt-0">
+          <%= link_to new_user_registration_path do %>
+            <button
+              role="button"
+              aria-label="Click to perform an action"
+              class="flex font-headline text-2xl md:text-base cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+            >
+              Sign Up Now
+            </button>
+          <% end %>
+        </div>
+        <div class="hidden md:block mt-3 sm:mt-0 sm:ml-3">
+          <%= link_to "#how-it-works" do %>
+            <button
+              role="button"
+              aria-label="Click to perform an action"
+              class="flex font-headline cursor-pointer items-center rounded-md border-2 border-black px-5 py-3 font-bold bg-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+            >
+              Show me more
+            </button>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
@@ -38,52 +40,64 @@
 
 <!-- ICONS -->
 <div class="relative flex w-full overflow-x-hidden border-b-8 border-t-2 border-black bg-green font-bold">
-<div class="hover:animate-marquee whitespace-nowrap py-12 flex">
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-rails-plain-wordmark"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-c-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-clojure-line"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-csharp-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-css3-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-docker-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-dot-net-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-flutter-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-go-original-wordmark"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-javascript-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-kotlin-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-kubernetes-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-ruby-plain"></i>
-  </span>
-  <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
-    <i class="devicon-rust-plain"></i>
-  </span>
-</div>
+  <div class="animate-marquee whitespace-nowrap py-12 flex">
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-rails-plain-wordmark"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-c-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-clojure-line"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-csharp-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-css3-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-docker-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-dot-net-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-flutter-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-go-original-wordmark"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-javascript-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-kotlin-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-kubernetes-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-ruby-plain"></i>
+    </span>
+    <span class="flex justify-center items-center bg-orange border-2 border-black rounded-xl p-4 block w-16 h-16 md:w-24 md:h-24 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mx-4 text-4xl">
+      <i class="devicon-rust-plain"></i>
+    </span>
+  </div>
 </div>
 <!-- ICONS END -->
+
+<div class="w-full flex flex-col items-center mt-12 md:mt-24">
+  <div class="md:w-1/2 text-center">
+    <h2 class="font-bold text-5xl md:text-6xl font-headline uppercase">Look no further!</h2>
+    <p class="mt-4 px-8 md:px-0">
+      <span class="font-semibold">Pairin.dev</span> is a community of programmers connecting with others for pair programming or coding collaboration.
+      Whether you need a coding buddy or a pair programming partner, you'll find the right match here.
+    </p>
+  </div>
+
+  <%= image_tag "collaborate.svg", alt: "Programmers collaborating", class: "w-1/2 md:w-1/4 h-fit mt-8" %>
+</div>
 
 <div id="how-it-works" class="flex items-center flex-col relative bg-yellow-50 pb-24">
   <div class="relative text-center">
