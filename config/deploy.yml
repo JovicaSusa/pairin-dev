@@ -67,6 +67,7 @@ env:
 #
 ssh:
   keys: ["~/.ssh/id_pairin.pub"]
+  keys_only: true
 
 # Use a persistent storage volume.
 #
