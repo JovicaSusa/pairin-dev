@@ -1,29 +1,31 @@
-<aside class="hidden md:block h-screen w-2/12 font-sans absolute border-r-4 border-black border-dashed">
-  <div class="border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]">
-    <%= image_tag "logo.svg", class: "w-12 h-12" %>
-  </div>
-  <div class="<%= active_link_class(activities_path) %> border-b-4 border-black h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Community", activities_path %>
-  </div>
-  <div class="<%= active_link_class(pair_requests_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Search", pair_requests_path %>
-  </div>
-  <div class="<%= active_link_class(users_offers_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Applied", users_offers_path %>
-  </div>
-  <div class="<%= active_link_class(users_pair_requests_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Pairin requests", users_pair_requests_path %>
-  </div>
-  <div class="<%= active_link_class(profile_path(current_user.id)) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Profile", profile_path(current_user.id) %>
-  </div>
-  <div class="<%= active_link_class(sessions_path) %> border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Sessions", sessions_path %>
-  </div>
-  <div class="border-b-4 border-black  h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] [&:not(.active)]:hover:bg-orange hover:translate-y-[3px]">
-    <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete } %>
-  </div>
-</aside>
+<input type="checkbox" id="drawer-overlay" class="drawer-toggle" />
+
+<label for="drawer-overlay" class="btn btn-primary mt-2 ml-2">Menu</label>
+<label class="overlay" for="drawer-left"></label>
+<div class="drawer">
+	<div class="drawer-content pt-10 flex flex-col h-full">
+    <label for="drawer-overlay" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</label>
+		<nav class="menu bg-gray-2 p-4 rounded-md">
+      <section class="menu-section">
+        <ul class="menu-items">
+          <li class="menu-item text-2xl"><%= link_to "Community", activities_path %></li>
+          <li class="menu-item text-2xl"><%= link_to "Search", pair_requests_path %></li>
+          <li class="menu-item text-2xl"><%= link_to "Applied", users_offers_path %></li>
+          <li class="menu-item text-2xl"><%= link_to "Pairin requests", users_pair_requests_path %></li>
+          <li class="menu-item text-2xl"><%= link_to "Sessions", sessions_path %></li>
+        </ul>
+      </section>
+      <div class="divider my-0"></div>
+      <section class="menu-section">
+        <span class="menu-title">Profile</span>
+        <ul class="menu-items">
+          <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete } %>
+        </ul>
+      </section>
+    </nav>
+	</div>
+</div>
+
 
 <div data-controller="home" class="md:hidden w-full">
   <div data-controller="reveal relative">
