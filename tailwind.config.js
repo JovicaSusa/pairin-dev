@@ -22,9 +22,23 @@ module.exports = {
 				},
       }
     ]
+  },
+  theme: {
+    extend: {
+      gridTemplateRows: {
+        "stack-item": "repeat(4, 87vh)"
+      }
+    },
+    animation: {
+      marquee: "marquee 40s linear infinite"
+    },
+    keyframes: {
+      marquee: {
+        "0%": { transform: "translateY(0%)" },
+        "100%": { transform: "translateY(-100%)" },
+      }
+    }
   }
-  // theme: {
-  //   extend: {
   //     colors: {
   //       orange: "#FF8B37",
   //       purple: "#7B5FF1",

@@ -1,18 +1,13 @@
-<div data-controller="home" class="w-full border-b-4 px-2 border-black bg-yellow-50 font-bold sticky top-0 z-10">
-  <div class="flex flex-col max-w-screen-xl py-2 mx-auto md:items-center md:justify-between md:flex-row md:px-6 lg:px-8">
-    <div class="flex items-center justify-between lg:justify-start">
-      <div class="flex items-center justify-center space-x-2">
-        <%= link_to root, class: "flex flex-col justify-center items-center" do %>
-          <%= image_tag "logo.svg", class: "w-fit h-8 md:h-12" %>
-          <span class="text-xl font-bold">pairin</span>
-        <% end %>
-      </div>
-
-      <button data-action="click->home#toggleNav" class="rounded-lg md:hidden focus:outline-none focus:shadow-outline">
-        <%= image_tag "hamburger.svg", class: "w-8 h-8 md:h-20" %>
-      </button>
-    </div>
-
+<div data-controller="home" class="navbar navbar-floating">
+  <div class="navbar-start">
+    <%= link_to root, class: "navbar-item" do %>
+      <%= image_tag "logo.svg", class: "w-fit h-8" %>
+    <% end %>
+  </div>
+  <div class="navbar-end">
+    <button data-action="click->home#toggleNav" class="rounded-lg md:hidden focus:outline-none focus:shadow-outline">
+      <%= image_tag "hamburger.svg", class: "w-8 h-8 md:h-20" %>
+    </button>
     <nav data-home-target="nav" class="flex-col flex-grow mt-4 hidden md:flex md:justify-end md:flex-row">
       <ul class="space-y-2 list-none lg:space-y-0 lg:items-center lg:inline-flex">
         <% if user_signed_in? %>
