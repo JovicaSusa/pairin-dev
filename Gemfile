@@ -111,3 +111,5 @@ gem "dry-operation", "~> 1.0"
 gem "kamal", "~> 2.3"
 
 gem "rack-attack", "~> 6.7"
+
+gem "vite_rails", "~> 3.0"
