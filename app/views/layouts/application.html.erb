@@ -12,6 +12,7 @@
     <%= vite_client_tag %>
     <%= vite_javascript_tag "inertia" %>
     <%= inertia_ssr_head %>
+    <%= vite_stylesheet_tag 'application', data: { 'turbo-track': 'reload' } %>
     <%= vite_javascript_tag 'application', data: { 'turbo-track': 'reload' } %>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
