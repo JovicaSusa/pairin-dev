@@ -215,6 +215,8 @@ GEM
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
+    inertia_rails (3.12.1)
+      railties (>= 6)
     io-console (0.7.2)
     irb (1.14.1)
       rdoc (>= 4.0.0)
@@ -504,6 +506,7 @@ DEPENDENCIES
   hotwire_combobox
   i18n_data (~> 1.1)
   image_processing (~> 1.8)
+  inertia_rails (~> 3.12)
   jbuilder
   jsbundling-rails
   kamal (~> 2.3)
