@@ -4,7 +4,7 @@ module.exports = {
     './app/helpers/**/*.rb',
     './app/assets/stylesheets/**/*.css',
     './app/javascript/**/*.css',
-    './app/javascript/**/*.js',
+    './app/javascript/**/*.{js,jsx}',
     'config/initializers/simple_form.rb'
   ],
   theme: {
