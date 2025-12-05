@@ -34,7 +34,7 @@ if Rails.env.development?
       start_at: Time.zone.now.advance(days: rand(1..30))
     )
 
-    users = User.where.not(id: pr.user_id).sample(10)
+    users = User.where.not(id: user.id).sample(10)
 
     users.first(5).map do |user|
       pr1.offers.create!(offerer: user, message: Faker::Hacker.say_something_smart, period: pr1.periods.future.first)

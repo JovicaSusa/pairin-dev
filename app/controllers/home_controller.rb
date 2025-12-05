@@ -1,5 +1,9 @@
 class HomeController < ApplicationController
   def index
-    render inertia: "Home"
+    if user_signed_in?
+      redirect_to pair_requests_path
+    else
+      render inertia: "Home"
+    end
   end
 end

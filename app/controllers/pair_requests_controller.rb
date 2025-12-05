@@ -4,13 +4,24 @@ class PairRequestsController < ApplicationController
     @q = PairRequest.ransack(params[:q])
     @pagy, @pair_requests = pagy_countless(
       PairRequest
-        .includes(:periods, :tags, :user)
-        .active
-        .where.not(user_id: current_user.id)
-        .all
-    )
+        .includes(:periods, :tags, :user, :offers)
+        .active.where.not(user_id: current_user.id)
+        .all )
 
-    render "scrollable_list" if params[:page]
+    render inertia: "PairRequests/Index", props: {
+      pairRequests: @pair_requests.as_json(
+        include: {
+          user: { only: [:id, :name, :avatar_url] },
+          tags: { only: [:id, :name] },
+          periods: { only: [:id, :start_at, :end_at] },
+          offers: { only: [:offerer_id] }
+        }
+      ),
+      currentUser: {
+        id: current_user.id,
+        name: current_user.name
+      }
+    }
   end
 
   def search
