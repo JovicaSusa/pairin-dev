@@ -1,4 +1,3 @@
-import Reveal from "@/components/Reveal";
 import Card from "./Card";
 import { Head } from "@inertiajs/react";
 import preferencesImg from "@/assets/images/preferences.svg";
