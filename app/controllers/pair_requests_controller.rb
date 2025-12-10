@@ -1,12 +1,14 @@
 class PairRequestsController < ApplicationController
   include Authenticated
   def index
-    @q = PairRequest.ransack(params[:q])
-    @pagy, @pair_requests = pagy_countless(
-      PairRequest
-        .includes(:periods, :tags, :user, :offers)
-        .active.where.not(user_id: current_user.id)
-        .all )
+    base = PairRequest
+      .includes(:periods, :tags, :user, :offers)
+      .left_joins(:periods, :tags, :user)
+      .active
+      .where.not(user_id: current_user.id)
+
+    @q = base.ransack(params[:q])
+    @pair_requests = @q.result(distinct: true).order('periods.start_at ASC')
 
     render inertia: "PairRequests/Index", props: {
       pairRequests: @pair_requests.as_json(
@@ -20,6 +22,11 @@ class PairRequestsController < ApplicationController
       currentUser: {
         id: current_user.id,
         name: current_user.name
+      },
+      filterOptions: {
+        tags: Tag.all.as_json(only: [:id, :name]), 
+        userLevels: User::LEVELS, 
+        languages: I18nData.languages.map { |k,v| [v,k] } 
       }
     }
   end

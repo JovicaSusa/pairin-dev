@@ -1,8 +1,11 @@
+import Reveal from "@/components/Reveal";
+import FilterForm from "@/components/FilterForm";
 import Card from "./Card";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import preferencesImg from "@/assets/images/preferences.svg";
 
-export default function Index({ pairRequests, currentUser }) {
+export default function Index({ pairRequests, currentUser, filterOptions }) {
+  const { tags, userLevels, languages } = filterOptions;
 
   return (
     <div className="flex flex-col items-center">
@@ -15,12 +18,25 @@ export default function Index({ pairRequests, currentUser }) {
         </div>
 
         <div className="mt-12">
-          <button className="relative group overflow-hidden items-center w-full flex justify-end mb-2">
-            <span className="absolute block font-bold top-0 -right-[60px] transition ease-in-out duration-500 group-hover:-translate-x-24">
-              Filter
-            </span>
-            <img src={preferencesImg} className="z-10 bg-yellow-50" />
-          </button>
+          <Reveal
+            button={
+              <button className="relative group overflow-hidden items-center w-full flex justify-end mb-2">
+                <span className="absolute block font-bold top-0 -right-[60px] transition ease-in-out duration-500 group-hover:-translate-x-24">
+                  Filter
+                </span>
+                <img src={preferencesImg} className="z-10 bg-yellow-50" />
+              </button>
+            }
+          >
+            <FilterForm
+              tags={tags}
+              userLevels={userLevels}
+              languages={languages}
+              onSubmit={(filters) => {
+                router.get("/pair_requests", { q: filters }, { preserveState: true });
+              }}
+            />
+          </Reveal>
         </div>
 
         <div className="mt-12">
@@ -32,7 +48,6 @@ export default function Index({ pairRequests, currentUser }) {
             />
           ))}
         </div>
-
       </div>
     </div>
   );
