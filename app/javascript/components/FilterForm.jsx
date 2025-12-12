@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { shiftDate } from "@/helpers/date";
 
 export default function FilterForm({ tags, userLevels, languages, onSubmit }) {
   const [form, setForm] = useState({
@@ -10,13 +11,6 @@ export default function FilterForm({ tags, userLevels, languages, onSubmit }) {
     starts_before: ""
   });
 
-  const shiftDate = (dateString, days) => {
-    const d = new Date(dateString);
-    
-    d.setDate(d.getDate() + days);
-    return d
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
@@ -27,7 +21,7 @@ export default function FilterForm({ tags, userLevels, languages, onSubmit }) {
 
     const payload = {
       ...form,
-      periods_start_at_gteq: form.starts_after ? shiftDate(form.starts_after, -1) : "",
+      periods_start_at_gteq: form.starts_after ? shiftDate(form.starts_after, 0) : "",
       periods_start_at_lteq: form.starts_before ? shiftDate(form.starts_before, 1) : ""
     };
 

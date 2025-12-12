@@ -11,3 +11,11 @@ export function formatShort(datetime) {
     hour12: false,
   }).format(date);
 }
+
+export function shiftDate(dateString, days) {
+    const d = new Date(dateString);
+    
+    d.setDate(d.getDate() + days);
+
+    return d
+  };
