@@ -7,37 +7,48 @@ class PairRequestsController < ApplicationController
       .active
       .where.not(user_id: current_user.id)
 
-    @q = base.ransack(params[:q])
-    @pair_requests = @q.result(distinct: true).order('periods.start_at ASC')
+    @q = base.ransack(params[:q]&.compact_blank)
+    @pagy, @pair_requests = pagy(
+      @q.result(distinct: true).order('periods.start_at ASC'), 
+      items: 15,
+    )
 
-    render inertia: "PairRequests/Index", props: {
-      pairRequests: @pair_requests.as_json(
-        include: {
-          user: { only: [:id, :name, :avatar_url] },
-          tags: { only: [:id, :name] },
-          periods: { only: [:id, :start_at, :end_at] },
-          offers: { only: [:offerer_id] }
-        }
-      ),
-      currentUser: {
-        id: current_user.id,
-        name: current_user.name
-      },
-      filterOptions: {
-        tags: Tag.all.as_json(only: [:id, :name]), 
-        userLevels: User::LEVELS, 
-        languages: I18nData.languages.map { |k,v| [v,k] } 
+    pair_requests_json = @pair_requests.as_json(
+      include: {
+        user: { only: [:id, :name, :avatar_url] },
+        tags: { only: [:id, :name] },
+        periods: { only: [:id, :start_at, :end_at] },
+        offers: { only: [:offerer_id] }
       }
-    }
-  end
+    )
 
-  def search
-    @q = PairRequest
-      .includes(:tags, :periods, :user)
-      .left_joins(:tags, :periods, :user)
-      .ransack(params[:q].compact_blank)
-    @pagy, @pair_requests = pagy_countless(@q.result(distinct: true))
-
-    render "scrollable_list" if params[:page]
+    respond_to do |format|
+      format.html do
+        render inertia: "PairRequests/Index", props: {
+          pairRequests: pair_requests_json,
+          currentUser: {
+            id: current_user.id,
+            name: current_user.name
+          },
+          filterOptions: {
+            tags: Tag.all.as_json(only: [:id, :name]), 
+            userLevels: User::LEVELS, 
+            languages: I18nData.languages.map { |k,v| [v,k] } 
+          },
+          pagination: {
+            next: @pagy.next,
+          }
+        }
+      end
+      
+      format.json do
+        render json: {
+          pairRequests: pair_requests_json,
+          pagination: {
+            next: @pagy.next
+          }
+        }
+      end
+    end
   end
 end
