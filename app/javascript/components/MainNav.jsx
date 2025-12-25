@@ -3,7 +3,7 @@ import Reveal from "@/components/Reveal";
 import logoImg from "@/assets/images/logo.svg";
 import hamburgerImg from "@/assets/images/hamburger.svg";
 
-export default function SideNav({ currentUser, currentPath }) {
+export default function MainNav({ currentUser, currentPath }) {
   const cleanPath = currentPath.split('?')[0];
   const isActive = (path) => cleanPath === path;
 

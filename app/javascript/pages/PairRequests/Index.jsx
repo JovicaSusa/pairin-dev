@@ -1,6 +1,6 @@
 import Reveal from "@/components/Reveal";
 import FilterForm from "@/components/FilterForm";
-import SideNav from "@/components/SideNav";
+import MainNav from "@/components/MainNav";
 import Card from "./Card";
 import { Head, router, usePage } from "@inertiajs/react";
 import preferencesImg from "@/assets/images/preferences.svg";
@@ -48,8 +48,8 @@ export default function Index({ pairRequests, currentUser, filterOptions, pagina
 
   return (
     <>
-      <SideNav currentUser={currentUser} currentPath={url} />
-      
+      <MainNav currentUser={currentUser} currentPath={url} />
+
       <div className="md:ml-[16.666667%] min-h-screen px-4 pt-8 md:pt-0">
         <div className="flex flex-col items-center w-full">
           <Head title="Pair Programming Requests" />
