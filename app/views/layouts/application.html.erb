@@ -29,23 +29,16 @@
     </script>
   </head>
 
-  <body class="bg-yellow-50">
-  <% if user_signed_in? %>
-    <div class="overflow-y-scroll h-screen md:flex">
-      <div class="md:w-2/12">
-        <%= render "layouts/nav" %>
+  <body class="bg-yellow-50 min-h-screen">
+    <% if user_signed_in? %>
+      <div id="flash" class="flash">
+        <%= render "layouts/flash" %>
       </div>
-
-      <div class="md:w-10/12 px-4">
-        <div id="flash" class="flash">
-          <%= render "layouts/flash" %>
-        </div>
-
+      <div>
         <%= yield %>
       </div>
-    </div>
-  <% else %>
-    <%= yield %>
-  <% end %>
+    <% else %>
+      <%= yield %>
+    <% end %>
   </body>
 </html>
