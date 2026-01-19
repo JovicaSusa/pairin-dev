@@ -29,16 +29,7 @@
     </script>
   </head>
 
-  <body class="bg-yellow-50 min-h-screen">
-    <% if user_signed_in? %>
-      <div id="flash" class="flash">
-        <%= render "layouts/flash" %>
-      </div>
-      <div>
-        <%= yield %>
-      </div>
-    <% else %>
-      <%= yield %>
-    <% end %>
+  <body>
+    <%= yield %>
   </body>
 </html>
