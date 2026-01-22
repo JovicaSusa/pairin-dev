@@ -7,7 +7,7 @@ export default function AppLayout({ children }) {
   const currentUser = props.auth?.user;
 
   return (
-    <main className='relative bg-yellow-50 min-h-screen px-4 pt-8 md:pt-0'>
+    <main className='relative bg-yellow-50 min-h-screen pt-8 md:pt-0'>
       <FlashMessages />
       <MainNav currentUser={currentUser} currentPath={url} />
       <article className="md:ml-[16.666667%] min-h-screen">{children}</article>
