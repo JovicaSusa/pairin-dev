@@ -16,15 +16,8 @@ export default function Index({ pairRequests, filterOptions, pagination }) {
   const [nextPage, setNextPage] = useState(pagination.next);
   const [isLoading, setIsLoading] = useState(false);
   const loadMoreRef = useRef(null);
-  const isFirstRender = useRef(true);
-
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
     setAllRequests(pairRequests);
     setNextPage(pagination.next);
   }, [pairRequests]);
