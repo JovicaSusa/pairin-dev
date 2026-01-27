@@ -1,7 +1,7 @@
 import AppLayout from "@/layouts/AppLayout"
 import { Head, Link } from "@inertiajs/react"
 
-export default function Index ({ activities }) {
+export default function Activities ({ activities }) {
   return (
     <div className="flex flex-col items-center w-full px-4">
       <Head title="Activity Feed"/>
@@ -44,4 +44,4 @@ export default function Index ({ activities }) {
   )
 }
 
-Index.layout = (page) => <AppLayout children={page} />;
+Activities.layout = (page) => <AppLayout children={page} />;
