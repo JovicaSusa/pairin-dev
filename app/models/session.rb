@@ -17,6 +17,11 @@ class Session < ApplicationRecord
     sessionable.user
   end
 
+  def formatted_call_link
+    return if call_link.blank?
+    call_link.match?(/\Ahttps?:\/\//) ? call_link : "https://#{call_link}"
+  end
+
   def other_participant(participant)
     (participants - [participant]).first
   end
