@@ -15,6 +15,8 @@ class SessionsController < ApplicationController
   def update
     @session = current_user.sessions.find(params[:id])
 
+    authorize @session
+
     if @session.update(session_params)
       redirect_to sessions_path, notice: "Call link successfully added!"
     else
