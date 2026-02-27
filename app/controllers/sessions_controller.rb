@@ -1,14 +1,14 @@
 class SessionsController < ApplicationController
   include Authenticated
-
+  include Alba::Inertia::Controller
+  
   def index
     @sessions = current_user.sessions
       .includes([sessionable: :user], :participants)
       .future
-      .map { |s| session_props(s) }
 
     render inertia: 'Sessions/Index', props: {
-      sessions: @sessions
+      sessions: SessionResource.new(@sessions, params: { current_user: current_user })
     }
   end
 
@@ -28,25 +28,5 @@ class SessionsController < ApplicationController
 
   def session_params
     params.permit(:call_link)
-  end
-
-  def session_props(session)
-
-    other = session.other_participant(current_user)
-    {
-      id: session.id,
-      subject: session.sessionable.subject,
-      start_at: session.start_at.to_fs(:short),
-      end_at: session.end_at.to_fs(:short),
-      call_link: session.formatted_call_link,
-      is_holder: session.hold_by_user?(current_user),
-      holder_name: session.holder.name,
-      other_participant: {
-        name: other.name,
-        image_url: other.image_url,
-        profession: other.profession,
-        level: other.level&.titlecase
-      }
-    }
   end
 end
