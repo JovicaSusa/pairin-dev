@@ -1,8 +1,15 @@
 class SessionsController < ApplicationController
   include Authenticated
-
+  include Alba::Inertia::Controller
+  
   def index
-    @sessions = current_user.sessions.includes([sessionable: :user], :participants).future
+    @sessions = current_user.sessions
+      .includes([sessionable: :user], :participants)
+      .future
+
+    render inertia: 'Sessions/Index', props: {
+      sessions: SessionResource.new(@sessions, params: { current_user: current_user })
+    }
   end
 
   def update
@@ -11,13 +18,15 @@ class SessionsController < ApplicationController
     authorize @session
 
     if @session.update(session_params)
-      respond_to do |format|
-        format.turbo_stream { flash.now[:notice] = "Call link successfuly added!" }
-      end
+      redirect_to sessions_path, notice: "Call link successfully added!"
+    else
+      redirect_to sessions_path, alert: "Could not update link."
     end
   end
 
   private
 
-  def session_params = params.require(:session).permit(:call_link)
+  def session_params
+    params.permit(:call_link)
+  end
 end

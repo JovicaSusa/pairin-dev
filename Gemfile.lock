@@ -80,6 +80,11 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    alba (3.10.0)
+    alba-inertia (0.1.3)
+      alba
+      inertia_rails
+      zeitwerk
     aws-eventstream (1.3.0)
     aws-partitions (1.1014.0)
     aws-sdk-core (3.214.0)
@@ -488,6 +493,8 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  alba (~> 3.10)
+  alba-inertia (~> 0.1.3)
   aws-sdk-s3 (~> 1.172)
   bootsnap
   bullet
