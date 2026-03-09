@@ -6,7 +6,7 @@ class Users::PairRequestsController < ApplicationController
     @pair_requests = current_user.pair_requests.includes(:sessions).order(created_at: :desc)
 
     respond_to do |format|
-      format.html { render :index } # forces rails to use index.html.erb
+      format.html { render :index } # forces rails to use index.html.erb [temporary] 
     end
   end
 
@@ -25,7 +25,6 @@ class Users::PairRequestsController < ApplicationController
     if @pair_request.save
       redirect_to users_pair_requests_path, notice: "Request posted! Good luck"
     else
-      puts "DEBUG: #{@pair_request.errors.full_messages}"
       render inertia: 'Users/PairRequests/New', props: {
         pair_request: @pair_request,
         tags: TagResource.new(Tag.select(:id, :name))
