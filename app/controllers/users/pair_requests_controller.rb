@@ -1,23 +1,34 @@
 class Users::PairRequestsController < ApplicationController
   include Authenticated
+  include Alba::Inertia::Controller
 
   def index
     @pair_requests = current_user.pair_requests.includes(:sessions).order(created_at: :desc)
+
+    respond_to do |format|
+      format.html { render :index } # forces rails to use index.html.erb [temporary] 
+    end
   end
 
   def new
     @pair_request = current_user.pair_requests.build
+    
+    render inertia: 'Users/PairRequests/New', props: {
+      pair_request: @pair_request,
+      tags: TagResource.new(Tag.select(:id, :name))
+    }
   end
 
   def create
     @pair_request = current_user.pair_requests.build(pair_request_params)
 
     if @pair_request.save
-      respond_to do |format|
-        format.html { redirect_to users_pair_requests_path, notice: "Request posted! Good luck" }
-      end
+      redirect_to users_pair_requests_path, notice: "Request posted! Good luck"
     else
-      render :new, status: :unprocessable_entity
+      render inertia: 'Users/PairRequests/New', props: {
+        pair_request: @pair_request,
+        tags: TagResource.new(Tag.select(:id, :name))
+      }, status: :unprocessable_entity
     end
   end
 
@@ -41,13 +52,12 @@ class Users::PairRequestsController < ApplicationController
 
   def pair_request_params
     params
-      .require(:pair_request)
       .permit(
         :subject,
         :description,
         :duration,
         periods_attributes: [:start_at, :_destroy],
-        taggings_attributes: [:tag_id, :_destroy, tag_attributes: [:name]]
+        taggings_attributes: [:_destroy, tag_attributes: [:name]]
       )
   end
 end
