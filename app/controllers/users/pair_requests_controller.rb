@@ -3,11 +3,13 @@ class Users::PairRequestsController < ApplicationController
   include Alba::Inertia::Controller
 
   def index
-    @pair_requests = current_user.pair_requests.includes(:sessions).order(created_at: :desc)
+    @pair_requests = current_user.pair_requests
+      .includes(:tags, :sessions, offers: :offerer)
+      .order(created_at: :desc)
 
-    respond_to do |format|
-      format.html { render :index } # forces rails to use index.html.erb [temporary] 
-    end
+    render inertia: 'Users/PairRequests/Index', props: {
+      pair_requests: PairRequestResource.new(@pair_requests)
+    }
   end
 
   def new
@@ -38,9 +40,9 @@ class Users::PairRequestsController < ApplicationController
     authorize @pair_request, policy_class: Users::PairRequestPolicy
 
     if @pair_request.update(add_call_link_params)
-      respond_to do |format|
-        format.turbo_stream { flash.now[:notice] = "Successfuly added!" }
-      end
+      redirect_to users_pair_requests_path, notice: "Successfully added!"
+    else
+      redirect_back fallback_location: users_pair_requests_path, alert: "Something went wrong."
     end
   end
 

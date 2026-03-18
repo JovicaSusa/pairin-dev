@@ -1,3 +1,4 @@
+import AppLayout from "@/layouts/AppLayout";
 import { useForm, Head } from '@inertiajs/react';
 
 export default function New({ tags }) {
@@ -65,7 +66,7 @@ export default function New({ tags }) {
     <div className="flex flex-col items-center w-full px-4">
       <Head title="Create a Request" />
       <div className="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
-        <div className="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed text-center">
+        <div className="flex w-full items-center mt-8 pb-8 border-b-4 border-black border-dashed text-center">
           <h3 className="text-5xl font-bold">Create a request</h3>
         </div>
 
@@ -207,3 +208,5 @@ export default function New({ tags }) {
     </div>
   );
 }
+
+New.layout = page => <AppLayout children={page} />
