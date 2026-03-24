@@ -16,8 +16,4 @@ class PairRequestResource < ApplicationResource
       }
     end
   end
-
-  attribute :has_accepted_offer do |pair_request|
-    pair_request.offers.any?(&:accepted_at)
-  end
 end

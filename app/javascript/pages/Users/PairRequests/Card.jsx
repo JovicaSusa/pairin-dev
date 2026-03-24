@@ -97,7 +97,7 @@ export default function RequestCard({ request }) {
         </div>
       )}
 
-      {request.has_accepted_offer && (
+      {request.accepted_offer && (
         <div className="px-4 mt-6">
           <form onSubmit={submitCallLink} className="flex flex-col md:flex-row w-full gap-y-4 md:gap-x-2 items-center md:items-end">
             <div className="flex flex-col w-full">
