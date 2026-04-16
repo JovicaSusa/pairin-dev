@@ -1,12 +1,18 @@
 class PairRequests::OffersController < ApplicationController
   include Authenticated
+  include Alba::Inertia::Controller
 
   def index
     @pair_request = current_user.pair_requests.find_by(id: params[:pair_request_id])
 
     authorize @pair_request, policy_class: PairRequests::OfferPolicy
 
-    @offers = @pair_request.offers.joins(:period).includes(:offerer, :period).order("accepted_at, periods.start_at desc")
+    @offers = @pair_request.offers.joins(:period).includes(:offerer, :period, pair_request: :offers).order("offers.accepted_at, periods.start_at desc")
+    
+    render inertia: 'PairRequests/Offers/Index', props: {
+      offers: ReceivedOfferResource.new(@offers),
+      pair_request_id: @pair_request.id
+    }
   end
 
   def new
