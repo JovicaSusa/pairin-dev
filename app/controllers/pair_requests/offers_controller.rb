@@ -18,18 +18,27 @@ class PairRequests::OffersController < ApplicationController
   def new
     @pair_request = PairRequest.find(params[:pair_request_id])
     @offer = @pair_request.offers.build(offerer: current_user)
+
+    authorize @offer, :create?, policy_class: PairRequests::OfferPolicy
+
+    render inertia: 'PairRequests/Offers/New', props: {
+      pair_request_id: @pair_request.id,
+      periods: @pair_request.periods.future.map { |p|
+        { id: p.id, start_at: p.start_at, end_at: p.end_at }
+      }
+    }
   end
 
   def create
     @pair_request = PairRequest.find(params[:pair_request_id])
     @offer = @pair_request.offers.build(offer_params.merge(offerer: current_user))
 
+    authorize @offer, policy_class: PairRequests::OfferPolicy
+
     if @offer.save
-      respond_to do |format|
-        format.html { redirect_to pair_requests_path, notice: "We have sent your offer, good luck!" }
-      end
+      redirect_to pair_requests_path, notice: "We have sent your offer, good luck!"
     else
-      render :new, status: :unprocessable_entity
+      redirect_to new_pair_request_offer_path(@pair_request), inertia: { errors: @offer.errors }
     end
   end
 
