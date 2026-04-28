@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pairin - Find pair programming partner or coding buddy quick and easy</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= vite_client_tag %>
+    <%= vite_javascript_tag 'application', data: { 'turbo-track': 'reload' } %>
+    <%= vite_stylesheet_tag 'application', data: { 'turbo-track': 'reload' } %>
+
+    <%= favicon_link_tag asset_path('logo.svg') %>
+  </head>
+
+  <body class="bg-yellow-50 min-h-screen">
+    <header class="w-full border-b-4 px-2 border-black bg-yellow-50 font-bold sticky top-0 z-10">
+      <div class="flex py-2 px-6 items-center justify-between">
+        <%= link_to root_path, class: "flex flex-col justify-center items-center" do %>
+          <%= image_tag asset_path('logo.svg'), alt: "Pairin logo", class: "h-10" %>
+          <span class="text-xl font-bold">pairin</span>
+        <% end %>
+        <nav class="space-x-4 text-sm">
+          <%= link_to "Login", new_user_session_path %>
+          <%= link_to "Sign up", new_user_registration_path %>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div id="flash">
+        <%= render "layouts/flash" %>
+      </div>
+      <%= yield %>
+    </main>
+  </body>
+</html>

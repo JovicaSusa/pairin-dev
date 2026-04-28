@@ -1,6 +1,5 @@
 import InfoCard from "@/components/InfoCard";
 import LandingNav from "../components/LandingNav";
-import { Link } from "@inertiajs/react";
 import collaborateImage from "@/assets/images/collaborate.svg";
 import arrowImage from "@/assets/images/arrow.svg"
 import logoImage from "@/assets/images/logo.svg";
@@ -34,11 +33,11 @@ export default function Home(props) {
 
             <div className="flex justify-center w-full max-w-2xl gap-2 mt-12">
               <div className="mt-3 rounded-lg sm:mt-0">
-                <Link href="/users/sign_up">
+                <a href="/users/sign_up">
                   <button className="flex font-headline text-2xl md:text-base cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none">
                     Sign Up Now
                   </button>
-                </Link>
+                </a>
               </div>
               <div className="hidden md:block mt-3 sm:mt-0 sm:ml-3">
                 <a href="#how-it-works">
@@ -203,11 +202,11 @@ export default function Home(props) {
             </p>
           </div>
 
-          <Link href="/users/sign_up">
+          <a href="/users/sign_up">
             <button className="flex font-headline text-2xl md:text-base cursor-pointer mt-12 md:mt-16 items-center rounded-md border-2 border-black bg-purple px-12 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none">
               Join our community
             </button>
-          </Link>
+          </a>
         </div>
       </div>
 
@@ -216,10 +215,10 @@ export default function Home(props) {
           <div>
             <p className="font-headline">Start pairin</p>
             <p>
-              <Link href="/users/sign_up">Sign up</Link>
+              <a href="/users/sign_up">Sign up</a>
             </p>
             <p>
-              <Link href="/users/sign_in">Log in</Link>
+              <a href="/users/sign_in">Log in</a>
             </p>
           </div>
         </div>

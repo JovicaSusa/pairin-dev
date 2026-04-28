@@ -33,14 +33,14 @@ export default function LandingNav({ user }) {
             ) : (
               <>
                 <li>
-                  <Link href="/users/sign_in" className="px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-black">
+                  <a href="/users/sign_in" className="px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-black">
                     Login
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link href="/users/sign_up" className="px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-black">
+                  <a href="/users/sign_up" className="px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-black">
                     Sign up
-                  </Link>
+                  </a>
                 </li>
               </>
             )}
