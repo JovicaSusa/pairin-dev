@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "skills": {
+    "alba-inertia": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/alba-inertia/SKILL.md",
+      "computedHash": "8cf79527b466be137788858868ddad86d9023cc75a2b7f8cb4734aa72316122e"
+    },
+    "inertia-rails-architecture": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/inertia-rails-architecture/SKILL.md",
+      "computedHash": "0df28a8608906ab197357e7b2668e649f9956b3d549594f00c8979c589b88f01"
+    },
+    "inertia-rails-controllers": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/inertia-rails-controllers/SKILL.md",
+      "computedHash": "612dfa44798d0b8554c08bae1e26c8d5c995f040239e41689c71e4ea19e106af"
+    },
+    "inertia-rails-forms": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/inertia-rails-forms/SKILL.md",
+      "computedHash": "47e38c3efe7e602d45b4a7edc7d36c35a98b5ce6146e5318dc0a2ea6182b2a60"
+    },
+    "inertia-rails-pages": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/inertia-rails-pages/SKILL.md",
+      "computedHash": "c5fa65f568407746a34f13a07d826549b6bfad6d610255b7852ceed172ba443c"
+    },
+    "inertia-rails-setup": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/inertia-rails-setup/SKILL.md",
+      "computedHash": "7e5039078abda4f3e0b156bba5dfdb6b70cc2598adbed5eab286497a17c041b9"
+    },
+    "inertia-rails-testing": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/inertia-rails-testing/SKILL.md",
+      "computedHash": "fb821201cf90578180eaf9004e914ce39412c3b5f3cefdbb155c227708327ece"
+    },
+    "inertia-rails-typescript": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/inertia-rails-typescript/SKILL.md",
+      "computedHash": "49f9c1eea1decbe8196ae9f5dfaecf7fff384c5bd5d828dd498b0b5e3bdede34"
+    },
+    "shadcn-inertia": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/shadcn-inertia/SKILL.md",
+      "computedHash": "2d65fa701ea12573aea5f45d77f513691d790958073e45cec55b0df20a261666"
+    },
+    "shadcn-svelte-inertia": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/shadcn-svelte-inertia/SKILL.md",
+      "computedHash": "266a9a65a11b4c807800d8ebec1fd16c2e1c6538e295814f0ef70048867e31cc"
+    },
+    "shadcn-vue-inertia": {
+      "source": "inertia-rails/skills",
+      "sourceType": "github",
+      "skillPath": "skills/shadcn-vue-inertia/SKILL.md",
+      "computedHash": "33a01c4a2dbfe5296f48a9506712eef4b99fcfb7bad02ff407869b4f0d836339"
+    }
+  }
+}
