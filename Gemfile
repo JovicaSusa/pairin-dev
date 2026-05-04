@@ -114,6 +114,6 @@ gem "rack-attack", "~> 6.7"
 
 gem "vite_rails", "~> 3.0"
 
-gem "inertia_rails", "~> 3.12"
+gem "inertia_rails", "~> 3.17.0"
 gem "alba", "~> 3.10"
 gem "alba-inertia", "~> 0.1.3"
