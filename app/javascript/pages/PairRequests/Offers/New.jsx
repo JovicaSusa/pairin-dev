@@ -1,4 +1,3 @@
-import AppLayout from "@/layouts/AppLayout";
 import { useForm, Head } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
 
@@ -68,4 +67,3 @@ export default function New({ pair_request_id, periods }) {
   );
 }
 
-New.layout = page => <AppLayout children={page} />

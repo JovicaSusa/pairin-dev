@@ -1,4 +1,3 @@
-import AppLayout from "@/layouts/AppLayout"
 import { Head, Link } from "@inertiajs/react"
 
 export default function Activities ({ activities }) {
@@ -44,4 +43,3 @@ export default function Activities ({ activities }) {
   )
 }
 
-Activities.layout = (page) => <AppLayout children={page} />;
