@@ -1,51 +1,14 @@
 import Reveal from "@/components/Reveal";
 import FilterForm from "@/components/FilterForm";
 import Card from "./Card";
-import { Head, router, usePage } from "@inertiajs/react";
+import { Head, router, usePage, InfiniteScroll } from "@inertiajs/react";
 import preferencesImg from "@/assets/images/preferences.svg";
-import { useState, useEffect, useRef } from "react";
 
-export default function Index({ pairRequests, filterOptions, pagination }) {
+export default function Index({ pairRequests, filterOptions }) {
   const { auth } = usePage().props;
   const currentUser = auth.user;
-  
+
   const { tags, userLevels, languages } = filterOptions;
-  
-  const [allRequests, setAllRequests] = useState(pairRequests);
-  const [nextPage, setNextPage] = useState(pagination.next);
-  const [isLoading, setIsLoading] = useState(false);
-  const loadMoreRef = useRef(null);
-
-  useEffect(() => {
-    setAllRequests(pairRequests);
-    setNextPage(pagination.next);
-  }, [pairRequests]);
-
-  const loadMore = async () => {
-    if (!nextPage || isLoading) return;
-    
-    setIsLoading(true);
-    
-    const params = new URLSearchParams(window.location.search);
-    params.set('page', nextPage);
-    
-    const response = await fetch(`/pair_requests.json?${params}`);
-    const data = await response.json();
-    
-    setAllRequests([...allRequests, ...data.pairRequests]);
-    setNextPage(data.pagination.next);
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) loadMore();
-    });
-
-    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
-    
-    return () => observer.disconnect();
-  }, [nextPage, isLoading, allRequests]);
 
   return (
     <>
@@ -53,7 +16,6 @@ export default function Index({ pairRequests, filterOptions, pagination }) {
         <Head title="Pair Programming Requests" />
 
         <div className="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
-
           <div className="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed text-center">
             <h3 className="text-5xl font-bold">Pair Programming Requests</h3>
           </div>
@@ -80,32 +42,29 @@ export default function Index({ pairRequests, filterOptions, pagination }) {
             </Reveal>
           </div>
 
-          <div className="mt-12">
-            {allRequests.map(req => (
-              <Card
-                key={req.id}
-                pairRequest={req}
-                currentUserId={currentUser.id}
-              />
-            ))}
+          <div className="mt-12 mb-12">
+            <InfiniteScroll
+              data="pairRequests"
+              loading={() => (
+                <div className="flex justify-center py-8">
+                  <div className="text-lg font-bold">Loading more...</div>
+                </div>
+              )}
+              next={({ hasMore }) =>
+                !hasMore && pairRequests.length > 0 ? (
+                  <div className="flex justify-center py-8">
+                    <div className="text-lg font-bold text-gray-500">No more requests</div>
+                  </div>
+                ) : null
+              }
+            >
+              {pairRequests.map((req) => (
+                <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} />
+              ))}
+            </InfiniteScroll>
           </div>
-
-          {isLoading && (
-            <div className="flex justify-center py-8">
-              <div className="text-lg font-bold">Loading more...</div>
-            </div>
-          )}
-
-          <div ref={loadMoreRef} className="h-10" />
-
-          {!nextPage && allRequests.length > 0 && (
-            <div className="flex justify-center py-8 mb-12">
-              <div className="text-lg font-bold text-gray-500">No more requests</div>
-            </div>
-          )}
         </div>
       </div>
     </>
   );
 }
-
