@@ -1,6 +1,7 @@
 import { createInertiaApp } from '@inertiajs/react'
 import { createElement } from 'react'
 import { createRoot } from 'react-dom/client'
+import AppLayout from '@/layouts/AppLayout'
 
 createInertiaApp({
   // Set default page title
@@ -22,11 +23,10 @@ createInertiaApp({
       console.error(`Missing Inertia page component: '${name}.jsx'`)
     }
 
-    // To use a default layout, import the Layout component
-    // and use the following lines.
-    // see https://inertia-rails.dev/guide/pages#default-layouts
-    //
-    // page.default.layout ||= (page) => createElement(Layout, null, page)
+    // Home uses LandingNav and manages its own layout; skip the default.
+    if (name !== 'Home') {
+      page.default.layout ||= (page) => createElement(AppLayout, null, page)
+    }
 
     return page
   },

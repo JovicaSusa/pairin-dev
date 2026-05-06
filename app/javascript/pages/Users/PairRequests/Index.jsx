@@ -1,4 +1,3 @@
-import AppLayout from "@/layouts/AppLayout";
 import { Head } from '@inertiajs/react';
 import Card from './Card';
 
@@ -28,4 +27,3 @@ export default function Index({ pair_requests }) {
   );
 }
 
-Index.layout = page => <AppLayout children={page} />

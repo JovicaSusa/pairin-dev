@@ -1,7 +1,6 @@
 import { Head, useForm } from "@inertiajs/react";
 import Reveal from "@/components/Reveal"
 import { useState } from "react";
-import FlashMessages from "@/components/FlashMessages";
 
 export default function Show({ user, countries, languages, levels }) {
   const { data, setData, patch, errors, processing } = useForm({
@@ -36,7 +35,6 @@ export default function Show({ user, countries, languages, levels }) {
   return (
     <div className="flex flex-col items-center w-full px-4">
       <Head title={`${user.name}'s Profile`}/>
-      <FlashMessages />
 
       <div className="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
         

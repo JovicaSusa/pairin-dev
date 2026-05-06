@@ -1,4 +1,3 @@
-import AppLayout from "@/layouts/AppLayout";
 import { useForm, Head } from '@inertiajs/react';
 
 export default function New({ tags }) {
@@ -209,4 +208,3 @@ export default function New({ tags }) {
   );
 }
 
-New.layout = page => <AppLayout children={page} />

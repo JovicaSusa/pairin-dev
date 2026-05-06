@@ -1,4 +1,3 @@
-import AppLayout from "@/layouts/AppLayout";
 import Reveal from "@/components/Reveal";
 import FilterForm from "@/components/FilterForm";
 import Card from "./Card";
@@ -110,4 +109,3 @@ export default function Index({ pairRequests, filterOptions, pagination }) {
   );
 }
 
-Index.layout = page => <AppLayout children={page} />
