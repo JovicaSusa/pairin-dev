@@ -2,7 +2,7 @@ import { usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 
 export default function FlashMessages() {
-  const { flash } = usePage().props;
+  const { flash } = usePage();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {

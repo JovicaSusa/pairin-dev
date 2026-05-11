@@ -16,7 +16,6 @@ class Users::PairRequestsController < ApplicationController
     @pair_request = current_user.pair_requests.build
     
     render inertia: 'Users/PairRequests/New', props: {
-      pair_request: @pair_request,
       tags: TagResource.new(Tag.select(:id, :name))
     }
   end

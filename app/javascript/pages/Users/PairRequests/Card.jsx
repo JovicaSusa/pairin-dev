@@ -2,7 +2,7 @@ import { useForm, Link } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 import { formatShort } from "@/helpers/date";
 
-export default function RequestCard({ request }) {
+export default function Card({ request }) {
   const [expanded, setExpanded] = useState(false);
   const [showButton, setShowButton] = useState(false);
   const contentRef = useRef(null);

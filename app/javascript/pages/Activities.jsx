@@ -31,7 +31,7 @@ export default function Activities ({ activities }) {
                   creating a pair request
                 </Link>{" "}
                 or maybe{" "}
-                <Link href="pair_requests" className="font-bold underline text-purple">
+                <Link href="/pair_requests" className="font-bold underline text-purple">
                   sending an offer
                 </Link>
               </p>

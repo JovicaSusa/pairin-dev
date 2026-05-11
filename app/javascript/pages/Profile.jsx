@@ -2,7 +2,7 @@ import { Head, useForm } from "@inertiajs/react";
 import Reveal from "@/components/Reveal"
 import { useState } from "react";
 
-export default function Show({ user, countries, languages, levels }) {
+export default function Profile({ user, countries, languages, levels }) {
   const { data, setData, patch, errors, processing } = useForm({
     name: user.name || "",
     profession: user.profession || "",

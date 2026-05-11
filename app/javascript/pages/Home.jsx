@@ -1,5 +1,6 @@
 import InfoCard from "@/components/InfoCard";
-import LandingNav from "../components/LandingNav";
+import FlashMessages from "@/components/FlashMessages";
+import LandingNav from "@/components/LandingNav";
 import collaborateImage from "@/assets/images/collaborate.svg";
 import arrowImage from "@/assets/images/arrow.svg"
 import logoImage from "@/assets/images/logo.svg";
@@ -11,10 +12,11 @@ import postNewImg from "@/assets/images/post_new.svg";
 import reviewImg from "@/assets/images/review.svg";
 import acceptImg from "@/assets/images/accept.svg";
 
-export default function Home(props) {
+export default function Home({ auth }) {
   return (
     <div>
-      <LandingNav user={props.auth.user} />
+      <FlashMessages />
+      <LandingNav user={auth.user} />
       <div className="w-full flex justify-center">
         <div className="flex w-full md:w-1/2 justify-center px-5 py-12 md:px-12 lg:px-16 lg:py-24">
           <div className="text-center">

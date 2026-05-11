@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   layout -> { devise_controller? ? 'devise' : 'application' }
 
-  inertia_share auth: -> { { user: current_user } }, flash: -> { flash.to_hash }
+  inertia_share auth: -> { { user: current_user } }
 
   def after_sign_in_path_for(resource_or_scope)
     pair_requests_path

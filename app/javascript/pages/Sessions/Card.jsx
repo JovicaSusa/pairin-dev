@@ -1,4 +1,5 @@
 import { useForm } from "@inertiajs/react";
+import { formatShort } from "@/helpers/date";
 
 export default function Card({ session }) {
   const { data, setData, patch, processing } = useForm({
@@ -34,11 +35,11 @@ export default function Card({ session }) {
         <div className="w-full mt-6 md:mt-0 md:w-1/2">
           <div className="w-full flex items-center justify-center md:justify-end gap-x-1">
             <div className="rounded-xl text-sm border-2 border-black px-3 py-0.5 font-semibold bg-white">
-              {session.start_at}
+              {formatShort(session.start_at)}
             </div>
             <span className="block font-bold">:</span>
             <div className="rounded-xl text-sm border-2 border-black px-3 py-0.5 font-semibold bg-white">
-              {session.end_at}
+              {formatShort(session.end_at)}
             </div>
           </div>
         </div>
