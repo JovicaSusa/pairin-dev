@@ -3,7 +3,7 @@ class ReceivedOfferResource < ApplicationResource
 
   attribute :offerer do |offer|
     {
-      email: offer.offerer.email,
+      name: offer.offerer.name,
       image_url: offer.offerer.image_url
     }
   end

@@ -11,7 +11,7 @@ class PairRequests::OffersController < ApplicationController
     
     render inertia: 'PairRequests/Offers/Index', props: {
       offers: ReceivedOfferResource.new(@offers),
-      pair_request_id: @pair_request.id
+      pairRequestId: @pair_request.id
     }
   end
 
@@ -22,7 +22,7 @@ class PairRequests::OffersController < ApplicationController
     authorize @offer, :create?, policy_class: PairRequests::OfferPolicy
 
     render inertia: 'PairRequests/Offers/New', props: {
-      pair_request_id: @pair_request.id,
+      pairRequestId: @pair_request.id,
       periods: @pair_request.periods.future.map { |p|
         { id: p.id, start_at: p.start_at, end_at: p.end_at }
       }
@@ -38,7 +38,7 @@ class PairRequests::OffersController < ApplicationController
     if @offer.save
       redirect_to pair_requests_path, notice: "We have sent your offer, good luck!"
     else
-      redirect_to new_pair_request_offer_path(@pair_request), inertia: { errors: @offer.errors }
+      redirect_to new_pair_request_offer_path(@pair_request), inertia: { errors: @offer.errors.to_hash(true) }
     end
   end
 
@@ -50,8 +50,8 @@ class PairRequests::OffersController < ApplicationController
     Offers::Accept
       .call(offer)
       .either(
-        -> (success) { redirect_to pair_request_offers_path, notice: "You just scheduled yourself a new pairing session. Happy pairin!" },
-        -> (failure) { render :index, status: :unprocessable_entity }
+        -> (success) { redirect_to pair_request_offers_path(offer.pair_request_id), notice: "You just scheduled yourself a new pairing session. Happy pairin!" },
+        -> (failure) { redirect_to pair_request_offers_path(offer.pair_request_id), alert: "Could not accept offer." }
       )
   end
 
