@@ -1,7 +1,7 @@
 import { useForm, Head } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
 
-export default function New({ pair_request_id, periods }) {
+export default function New({ pairRequestId, periods }) {
   const { data, setData, post, processing, errors } = useForm({
     message: '',
     period_id: periods[0]?.id || ''
@@ -9,7 +9,7 @@ export default function New({ pair_request_id, periods }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    post(`/pair_requests/${pair_request_id}/offers`);
+    post(`/pair_requests/${pairRequestId}/offers`);
   };
 
   return (

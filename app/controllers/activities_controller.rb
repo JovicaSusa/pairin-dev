@@ -5,7 +5,7 @@ class ActivitiesController < ApplicationController
     @activities = Activity.where(receiver: current_user).order(created_at: :desc)
 
     render inertia: "Activities", props: {
-      activities: @activities
+      activities: @activities.as_json(only: [:id, :title, :content])
     }
   end
 end

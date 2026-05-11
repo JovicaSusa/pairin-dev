@@ -3,9 +3,9 @@ class ProfilesController < ApplicationController
 
   def show
     @user = current_user
-    
+
     render inertia: 'Profile', props: {
-      user: current_user.as_json(methods: [:image_url]),
+      user: current_user.as_json(only: [:id, :name, :profession, :about, :date_of_birth, :programming_since, :language, :country, :level], methods: [:image_url]),
       languages: I18nData.languages.invert.to_a,
       countries: I18nData.countries.invert.to_a,
       levels: User::LEVELS.map { |l| [l.capitalize, l] }
@@ -14,17 +14,11 @@ class ProfilesController < ApplicationController
 
   def update
     @user = User.find(params[:id])
-    
+
     if @user.update(profile_attributes)
       redirect_to profile_path(@user.id), notice: "Your profile has been updated!"
     else
-      render inertia: 'Profile', props: {
-        user: @user.as_json(methods: [:image_url]),
-        languages: I18nData.languages.invert.to_a,
-        countries: I18nData.countries.invert.to_a,
-        levels: User::LEVELS.map { |l| [l.capitalize, l] },
-        errors: @user.errors
-      }
+      redirect_back_or_to profile_path(@user), inertia: { errors: @user.errors.to_hash(true) }
     end
   end
 

@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import Card from './Card';
 
-export default function Index({ pair_requests }) {
+export default function Index({ pairRequests }) {
   return (
     <div className="flex justify-center">
       <Head title="Your Requests" />
@@ -12,8 +12,8 @@ export default function Index({ pair_requests }) {
         </div>
 
         <div className="mt-12">
-          {pair_requests && pair_requests.length > 0 ? (
-            pair_requests.map((request) => (
+          {pairRequests && pairRequests.length > 0 ? (
+            pairRequests.map((request) => (
               <Card key={request.id} request={request} />
             ))
           ) : (

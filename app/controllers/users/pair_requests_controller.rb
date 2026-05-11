@@ -8,7 +8,7 @@ class Users::PairRequestsController < ApplicationController
       .order(created_at: :desc)
 
     render inertia: 'Users/PairRequests/Index', props: {
-      pair_requests: PairRequestResource.new(@pair_requests)
+      pairRequests: PairRequestResource.new(@pair_requests)
     }
   end
 
@@ -26,10 +26,7 @@ class Users::PairRequestsController < ApplicationController
     if @pair_request.save
       redirect_to users_pair_requests_path, notice: "Request posted! Good luck"
     else
-      render inertia: 'Users/PairRequests/New', props: {
-        pair_request: @pair_request,
-        tags: TagResource.new(Tag.select(:id, :name))
-      }, status: :unprocessable_entity
+      redirect_back_or_to new_users_pair_request_path, inertia: { errors: @pair_request.errors.to_hash(true) }
     end
   end
 

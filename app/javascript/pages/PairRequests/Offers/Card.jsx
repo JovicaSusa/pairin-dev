@@ -25,9 +25,9 @@ export default function Card({ offer, pairRequestId }) {
 
       <div className="flex items-center gap-x-2 px-4 pt-4">
         <figure className="border-2 border-black w-12 h-12 overflow-hidden rounded-md shrink-0">
-          <img src={offer.offerer.image_url} alt={offer.offerer.email} className="w-full h-full object-cover" />
+          <img src={offer.offerer.image_url} alt={offer.offerer.name} className="w-full h-full object-cover" />
         </figure>
-        <p>{offer.offerer.email}</p>
+        <p>{offer.offerer.name}</p>
         {offer.status === "ACCEPTED" && (
           <span className="ml-auto bg-green-400 border-2 border-black px-2 py-1 rounded-md text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             ACCEPTED

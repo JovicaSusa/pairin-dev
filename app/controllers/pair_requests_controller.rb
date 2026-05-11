@@ -24,10 +24,12 @@ class PairRequestsController < ApplicationController
           }
         )
       },
-      filterOptions: {
-        tags: Tag.all.as_json(only: [:id, :name]),
-        userLevels: User::LEVELS,
-        languages: I18nData.languages.map { |k, v| [v, k] }
+      filterOptions: InertiaRails.once {
+        {
+          tags: Tag.all.as_json(only: [:id, :name]),
+          userLevels: User::LEVELS,
+          languages: I18nData.languages.map { |k, v| [v, k] }
+        }
       }
     }
   end
