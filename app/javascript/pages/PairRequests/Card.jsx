@@ -1,22 +1,9 @@
-import { useState, useEffect, useRef } from "react";
 import { Link } from "@inertiajs/react";
 import { formatShort } from "@/helpers/date";
 import logoImg from "@/assets/images/logo.svg"
+import ExpandableText from "@/components/ExpandableText";
 
 export default function Card({ pairRequest, currentUserId }) {
-  const [expanded, setExpanded] = useState(false);
-  const [showButton, setShowButton] = useState(false);
-  const contentRef = useRef(null);
-
-  
-  useEffect(() => {
-    const el = contentRef.current;
-    if (!el) return;
-
-    const isOverflowing = el.scrollHeight > el.clientHeight;
-    setShowButton(isOverflowing);
-  }, []);
-
   const alreadyOffered = pairRequest.offers
     ?.map(o => o.offerer_id)
     .includes(currentUserId);
@@ -29,14 +16,7 @@ export default function Card({ pairRequest, currentUserId }) {
 
       <div className="md:flex max-h-fit px-2 py-4">
         <div className="w-full md:w-7/12">
-          <p ref={contentRef} className={`${expanded ? "line-clamp-none" : "line-clamp-3"}`}>
-              {pairRequest.description}
-          </p>
-          {showButton && (
-            <button className="underline" onClick={() => setExpanded((prev) => !prev)}>
-              {expanded ? "Read less" : "Read more"}
-            </button>
-          )}
+          <ExpandableText>{pairRequest.description}</ExpandableText>
         </div>
 
         <div className="w-full mt-4 md:mt-0 md:w-5/12">

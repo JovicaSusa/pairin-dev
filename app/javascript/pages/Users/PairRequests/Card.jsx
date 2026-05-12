@@ -1,20 +1,8 @@
 import { useForm, Link } from '@inertiajs/react';
-import { useState, useEffect, useRef } from 'react';
 import { formatShort } from "@/helpers/date";
+import ExpandableText from "@/components/ExpandableText";
 
 export default function Card({ request }) {
-  const [expanded, setExpanded] = useState(false);
-  const [showButton, setShowButton] = useState(false);
-  const contentRef = useRef(null);
-
-  useEffect(() => {
-    const el = contentRef.current;
-    if (!el) return;
-
-    const isOverflowing = el.scrollHeight > el.clientHeight;
-    setShowButton(isOverflowing);
-  }, [request.description]);
-  
   const { data, setData, patch, processing } = useForm({
     pair_request: {
       sessions_attributes: request.sessions.map(s => ({ 
@@ -42,14 +30,7 @@ export default function Card({ request }) {
       </div>
 
       <div className="px-4 py-4">
-        <p ref={contentRef} className={`${expanded ? "line-clamp-none" : "line-clamp-3"}`}>
-            {request.description}
-        </p>
-        {showButton && (
-          <button className="underline" onClick={() => setExpanded((prev) => !prev)}>
-            {expanded ? "Read less" : "Read more"}
-          </button>
-        )}
+        <ExpandableText>{request.description}</ExpandableText>
 
         <div className="flex w-full overflow-x-auto justify-start space-x-2 mt-4 pb-2">
           {request.tags?.map((tag) => (

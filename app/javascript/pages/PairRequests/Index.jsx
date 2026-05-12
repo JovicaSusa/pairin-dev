@@ -4,7 +4,7 @@ import Card from "./Card";
 import { Head, router, usePage, InfiniteScroll } from "@inertiajs/react";
 import preferencesImg from "@/assets/images/preferences.svg";
 
-export default function Index({ pairRequests, filterOptions }) {
+export default function Index({ pairRequests, filterOptions, filters }) {
   const { auth } = usePage().props;
   const currentUser = auth.user;
 
@@ -35,8 +35,9 @@ export default function Index({ pairRequests, filterOptions }) {
                 tags={tags}
                 userLevels={userLevels}
                 languages={languages}
-                onSubmit={(filters) => {
-                  router.get("/pair_requests", { q: filters }, { preserveState: true });
+                filters={filters}
+                onSubmit={(q) => {
+                  router.get("/pair_requests", { q });
                 }}
               />
             </Reveal>

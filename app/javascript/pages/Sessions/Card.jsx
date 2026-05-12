@@ -1,16 +1,7 @@
-import { useForm } from "@inertiajs/react";
+import { Form } from "@inertiajs/react";
 import { formatShort } from "@/helpers/date";
 
 export default function Card({ session }) {
-  const { data, setData, patch, processing } = useForm({
-      call_link: session.call_link || "",
-  });
-
-  const submit = (e) => {
-    e.preventDefault();
-    patch(`/sessions/${session.id}`)
-  }
-
   return (
     <div className="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <div className="border-b-2 border-black py-4 px-2 rounded-t-md bg-green">
@@ -47,25 +38,28 @@ export default function Card({ session }) {
 
       <div className="w-full flex justify-center px-2">
         {session.is_holder ? (
-          <form onSubmit={submit} className="flex flex-col md:flex-row w-full gap-y-4 md:gap-x-2 items-center md:items-end justify-between">
-            <div className="flex flex-col justify-end w-full">
-              <label className="font-bold">Call link</label>
-              <input
-                value={data.call_link}
-                onChange={(e) => setData("call_link", e.target.value)}
-                className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none"
-              />
-            </div>
+          <Form method="patch" action={`/sessions/${session.id}`} className="flex flex-col md:flex-row w-full gap-y-4 md:gap-x-2 items-center md:items-end justify-between">
+            {({ processing }) => (
+              <>
+                <div className="flex flex-col justify-end w-full">
+                  <label className="font-bold">Call link</label>
+                  <input
+                    name="call_link"
+                    defaultValue={session.call_link || ""}
+                    className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none"
+                  />
+                </div>
 
-            <button
-              type="submit"
-              disabled={processing}
-              className="w-3/4 md:w-1/4 flex cursor-pointer justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-            >
-              {processing ? "..." : "Add"}
-            </button>
-
-          </form>
+                <button
+                  type="submit"
+                  disabled={processing}
+                  className="w-3/4 md:w-1/4 flex cursor-pointer justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+                >
+                  {processing ? "..." : "Add"}
+                </button>
+              </>
+            )}
+          </Form>
         ) : (
           session.call_link ? (
             <a
