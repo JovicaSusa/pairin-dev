@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
 import { formatShort } from "@/helpers/date";
+import ExpandableText from "@/components/ExpandableText";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -17,16 +17,6 @@ const StatusBadge = ({ status }) => {
 };
 
 export default function Card({ offer }) {
-  const [expanded, setExpanded] = useState(false);
-  const [showButton, setShowButton] = useState(false);
-  const contentRef = useRef(null);
-
-  useEffect(() => {
-    if (contentRef.current) {
-      setShowButton(contentRef.current.scrollHeight > contentRef.current.clientHeight);
-    }
-  }, []);
-
   return (
     <div className="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <div className="border-b-2 border-black px-2 py-3 rounded-t-md bg-green flex flex-col md:flex-row justify-between items-start md:items-center gap-y-2">
@@ -58,17 +48,7 @@ export default function Card({ offer }) {
       </div>
 
       <div className="px-2 py-4">
-        <p ref={contentRef} className={`whitespace-pre-wrap ${expanded ? "" : "line-clamp-3"}`}>
-          {offer.message}
-        </p>
-        {showButton && (
-          <button
-            className="mt-2 text-sm font-bold underline hover:text-purple"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? "Read less" : "Read more"}
-          </button>
-        )}
+        <ExpandableText className="whitespace-pre-wrap">{offer.message}</ExpandableText>
       </div>
 
       <div className="flex justify-end px-2">

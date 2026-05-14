@@ -9,11 +9,13 @@ class PairRequestsController < ApplicationController
 
     @q = base.ransack(params[:q]&.compact_blank)
     @pagy, @pair_requests = pagy(
-      @q.result(distinct: true).order('periods.start_at ASC'), 
+      @q.result(distinct: true).order('periods.start_at ASC'),
       items: 15,
+      overflow: :empty_page,
     )
 
     render inertia: 'PairRequests/Index', props: {
+      filters: params[:q]&.compact_blank || {},
       pairRequests: InertiaRails.scroll(@pagy) {
         @pair_requests.as_json(
           include: {

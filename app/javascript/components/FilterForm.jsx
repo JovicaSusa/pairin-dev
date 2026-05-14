@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { shiftDate } from "@/helpers/date";
 
-export default function FilterForm({ tags, userLevels, languages, onSubmit }) {
+export default function FilterForm({ tags, userLevels, languages, filters = {}, onSubmit }) {
   const [form, setForm] = useState({
-    tags_name_eq: "",
-    duration_eq: "",
-    user_level_eq: "",
-    user_language_eq: "",
-    starts_after: "",
-    starts_before: ""
+    tags_name_eq: filters.tags_name_eq || "",
+    duration_eq: filters.duration_eq || "",
+    user_level_eq: filters.user_level_eq || "",
+    user_language_eq: filters.user_language_eq || "",
+    periods_start_at_gteq: filters.periods_start_at_gteq || "",
+    periods_start_at_lteq: filters.periods_start_at_lteq || "",
   });
 
   const handleChange = (e) => {
@@ -18,16 +17,7 @@ export default function FilterForm({ tags, userLevels, languages, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const payload = {
-      ...form,
-      periods_start_at_gteq: form.starts_after ? shiftDate(form.starts_after, 0) : "",
-      periods_start_at_lteq: form.starts_before ? shiftDate(form.starts_before, 1) : ""
-    };
-
-    delete payload.starts_after;
-    delete payload.starts_before;
-    onSubmit(payload);
+    onSubmit(form);
   };
 
   return (
@@ -111,28 +101,28 @@ export default function FilterForm({ tags, userLevels, languages, onSubmit }) {
       </div>
 
       <div className="md:w-5/12">
-        <label htmlFor="starts_after" className="font-bold block mb-1">
+        <label htmlFor="periods_start_at_gteq" className="font-bold block mb-1">
           Session starts after
         </label>
         <input
           type="date"
-          id="starts_after"
-          name="starts_after"
-          value={form.starts_after}
+          id="periods_start_at_gteq"
+          name="periods_start_at_gteq"
+          value={form.periods_start_at_gteq}
           onChange={handleChange}
           className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none"
         />
       </div>
 
       <div className="md:w-5/12">
-        <label htmlFor="starts_before" className="font-bold block mb-1">
+        <label htmlFor="periods_start_at_lteq" className="font-bold block mb-1">
           Session starts before
         </label>
         <input
           type="date"
-          id="starts_before"
-          name="starts_before"
-          value={form.starts_before}
+          id="periods_start_at_lteq"
+          name="periods_start_at_lteq"
+          value={form.periods_start_at_lteq}
           onChange={handleChange}
           className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none"
         />

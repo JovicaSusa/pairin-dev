@@ -1,18 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
 import { router } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
+import ExpandableText from "@/components/ExpandableText";
 
 export default function Card({ offer, pairRequestId }) {
-  const [expanded, setExpanded] = useState(false);
-  const [showButton, setShowButton] = useState(false);
-  const contentRef = useRef(null);
-
-  useEffect(() => {
-    const el = contentRef.current;
-    if (!el) return;
-    setShowButton(el.scrollHeight > el.clientHeight);
-  }, [offer.message]);
-
   const handleAccept = () => {
     router.post(`/pair_requests/${pairRequestId}/offers/${offer.id}/accept`);
   };
@@ -36,17 +26,7 @@ export default function Card({ offer, pairRequestId }) {
       </div>
 
       <div className="px-2 py-4">
-        <p ref={contentRef} className={`whitespace-pre-wrap ${expanded ? "" : "line-clamp-3"}`}>
-          {offer.message}
-        </p>
-        {showButton && (
-          <button
-            className="mt-2 text-sm font-bold underline hover:text-purple"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? "Read less" : "Read more"}
-          </button>
-        )}
+        <ExpandableText className="whitespace-pre-wrap">{offer.message}</ExpandableText>
       </div>
 
       <div className="px-4 md:flex md:items-center">
