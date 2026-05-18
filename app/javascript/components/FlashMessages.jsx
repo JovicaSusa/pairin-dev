@@ -17,7 +17,7 @@ export default function FlashMessages() {
     }
   }, [flash]);
 
-  if (!visible) return null;
+  if (!visible || !flash) return null;
 
   return (
     <div className="absolute w-full z-[100] flex flex-col gap-2">
