@@ -1,6 +1,7 @@
 import { router } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
+import { Button } from "@/components/ui/button";
 
 export default function Card({ offer, pairRequestId }) {
   const handleAccept = () => {
@@ -43,12 +44,7 @@ export default function Card({ offer, pairRequestId }) {
         <div className="md:w-1/2 md:flex md:justify-end">
           {offer.show_accept_button && (
             <div className="flex justify-center mt-6">
-              <button
-                onClick={handleAccept}
-                className="flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-5 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-              >
-                Accept
-              </button>
+              <Button onClick={handleAccept}>Accept</Button>
             </div>
           )}
         </div>

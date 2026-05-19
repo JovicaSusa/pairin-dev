@@ -1,4 +1,5 @@
 import { useForm, Head } from '@inertiajs/react';
+import { Button } from "@/components/ui/button";
 
 export default function New({ tags }) {
   const { data, setData, post, processing, errors} = useForm({
@@ -119,13 +120,15 @@ export default function New({ tags }) {
                       onChange={(e) => updatePeriod(index, e.target.value)}
                       className="w-10/12 rounded-md border-2 border-black p-1 outline-none"
                     />
-                    <button 
-                      type="button" 
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="neutral"
                       onClick={() => removePeriod(index)}
-                      className="w-2/12 font-bold text-red-500 border-2 border-black rounded-md hover:bg-gray-100"
+                      className="w-2/12 text-red-500"
                     >
                       X
-                    </button>
+                    </Button>
                   </div>
                   {errors[`periods_attributes.${index}.start_at`] && (
                     <div className="text-orange text-xs font-bold mt-1">
@@ -135,13 +138,9 @@ export default function New({ tags }) {
                 </div>
               ))}
 
-              <button
-                type="button"
-                onClick={addPeriod}
-                className="rounded-xl border-2 border-black bg-orange px-3 py-1 font-semibold mt-2 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
-              >
+              <Button type="button" size="sm" variant="neutral" onClick={addPeriod} className="mt-2">
                 + Add period
-              </button>
+              </Button>
             </div>
 
             <div className="w-1/2">
@@ -169,13 +168,15 @@ export default function New({ tags }) {
                       </datalist>
                     </div>
 
-                    <button 
-                      type="button" 
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="neutral"
                       onClick={() => removeTag(index)}
-                      className="w-2/12 font-bold text-red-500 border-2 border-black rounded-md hover:bg-gray-100"
+                      className="w-2/12 text-red-500"
                     >
                       X
-                    </button>
+                    </Button>
                   </div>
                   {errors[`taggings_attributes.${index}.tag_attributes.name`] && (
                     <div className="text-orange text-xs font-bold mt-1">
@@ -185,23 +186,17 @@ export default function New({ tags }) {
                 </div>
               ))}
 
-              <button
-                type="button"
-                onClick={addTag}
-                className="rounded-xl border-2 border-black bg-orange px-3 py-1 font-semibold mt-2 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
-              >
-                + Add tag
-              </button>
+              <div className="flex justify-end mt-2">
+                <Button type="button" size="sm" variant="neutral" onClick={addTag}>
+                  + Add tag
+                </Button>
+              </div>
             </div>
           </div>
           
-          <button 
-            type="submit" 
-            disabled={processing}
-            className="mt-12 flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-          >
+          <Button type="submit" size="lg" disabled={processing} className="mt-12">
             {processing ? 'Creating...' : 'Create Pair request'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

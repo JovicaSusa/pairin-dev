@@ -1,6 +1,7 @@
 import { useForm, Link } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
+import { Button } from "@/components/ui/button";
 
 export default function Card({ request }) {
   const { data, setData, patch, processing } = useForm({
@@ -21,12 +22,9 @@ export default function Card({ request }) {
     <div className="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <div className="w-full border-b-2 flex flex-col md:flex-row justify-between items-center border-black py-4 px-4 rounded-t-md bg-green">
         <h3 className="font-bold text-xl">{request.subject}</h3>
-        <Link 
-          href={`/pair_requests/${request.id}/offers`} 
-          className="rounded-md border-2 border-black bg-white px-6 py-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all mt-4 md:mt-0"
-        >
-          See applications
-        </Link>
+        <Button asChild variant="neutral" className="mt-4 md:mt-0">
+          <Link href={`/pair_requests/${request.id}/offers`}>See applications</Link>
+        </Button>
       </div>
 
       <div className="px-4 py-4">
@@ -95,12 +93,9 @@ export default function Card({ request }) {
                 className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none"
               />
             </div>
-            <button 
-              disabled={processing}
-              className="w-full md:w-1/4 bg-purple border-2 border-black px-10 py-3 rounded-md font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-            >
+            <Button disabled={processing} className="w-full md:w-1/4">
               {processing ? '...' : 'Add'}
-            </button>
+            </Button>
           </form>
         </div>
       )}

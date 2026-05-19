@@ -2,6 +2,7 @@ import { Link } from "@inertiajs/react";
 import { formatShort } from "@/helpers/date";
 import logoImg from "@/assets/images/logo.svg"
 import ExpandableText from "@/components/ExpandableText";
+import { Button } from "@/components/ui/button";
 
 export default function Card({ pairRequest, currentUserId }) {
   const alreadyOffered = pairRequest.offers
@@ -70,12 +71,9 @@ export default function Card({ pairRequest, currentUserId }) {
           {alreadyOffered ? (
             <p>You have already sent an offer</p>
           ) : (
-            <Link
-              href={`/pair_requests/${pairRequest.id}/offers/new`}
-              className="flex md:w-1/2 cursor-pointer items-center justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-            >
-              Apply
-            </Link>
+            <Button asChild className="md:w-1/2">
+              <Link href={`/pair_requests/${pairRequest.id}/offers/new`}>Apply</Link>
+            </Button>
           )}
         </div>
       </div>

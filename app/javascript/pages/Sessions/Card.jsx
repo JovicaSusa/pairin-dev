@@ -1,5 +1,6 @@
 import { Form } from "@inertiajs/react";
 import { formatShort } from "@/helpers/date";
+import { Button } from "@/components/ui/button";
 
 export default function Card({ session }) {
   return (
@@ -50,26 +51,19 @@ export default function Card({ session }) {
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={processing}
-                  className="w-3/4 md:w-1/4 flex cursor-pointer justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-                >
+                <Button type="submit" disabled={processing} className="w-3/4 md:w-1/4">
                   {processing ? "..." : "Add"}
-                </button>
+                </Button>
               </>
             )}
           </Form>
         ) : (
           session.call_link ? (
-            <a
-              href={session.call_link}
-              rel="noopener noreferrer"
-              target="_blank"
-              className="w-3/4 flex cursor-pointer justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none truncate"
-            >
-              Join Call
-            </a>
+            <Button asChild className="w-3/4 truncate">
+              <a href={session.call_link} rel="noopener noreferrer" target="_blank">
+                Join Call
+              </a>
+            </Button>
           ) : (
             <p className="font-semibold text-gray-600">
               Waiting for {session.holder_name} to provide the link

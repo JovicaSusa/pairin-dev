@@ -1,6 +1,7 @@
 import { Head, Form } from "@inertiajs/react";
 import Reveal from "@/components/Reveal";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function Profile({ user, countries, languages, levels }) {
   const [previewUrl, setPreviewUrl] = useState(user.image_url);
@@ -33,9 +34,9 @@ export default function Profile({ user, countries, languages, levels }) {
                   <Reveal
                     key={user.image_url}
                     button={
-                      <button type="button" className="border-2 border-black rounded-xl px-2 font-bold hover:bg-gray-100 transition-colors">
+                      <Button type="button" variant="neutral" size="sm">
                         Change Avatar
-                      </button>
+                      </Button>
                     }
                   >
                     <div className="mt-4">
@@ -154,13 +155,9 @@ export default function Profile({ user, countries, languages, levels }) {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={processing}
-                  className="mt-16 flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                >
+                <Button type="submit" size="lg" disabled={processing} className="mt-16">
                   {processing ? "Saving..." : "Save Changes"}
-                </button>
+                </Button>
               </div>
             </>
           )}

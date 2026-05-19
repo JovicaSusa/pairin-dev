@@ -1,6 +1,7 @@
 import InfoCard from "@/components/InfoCard";
 import FlashMessages from "@/components/FlashMessages";
 import LandingNav from "@/components/LandingNav";
+import { Button } from "@/components/ui/button";
 import collaborateImage from "@/assets/images/collaborate.svg";
 import arrowImage from "@/assets/images/arrow.svg"
 import logoImage from "@/assets/images/logo.svg";
@@ -34,19 +35,15 @@ export default function Home({ auth }) {
             </div>
 
             <div className="flex justify-center w-full max-w-2xl gap-2 mt-12">
-              <div className="mt-3 rounded-lg sm:mt-0">
-                <a href="/users/sign_up">
-                  <button className="flex font-headline text-2xl md:text-base cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none">
-                    Sign Up Now
-                  </button>
-                </a>
+              <div className="mt-3 sm:mt-0">
+                <Button asChild size="lg" className="font-headline text-2xl md:text-base">
+                  <a href="/users/sign_up">Sign Up Now</a>
+                </Button>
               </div>
               <div className="hidden md:block mt-3 sm:mt-0 sm:ml-3">
-                <a href="#how-it-works">
-                  <button className="flex font-headline cursor-pointer items-center rounded-md border-2 border-black px-5 py-3 font-bold bg-green shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none">
-                    Show me more
-                  </button>
-                </a>
+                <Button asChild size="lg" variant="neutral" className="font-headline">
+                  <a href="#how-it-works">Show me more</a>
+                </Button>
               </div>
             </div>
           </div>
@@ -204,11 +201,9 @@ export default function Home({ auth }) {
             </p>
           </div>
 
-          <a href="/users/sign_up">
-            <button className="flex font-headline text-2xl md:text-base cursor-pointer mt-12 md:mt-16 items-center rounded-md border-2 border-black bg-purple px-12 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none">
-              Join our community
-            </button>
-          </a>
+          <Button asChild size="lg" className="font-headline text-2xl md:text-base mt-12 md:mt-16">
+            <a href="/users/sign_up">Join our community</a>
+          </Button>
         </div>
       </div>
 
