@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function FilterForm({ tags, userLevels, languages, filters = {}, onSubmit }) {
   const [form, setForm] = useState({
@@ -27,9 +29,9 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       onSubmit={handleSubmit}
     >
       <div className="md:w-5/12">
-        <label htmlFor="tags_name_eq" className="font-bold block mb-1">
+        <Label htmlFor="tags_name_eq" className="block mb-1">
           Tags
-        </label>
+        </Label>
         <select
           id="tags_name_eq"
           name="tags_name_eq"
@@ -47,24 +49,23 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div className="md:w-5/12">
-        <label htmlFor="duration_eq" className="font-bold block mb-1">
+        <Label htmlFor="duration_eq" className="block mb-1">
           Duration
-        </label>
-        <input
+        </Label>
+        <Input
           type="number"
           id="duration_eq"
           name="duration_eq"
           value={form.duration_eq}
           onChange={handleChange}
           placeholder="Duration in minutes"
-          className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none"
         />
       </div>
 
       <div className="md:w-5/12">
-        <label htmlFor="user_level_eq" className="font-bold block mb-1">
+        <Label htmlFor="user_level_eq" className="block mb-1">
           User level
-        </label>
+        </Label>
         <select
           id="user_level_eq"
           name="user_level_eq"
@@ -82,9 +83,9 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div className="md:w-5/12">
-        <label htmlFor="user_language_eq" className="font-bold block mb-1">
+        <Label htmlFor="user_language_eq" className="block mb-1">
           User language
-        </label>
+        </Label>
         <select
           id="user_language_eq"
           name="user_language_eq"
@@ -102,30 +103,28 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div className="md:w-5/12">
-        <label htmlFor="periods_start_at_gteq" className="font-bold block mb-1">
+        <Label htmlFor="periods_start_at_gteq" className="block mb-1">
           Session starts after
-        </label>
-        <input
+        </Label>
+        <Input
           type="date"
           id="periods_start_at_gteq"
           name="periods_start_at_gteq"
           value={form.periods_start_at_gteq}
           onChange={handleChange}
-          className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none"
         />
       </div>
 
       <div className="md:w-5/12">
-        <label htmlFor="periods_start_at_lteq" className="font-bold block mb-1">
+        <Label htmlFor="periods_start_at_lteq" className="block mb-1">
           Session starts before
-        </label>
-        <input
+        </Label>
+        <Input
           type="date"
           id="periods_start_at_lteq"
           name="periods_start_at_lteq"
           value={form.periods_start_at_lteq}
           onChange={handleChange}
-          className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none"
         />
       </div>
 

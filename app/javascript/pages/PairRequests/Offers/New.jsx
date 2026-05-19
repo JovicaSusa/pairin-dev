@@ -1,6 +1,8 @@
 import { Form, Head } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function New({ pairRequestId, periods }) {
   return (
@@ -15,19 +17,15 @@ export default function New({ pairRequestId, periods }) {
           {({ errors, processing }) => (
             <>
               <div className="w-full">
-                <label className="block font-bold mb-1">Message</label>
-                <textarea
-                  name="message"
-                  rows="4"
-                  className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                />
+                <Label className="block mb-1">Message</Label>
+                <Textarea name="message" rows="4" className="w-full" />
                 {errors.message && (
                   <div className="text-red-600 font-bold mt-1">{errors.message}</div>
                 )}
               </div>
 
               <div className="w-full mt-4">
-                <label className="block font-bold mb-1">Select period</label>
+                <Label className="block mb-1">Select period</Label>
                 <select
                   name="period_id"
                   defaultValue={periods[0]?.id || ''}

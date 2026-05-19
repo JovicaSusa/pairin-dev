@@ -1,5 +1,8 @@
 import { useForm, Head } from '@inertiajs/react';
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function New({ tags }) {
   const { data, setData, post, processing, errors} = useForm({
@@ -73,35 +76,32 @@ export default function New({ tags }) {
         <form onSubmit={handleSubmit} className="flex flex-col items-center pb-12 mt-12">
           <div className="flex w-full gap-x-4">
             <div className="w-3/4">
-              <label className="block font-bold mb-1">Subject</label>
-              <input
+              <Label className="block mb-1">Subject</Label>
+              <Input
                 type="text"
                 value={data.subject}
                 onChange={e => setData('subject', e.target.value)}
-                className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
               />
               {errors.subject && <div className="text-orange font-bold mt-1">{errors.subject}</div>}
             </div>
 
             <div className="w-1/4">
-              <label className="block font-bold mb-1">Duration (min)</label>
-              <input
+              <Label className="block mb-1">Duration (min)</Label>
+              <Input
                 type="number"
                 value={data.duration}
                 onChange={e => setData('duration', e.target.value)}
-                className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
               />
               {errors.duration && <div className="text-orange font-bold mt-1">{errors.duration}</div>}
             </div>
           </div>
 
           <div className="w-full mt-4">
-            <label className="block font-bold mb-1">Description</label>
-            <textarea
+            <Label className="block mb-1">Description</Label>
+            <Textarea
               value={data.description}
               onChange={e => setData('description', e.target.value)}
               rows="4"
-              className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
             />
             {errors.description && <div className="text-orange font-bold mt-1">{errors.description}</div>}
           </div>
@@ -112,13 +112,13 @@ export default function New({ tags }) {
               
               {data.periods_attributes.map((period, index) => (
                 <div key={index} className="mb-4 p-2 border-2 border-black rounded-md bg-white">
-                  <label className="block text-sm font-bold mb-1 text-gray-700">Start at</label>
+                  <Label className="block mb-1 text-gray-700">Start at</Label>
                   <div className="flex gap-x-2">
-                    <input
+                    <Input
                       type="datetime-local"
                       value={period.start_at}
                       onChange={(e) => updatePeriod(index, e.target.value)}
-                      className="w-10/12 rounded-md border-2 border-black p-1 outline-none"
+                      className="w-10/12"
                     />
                     <Button
                       type="button"
@@ -148,17 +148,16 @@ export default function New({ tags }) {
               
               {data.taggings_attributes.map((tagging, index) => (
                 <div key={index} className="mb-4 p-2 border-2 border-black rounded-md bg-white">
-                  <label className="block text-sm font-bold mb-1 text-gray-700">
+                  <Label className="block mb-1 text-gray-700">
                     Tag <span className="text-xs font-normal">(select or type new)</span>
-                  </label>
-                  
+                  </Label>
+
                   <div className="flex gap-x-2">
                     <div className="w-10/12 relative">
-                      <input
+                      <Input
                         list={`tags-list-${index}`}
                         value={tagging.tag_attributes.name}
                         onChange={(e) => updateTag(index, e.target.value)}
-                        className="w-full rounded-md border-2 border-black p-1 outline-none"
                         placeholder="Search or create..."
                       />
                       <datalist id={`tags-list-${index}`}>

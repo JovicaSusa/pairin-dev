@@ -2,6 +2,9 @@ import { Head, Form } from "@inertiajs/react";
 import Reveal from "@/components/Reveal";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Profile({ user, countries, languages, levels }) {
   const [previewUrl, setPreviewUrl] = useState(user.image_url);
@@ -58,62 +61,47 @@ export default function Profile({ user, countries, languages, levels }) {
 
                 <div className="w-full flex flex-wrap md:flex-nowrap gap-4">
                   <div className="w-full md:w-1/2 text-left">
-                    <label className="block font-bold mb-1">Name</label>
-                    <input
-                      name="name"
-                      defaultValue={user.name || ""}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                    />
+                    <Label className="block mb-1">Name</Label>
+                    <Input name="name" defaultValue={user.name || ""} />
                     {errors.name && <div className="text-red-500 font-bold mt-1 text-sm">{errors.name}</div>}
                   </div>
 
                   <div className="w-full md:w-1/2 text-left">
-                    <label className="block font-bold mb-1">Profession</label>
-                    <input
-                      name="profession"
-                      defaultValue={user.profession || ""}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                    />
+                    <Label className="block mb-1">Profession</Label>
+                    <Input name="profession" defaultValue={user.profession || ""} />
                   </div>
                 </div>
 
                 <div className="w-full mt-6 text-left">
-                  <label className="block font-bold mb-1">About</label>
-                  <textarea
-                    name="about"
-                    rows="4"
-                    defaultValue={user.about || ""}
-                    className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                  />
+                  <Label className="block mb-1">About</Label>
+                  <Textarea name="about" rows="4" defaultValue={user.about || ""} />
                 </div>
 
                 <div className="w-full flex flex-wrap md:flex-nowrap gap-4 mt-6">
                   <div className="w-full md:w-1/2 text-left">
-                    <label className="block font-bold mb-1">Date of Birth</label>
-                    <input
+                    <Label className="block mb-1">Date of Birth</Label>
+                    <Input
                       type="date"
                       name="date_of_birth"
                       max={new Date().toISOString().split("T")[0]}
                       defaultValue={user.date_of_birth ? user.date_of_birth.split("T")[0] : "1995-01-01"}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
                     />
                   </div>
 
                   <div className="w-full md:w-1/2 text-left">
-                    <label className="block font-bold mb-1">Programming Since</label>
-                    <input
+                    <Label className="block mb-1">Programming Since</Label>
+                    <Input
                       type="date"
                       name="programming_since"
                       max={new Date().toISOString().split("T")[0]}
                       defaultValue={user.programming_since ? user.programming_since.split("T")[0] : "2015-01-01"}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
                     />
                   </div>
                 </div>
 
                 <div className="w-full flex flex-wrap md:flex-nowrap gap-4 mt-6">
                   <div className="w-full md:w-1/3 text-left">
-                    <label className="block font-bold mb-1">Country</label>
+                    <Label className="block mb-1">Country</Label>
                     <select
                       name="country"
                       defaultValue={user.country || ""}
@@ -127,7 +115,7 @@ export default function Profile({ user, countries, languages, levels }) {
                   </div>
 
                   <div className="w-full md:w-1/3 text-left">
-                    <label className="block font-bold mb-1">Language</label>
+                    <Label className="block mb-1">Language</Label>
                     <select
                       name="language"
                       defaultValue={user.language || ""}
@@ -141,7 +129,7 @@ export default function Profile({ user, countries, languages, levels }) {
                   </div>
 
                   <div className="w-full md:w-1/3 text-left">
-                    <label className="block font-bold mb-1">Level</label>
+                    <Label className="block mb-1">Level</Label>
                     <select
                       name="level"
                       defaultValue={user.level || ""}

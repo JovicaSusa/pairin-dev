@@ -2,6 +2,8 @@ import { useForm, Link } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function Card({ request }) {
   const { data, setData, patch, processing } = useForm({
@@ -80,8 +82,8 @@ export default function Card({ request }) {
         <div className="px-4 mt-6">
           <form onSubmit={submitCallLink} className="flex flex-col md:flex-row w-full gap-y-4 md:gap-x-2 items-center md:items-end">
             <div className="flex flex-col w-full">
-              <label className="font-bold">Call link</label>
-              <input 
+              <Label className="mb-1">Call link</Label>
+              <Input
                 type="text"
                 value={data.pair_request.sessions_attributes[0]?.call_link}
                 onChange={e => {
@@ -90,7 +92,6 @@ export default function Card({ request }) {
                   setData('pair_request', { ...data.pair_request, sessions_attributes: newAttrs });
                 }}
                 placeholder="https://meet.google.com/..."
-                className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none"
               />
             </div>
             <Button disabled={processing} className="w-full md:w-1/4">

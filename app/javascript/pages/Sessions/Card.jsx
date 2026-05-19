@@ -1,6 +1,8 @@
 import { Form } from "@inertiajs/react";
 import { formatShort } from "@/helpers/date";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function Card({ session }) {
   return (
@@ -43,12 +45,8 @@ export default function Card({ session }) {
             {({ processing }) => (
               <>
                 <div className="flex flex-col justify-end w-full">
-                  <label className="font-bold">Call link</label>
-                  <input
-                    name="call_link"
-                    defaultValue={session.call_link || ""}
-                    className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none"
-                  />
+                  <Label className="mb-1">Call link</Label>
+                  <Input name="call_link" defaultValue={session.call_link || ""} />
                 </div>
 
                 <Button type="submit" disabled={processing} className="w-3/4 md:w-1/4">
