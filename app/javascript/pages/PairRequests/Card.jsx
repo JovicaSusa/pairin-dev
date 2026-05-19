@@ -1,9 +1,9 @@
 import { Link } from "@inertiajs/react";
 import { formatShort } from "@/helpers/date";
-import logoImg from "@/assets/images/logo.svg"
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Card({ pairRequest, currentUserId }) {
   const alreadyOffered = pairRequest.offers
@@ -54,9 +54,10 @@ export default function Card({ pairRequest, currentUserId }) {
 
       <div className="px-4 md:flex md:items-center">
         <div className="md:w-1/2 flex items-center gap-x-2">
-          <figure className="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
-            <img src={pairRequest.user.image_url || logoImg} />
-          </figure>
+          <Avatar className="w-12 h-12">
+            <AvatarImage src={pairRequest.user.image_url} alt={pairRequest.user.name} />
+            <AvatarFallback>{pairRequest.user.name?.[0]}</AvatarFallback>
+          </Avatar>
 
           <div>
             <p>{pairRequest.user.name}</p>

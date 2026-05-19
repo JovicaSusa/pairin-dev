@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Profile({ user, countries, languages, levels }) {
   const [previewUrl, setPreviewUrl] = useState(user.image_url);
@@ -25,13 +26,10 @@ export default function Profile({ user, countries, languages, levels }) {
               <div className="flex flex-col items-center w-full mt-12 pb-8 border-b-4 border-black border-dashed text-center">
                 <h3 className="text-5xl font-bold mb-4">{user.name}</h3>
 
-                <div className="w-32 h-32 border-black border-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden bg-white">
-                  {previewUrl ? (
-                    <img src={previewUrl} alt={user.name} className="w-full h-full object-contain" />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200" />
-                  )}
-                </div>
+                <Avatar className="w-32 h-32 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <AvatarImage src={previewUrl} alt={user.name} className="object-contain" />
+                  <AvatarFallback className="rounded-xl text-4xl">{user.name?.[0]}</AvatarFallback>
+                </Avatar>
 
                 <div className="mt-4">
                   <Reveal

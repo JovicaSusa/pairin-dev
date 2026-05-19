@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Card({ session }) {
   return (
@@ -14,9 +15,10 @@ export default function Card({ session }) {
 
       <div className="md:flex items-center max-h-fit px-2 py-4">
         <div className="md:w-1/2 flex flex-col md:flex-row items-center md:items-start gap-y-2 md:gap-x-2 text-center md:text-left">
-          <figure className="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
-            <img src={session.other_participant.image_url} alt="" className="w-full h-full object-contain" />
-          </figure>
+          <Avatar className="w-12 h-12">
+            <AvatarImage src={session.other_participant.image_url} alt={session.other_participant.name} />
+            <AvatarFallback>{session.other_participant.name?.[0]}</AvatarFallback>
+          </Avatar>
           <div>
             <p className="font-bold">{session.other_participant.name}</p>
             <span className="text-sm">

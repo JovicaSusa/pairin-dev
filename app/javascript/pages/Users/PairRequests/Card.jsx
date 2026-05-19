@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Card({ request }) {
   const { data, setData, patch, processing } = useForm({
@@ -49,9 +50,10 @@ export default function Card({ request }) {
         <div className="px-4 pt-4 mt-2">
           <div className="flex flex-col md:flex-row items-center justify-between gap-y-4">
              <div className="flex items-center gap-x-2 w-full md:w-1/2">
-                <figure className="border-2 border-black w-12 h-12 overflow-hidden rounded-md shrink-0">
-                  <img src={request.accepted_offer.offerer_image} className="w-full h-full object-contain" />
-                </figure>
+                <Avatar className="w-12 h-12 shrink-0">
+                  <AvatarImage src={request.accepted_offer.offerer_image} alt={request.accepted_offer.offerer_name} />
+                  <AvatarFallback>{request.accepted_offer.offerer_name?.[0]}</AvatarFallback>
+                </Avatar>
                 <div>
                   <p className="font-bold">{request.accepted_offer.offerer_name}</p>
                   <span className="text-sm">

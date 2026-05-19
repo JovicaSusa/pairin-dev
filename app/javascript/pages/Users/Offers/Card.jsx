@@ -1,6 +1,7 @@
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -35,9 +36,10 @@ export default function Card({ offer }) {
       </div>
 
       <div className="px-2 mt-4 flex items-center gap-x-2">
-        <figure className="border-2 border-black w-12 h-12 overflow-hidden rounded-md shrink-0">
-          <img src={offer.owner.image_url} alt={offer.owner.name} className="w-full h-full object-cover" />
-        </figure>
+        <Avatar className="w-12 h-12 shrink-0">
+          <AvatarImage src={offer.owner.image_url} alt={offer.owner.name} />
+          <AvatarFallback>{offer.owner.name?.[0]}</AvatarFallback>
+        </Avatar>
         <div>
           <p>{offer.owner.name}</p>
           <span className="text-sm">

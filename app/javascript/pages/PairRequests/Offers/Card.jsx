@@ -3,6 +3,7 @@ import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Card({ offer, pairRequestId }) {
   const handleAccept = () => {
@@ -16,9 +17,10 @@ export default function Card({ offer, pairRequestId }) {
       )}
 
       <div className="flex items-center gap-x-2 px-4 pt-4">
-        <figure className="border-2 border-black w-12 h-12 overflow-hidden rounded-md shrink-0">
-          <img src={offer.offerer.image_url} alt={offer.offerer.name} className="w-full h-full object-cover" />
-        </figure>
+        <Avatar className="w-12 h-12 shrink-0">
+          <AvatarImage src={offer.offerer.image_url} alt={offer.offerer.name} />
+          <AvatarFallback>{offer.offerer.name?.[0]}</AvatarFallback>
+        </Avatar>
         <p>{offer.offerer.name}</p>
         {offer.status === "ACCEPTED" && (
           <Badge className="ml-auto bg-green-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
