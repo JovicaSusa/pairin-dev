@@ -1,5 +1,6 @@
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
+import { Badge } from "@/components/ui/badge";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -10,9 +11,9 @@ const StatusBadge = ({ status }) => {
   };
 
   return (
-    <div className={`border-2 border-black rounded-xl px-2 font-bold text-xs ${styles[status] || 'bg-white'}`}>
+    <Badge className={`rounded-xl ${styles[status] || 'bg-white'}`}>
       {status}
-    </div>
+    </Badge>
   );
 };
 
@@ -23,13 +24,13 @@ export default function Card({ offer }) {
         <p className="font-bold">{offer.subject}</p>
 
         <div className="flex items-center gap-x-2">
-          <div className="rounded-xl text-sm border-2 border-black bg-orange px-2 font-semibold">
+          <Badge className="bg-orange rounded-xl">
             {formatShort(offer.start_at)}
-          </div>
+          </Badge>
           <span className="block font-bold">:</span>
-          <div className="rounded-xl text-sm border-2 border-black bg-orange px-2 font-semibold">
+          <Badge className="bg-orange rounded-xl">
             {formatShort(offer.end_at)}
-          </div>
+          </Badge>
         </div>
       </div>
 

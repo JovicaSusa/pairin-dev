@@ -2,6 +2,7 @@ import { router } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function Card({ offer, pairRequestId }) {
   const handleAccept = () => {
@@ -20,9 +21,9 @@ export default function Card({ offer, pairRequestId }) {
         </figure>
         <p>{offer.offerer.name}</p>
         {offer.status === "ACCEPTED" && (
-          <span className="ml-auto bg-green-400 border-2 border-black px-2 py-1 rounded-md text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <Badge className="ml-auto bg-green-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             ACCEPTED
-          </span>
+          </Badge>
         )}
       </div>
 
@@ -32,13 +33,13 @@ export default function Card({ offer, pairRequestId }) {
 
       <div className="px-4 md:flex md:items-center">
         <div className="md:w-1/2 flex items-center gap-x-2">
-          <div className="rounded-xl border-2 border-black bg-orange px-2 font-semibold">
+          <Badge className="bg-orange rounded-xl">
             {formatShort(offer.start_at)}
-          </div>
+          </Badge>
           <span className="block font-bold">:</span>
-          <div className="rounded-xl border-2 border-black bg-orange px-2 font-semibold">
+          <Badge className="bg-orange rounded-xl">
             {formatShort(offer.end_at)}
-          </div>
+          </Badge>
         </div>
 
         <div className="md:w-1/2 md:flex md:justify-end">

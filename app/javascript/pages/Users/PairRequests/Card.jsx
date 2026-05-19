@@ -4,6 +4,7 @@ import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 export default function Card({ request }) {
   const { data, setData, patch, processing } = useForm({
@@ -34,12 +35,12 @@ export default function Card({ request }) {
 
         <div className="flex w-full overflow-x-auto justify-start space-x-2 mt-4 pb-2">
           {request.tags?.map((tag) => (
-            <div
+            <Badge
               key={tag.id}
-              className="max-w-max whitespace-nowrap rounded-full border-2 border-black bg-orange px-2 py-1 text-xs 2xl:text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
+              className="bg-orange rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] 2xl:text-sm"
             >
               {tag.name}
-            </div>
+            </Badge>
           ))}
         </div>
       </div>

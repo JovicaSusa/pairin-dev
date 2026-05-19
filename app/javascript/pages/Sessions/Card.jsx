@@ -3,6 +3,7 @@ import { formatShort } from "@/helpers/date";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 export default function Card({ session }) {
   return (
@@ -28,13 +29,13 @@ export default function Card({ session }) {
 
         <div className="w-full mt-6 md:mt-0 md:w-1/2">
           <div className="w-full flex items-center justify-center md:justify-end gap-x-1">
-            <div className="rounded-xl text-sm border-2 border-black px-3 py-0.5 font-semibold bg-white">
+            <Badge variant="neutral" className="rounded-xl text-sm px-3">
               {formatShort(session.start_at)}
-            </div>
+            </Badge>
             <span className="block font-bold">:</span>
-            <div className="rounded-xl text-sm border-2 border-black px-3 py-0.5 font-semibold bg-white">
+            <Badge variant="neutral" className="rounded-xl text-sm px-3">
               {formatShort(session.end_at)}
-            </div>
+            </Badge>
           </div>
         </div>
       </div>
