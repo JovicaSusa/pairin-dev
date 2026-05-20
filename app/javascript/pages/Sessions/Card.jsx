@@ -5,15 +5,16 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 
-export default function Card({ session }) {
+export default function SessionCard({ session }) {
   return (
-    <div className="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <div className="border-b-2 border-black py-4 px-2 rounded-t-md bg-green">
-        <h3 className="font-bold text-xl">{session.subject}</h3>
-      </div>
+    <Card className="mb-12 bg-white gap-0 py-0 pb-4">
+      <CardHeader className="border-b-2 border-border bg-green py-4 px-2 rounded-t-base">
+        <CardTitle className="text-xl">{session.subject}</CardTitle>
+      </CardHeader>
 
-      <div className="md:flex items-center max-h-fit px-2 py-4">
+      <CardContent className="md:flex items-center max-h-fit px-2 py-4">
         <div className="md:w-1/2 flex flex-col md:flex-row items-center md:items-start gap-y-2 md:gap-x-2 text-center md:text-left">
           <Avatar className="w-12 h-12">
             <AvatarImage src={session.other_participant.image_url} alt={session.other_participant.name} />
@@ -23,7 +24,7 @@ export default function Card({ session }) {
             <p className="font-bold">{session.other_participant.name}</p>
             <span className="text-sm">
               {session.other_participant.profession}
-                <span className="text-gray-400 font-black"> &bull; </span>
+              <span className="text-gray-400 font-black"> &bull; </span>
               {session.other_participant.level}
             </span>
           </div>
@@ -40,9 +41,9 @@ export default function Card({ session }) {
             </Badge>
           </div>
         </div>
-      </div>
+      </CardContent>
 
-      <div className="w-full flex justify-center px-2">
+      <CardFooter className="w-full flex justify-center px-2">
         {session.is_holder ? (
           <Form method="patch" action={`/sessions/${session.id}`} className="flex flex-col md:flex-row w-full gap-y-4 md:gap-x-2 items-center md:items-end justify-between">
             {({ processing }) => (
@@ -71,7 +72,7 @@ export default function Card({ session }) {
             </p>
           )
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   )
 }

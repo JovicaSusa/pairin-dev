@@ -2,6 +2,7 @@ import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -18,12 +19,11 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-export default function Card({ offer }) {
+export default function UserOfferCard({ offer }) {
   return (
-    <div className="mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-      <div className="border-b-2 border-black px-2 py-3 rounded-t-md bg-green flex flex-col md:flex-row justify-between items-start md:items-center gap-y-2">
-        <p className="font-bold">{offer.subject}</p>
-
+    <Card className="mb-12 bg-white gap-0 py-0 pb-4">
+      <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-border bg-green px-2 py-3 rounded-t-base gap-y-2">
+        <CardTitle>{offer.subject}</CardTitle>
         <div className="flex items-center gap-x-2">
           <Badge className="bg-orange">
             {formatShort(offer.start_at)}
@@ -33,7 +33,7 @@ export default function Card({ offer }) {
             {formatShort(offer.end_at)}
           </Badge>
         </div>
-      </div>
+      </CardHeader>
 
       <div className="px-2 mt-4 flex items-center gap-x-2">
         <Avatar className="w-12 h-12 shrink-0">
@@ -50,13 +50,13 @@ export default function Card({ offer }) {
         </div>
       </div>
 
-      <div className="px-2 py-4">
+      <CardContent className="px-2 py-4">
         <ExpandableText className="whitespace-pre-wrap">{offer.message}</ExpandableText>
-      </div>
+      </CardContent>
 
-      <div className="flex justify-end px-2">
+      <CardFooter className="flex justify-end px-2">
         <StatusBadge status={offer.status} />
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }

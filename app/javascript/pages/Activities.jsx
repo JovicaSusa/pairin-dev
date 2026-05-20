@@ -1,6 +1,7 @@
 import { Head, Link } from "@inertiajs/react"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
-export default function Activities ({ activities }) {
+export default function Activities({ activities }) {
   return (
     <div className="flex flex-col items-center w-full px-4">
       <Head title="Activity Feed"/>
@@ -13,14 +14,14 @@ export default function Activities ({ activities }) {
         <div className="mt-12">
           {activities.length > 0 ? (
             activities.map((activity) => (
-              <div key={activity.id} className="mb-8 border-2 border-black rounded-t-md shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white">
-                <div className="border-b-2 border-black py-4 px-2 rounded-t-md bg-green">
-                  <p className="font-bold">{activity.title}</p>
-                </div>
-                <div className="px-2 py-4">
+              <Card key={activity.id} className="mb-8 bg-white gap-0 py-0">
+                <CardHeader className="border-b-2 border-border bg-green py-4 px-2 rounded-t-base">
+                  <CardTitle>{activity.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="px-2 py-4">
                   <p>{activity.content}</p>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))
           ) : (
             <div className="text-center p-8 border-2 border-black border-dashed rounded-md bg-white">
@@ -42,4 +43,3 @@ export default function Activities ({ activities }) {
     </div>
   )
 }
-
