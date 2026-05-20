@@ -1,6 +1,9 @@
 import { router } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Card({ offer, pairRequestId }) {
   const handleAccept = () => {
@@ -14,14 +17,15 @@ export default function Card({ offer, pairRequestId }) {
       )}
 
       <div className="flex items-center gap-x-2 px-4 pt-4">
-        <figure className="border-2 border-black w-12 h-12 overflow-hidden rounded-md shrink-0">
-          <img src={offer.offerer.image_url} alt={offer.offerer.name} className="w-full h-full object-cover" />
-        </figure>
+        <Avatar className="w-12 h-12 shrink-0">
+          <AvatarImage src={offer.offerer.image_url} alt={offer.offerer.name} />
+          <AvatarFallback>{offer.offerer.name?.[0]}</AvatarFallback>
+        </Avatar>
         <p>{offer.offerer.name}</p>
         {offer.status === "ACCEPTED" && (
-          <span className="ml-auto bg-green-400 border-2 border-black px-2 py-1 rounded-md text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <Badge className="ml-auto bg-green-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             ACCEPTED
-          </span>
+          </Badge>
         )}
       </div>
 
@@ -31,24 +35,19 @@ export default function Card({ offer, pairRequestId }) {
 
       <div className="px-4 md:flex md:items-center">
         <div className="md:w-1/2 flex items-center gap-x-2">
-          <div className="rounded-xl border-2 border-black bg-orange px-2 font-semibold">
+          <Badge className="bg-orange">
             {formatShort(offer.start_at)}
-          </div>
+          </Badge>
           <span className="block font-bold">:</span>
-          <div className="rounded-xl border-2 border-black bg-orange px-2 font-semibold">
+          <Badge className="bg-orange">
             {formatShort(offer.end_at)}
-          </div>
+          </Badge>
         </div>
 
         <div className="md:w-1/2 md:flex md:justify-end">
           {offer.show_accept_button && (
             <div className="flex justify-center mt-6">
-              <button
-                onClick={handleAccept}
-                className="flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-5 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-              >
-                Accept
-              </button>
+              <Button onClick={handleAccept}>Accept</Button>
             </div>
           )}
         </div>

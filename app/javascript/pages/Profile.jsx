@@ -1,6 +1,11 @@
 import { Head, Form } from "@inertiajs/react";
 import Reveal from "@/components/Reveal";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Profile({ user, countries, languages, levels }) {
   const [previewUrl, setPreviewUrl] = useState(user.image_url);
@@ -21,21 +26,18 @@ export default function Profile({ user, countries, languages, levels }) {
               <div className="flex flex-col items-center w-full mt-12 pb-8 border-b-4 border-black border-dashed text-center">
                 <h3 className="text-5xl font-bold mb-4">{user.name}</h3>
 
-                <div className="w-32 h-32 border-black border-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden bg-white">
-                  {previewUrl ? (
-                    <img src={previewUrl} alt={user.name} className="w-full h-full object-contain" />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200" />
-                  )}
-                </div>
+                <Avatar className="w-32 h-32 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <AvatarImage src={previewUrl} alt={user.name} className="object-contain" />
+                  <AvatarFallback className="rounded-xl text-4xl">{user.name?.[0]}</AvatarFallback>
+                </Avatar>
 
                 <div className="mt-4">
                   <Reveal
                     key={user.image_url}
                     button={
-                      <button type="button" className="border-2 border-black rounded-xl px-2 font-bold hover:bg-gray-100 transition-colors">
+                      <Button type="button" variant="neutral" size="sm">
                         Change Avatar
-                      </button>
+                      </Button>
                     }
                   >
                     <div className="mt-4">
@@ -57,62 +59,47 @@ export default function Profile({ user, countries, languages, levels }) {
 
                 <div className="w-full flex flex-wrap md:flex-nowrap gap-4">
                   <div className="w-full md:w-1/2 text-left">
-                    <label className="block font-bold mb-1">Name</label>
-                    <input
-                      name="name"
-                      defaultValue={user.name || ""}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                    />
+                    <Label className="block mb-1">Name</Label>
+                    <Input name="name" defaultValue={user.name || ""} />
                     {errors.name && <div className="text-red-500 font-bold mt-1 text-sm">{errors.name}</div>}
                   </div>
 
                   <div className="w-full md:w-1/2 text-left">
-                    <label className="block font-bold mb-1">Profession</label>
-                    <input
-                      name="profession"
-                      defaultValue={user.profession || ""}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                    />
+                    <Label className="block mb-1">Profession</Label>
+                    <Input name="profession" defaultValue={user.profession || ""} />
                   </div>
                 </div>
 
                 <div className="w-full mt-6 text-left">
-                  <label className="block font-bold mb-1">About</label>
-                  <textarea
-                    name="about"
-                    rows="4"
-                    defaultValue={user.about || ""}
-                    className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                  />
+                  <Label className="block mb-1">About</Label>
+                  <Textarea name="about" rows="4" defaultValue={user.about || ""} />
                 </div>
 
                 <div className="w-full flex flex-wrap md:flex-nowrap gap-4 mt-6">
                   <div className="w-full md:w-1/2 text-left">
-                    <label className="block font-bold mb-1">Date of Birth</label>
-                    <input
+                    <Label className="block mb-1">Date of Birth</Label>
+                    <Input
                       type="date"
                       name="date_of_birth"
                       max={new Date().toISOString().split("T")[0]}
                       defaultValue={user.date_of_birth ? user.date_of_birth.split("T")[0] : "1995-01-01"}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
                     />
                   </div>
 
                   <div className="w-full md:w-1/2 text-left">
-                    <label className="block font-bold mb-1">Programming Since</label>
-                    <input
+                    <Label className="block mb-1">Programming Since</Label>
+                    <Input
                       type="date"
                       name="programming_since"
                       max={new Date().toISOString().split("T")[0]}
                       defaultValue={user.programming_since ? user.programming_since.split("T")[0] : "2015-01-01"}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
                     />
                   </div>
                 </div>
 
                 <div className="w-full flex flex-wrap md:flex-nowrap gap-4 mt-6">
                   <div className="w-full md:w-1/3 text-left">
-                    <label className="block font-bold mb-1">Country</label>
+                    <Label className="block mb-1">Country</Label>
                     <select
                       name="country"
                       defaultValue={user.country || ""}
@@ -126,7 +113,7 @@ export default function Profile({ user, countries, languages, levels }) {
                   </div>
 
                   <div className="w-full md:w-1/3 text-left">
-                    <label className="block font-bold mb-1">Language</label>
+                    <Label className="block mb-1">Language</Label>
                     <select
                       name="language"
                       defaultValue={user.language || ""}
@@ -140,7 +127,7 @@ export default function Profile({ user, countries, languages, levels }) {
                   </div>
 
                   <div className="w-full md:w-1/3 text-left">
-                    <label className="block font-bold mb-1">Level</label>
+                    <Label className="block mb-1">Level</Label>
                     <select
                       name="level"
                       defaultValue={user.level || ""}
@@ -154,13 +141,9 @@ export default function Profile({ user, countries, languages, levels }) {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={processing}
-                  className="mt-16 flex cursor-pointer items-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                >
+                <Button type="submit" size="lg" disabled={processing} className="mt-16">
                   {processing ? "Saving..." : "Save Changes"}
-                </button>
+                </Button>
               </div>
             </>
           )}

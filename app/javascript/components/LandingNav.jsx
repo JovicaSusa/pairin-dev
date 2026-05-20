@@ -2,6 +2,7 @@ import { Link, router } from "@inertiajs/react";
 import { useState } from "react";
 import logoImage from "@/assets/images/logo.svg";
 import logoHamburger from "@/assets/images/hamburger.svg";
+import { Button } from "@/components/ui/button";
 
 export default function LandingNav({ user }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,9 +27,9 @@ export default function LandingNav({ user }) {
           <ul className="space-y-2 list-none lg:space-y-0 lg:items-center lg:inline-flex">
             {user ? (
             <li>
-              <button type="button" onClick={() => router.delete('/users/sign_out')} className="text-sm">
-                  Logout
-              </button>
+              <Button size="sm" variant="neutral" onClick={() => router.delete('/users/sign_out')}>
+                Logout
+              </Button>
             </li>
             ) : (
               <>
@@ -38,9 +39,9 @@ export default function LandingNav({ user }) {
                   </a>
                 </li>
                 <li>
-                  <a href="/users/sign_up" className="px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-black">
-                    Sign up
-                  </a>
+                  <Button asChild size="sm">
+                    <a href="/users/sign_up">Sign up</a>
+                  </Button>
                 </li>
               </>
             )}

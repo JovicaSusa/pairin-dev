@@ -1,7 +1,9 @@
 import { Link } from "@inertiajs/react";
 import { formatShort } from "@/helpers/date";
-import logoImg from "@/assets/images/logo.svg"
 import ExpandableText from "@/components/ExpandableText";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Card({ pairRequest, currentUserId }) {
   const alreadyOffered = pairRequest.offers
@@ -25,15 +27,15 @@ export default function Card({ pairRequest, currentUserId }) {
               key={period.id}
               className="w-full flex md:items-center md:justify-end gap-x-1 mt-1"
             >
-              <div className="rounded-xl text-sm border-2 border-black px-2 font-semibold">
+              <Badge variant="neutral" className="text-sm">
                 {formatShort(period.start_at)}
-              </div>
+              </Badge>
 
               <span className="block font-bold">:</span>
 
-              <div className="rounded-xl text-sm border-2 border-black px-2 font-semibold">
+              <Badge variant="neutral" className="text-sm">
                 {formatShort(period.end_at)}
-              </div>
+              </Badge>
             </div>
           ))}
         </div>
@@ -41,20 +43,21 @@ export default function Card({ pairRequest, currentUserId }) {
 
       <div className="flex w-full overflow-x-scroll justify-start space-x-2 py-2 px-2 mb-6">
         {pairRequest.tags.map((tag) => (
-          <div
+          <Badge
             key={tag.id}
-            className="max-w-max whitespace-nowrap rounded-full border-2 border-black bg-orange px-2 py-1 text-xs 2xl:text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
+            className="bg-orange shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none 2xl:text-sm"
           >
             {tag.name}
-          </div>
+          </Badge>
         ))}
       </div>
 
       <div className="px-4 md:flex md:items-center">
         <div className="md:w-1/2 flex items-center gap-x-2">
-          <figure className="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
-            <img src={pairRequest.user.image_url || logoImg} />
-          </figure>
+          <Avatar className="w-12 h-12">
+            <AvatarImage src={pairRequest.user.image_url} alt={pairRequest.user.name} />
+            <AvatarFallback>{pairRequest.user.name?.[0]}</AvatarFallback>
+          </Avatar>
 
           <div>
             <p>{pairRequest.user.name}</p>
@@ -70,12 +73,9 @@ export default function Card({ pairRequest, currentUserId }) {
           {alreadyOffered ? (
             <p>You have already sent an offer</p>
           ) : (
-            <Link
-              href={`/pair_requests/${pairRequest.id}/offers/new`}
-              className="flex md:w-1/2 cursor-pointer items-center justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-            >
-              Apply
-            </Link>
+            <Button asChild className="md:w-1/2">
+              <Link href={`/pair_requests/${pairRequest.id}/offers/new`}>Apply</Link>
+            </Button>
           )}
         </div>
       </div>

@@ -1,5 +1,10 @@
 import { Form } from "@inertiajs/react";
 import { formatShort } from "@/helpers/date";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Card({ session }) {
   return (
@@ -10,9 +15,10 @@ export default function Card({ session }) {
 
       <div className="md:flex items-center max-h-fit px-2 py-4">
         <div className="md:w-1/2 flex flex-col md:flex-row items-center md:items-start gap-y-2 md:gap-x-2 text-center md:text-left">
-          <figure className="border-2 border-black w-12 h-12 overflow-hidden rounded-md">
-            <img src={session.other_participant.image_url} alt="" className="w-full h-full object-contain" />
-          </figure>
+          <Avatar className="w-12 h-12">
+            <AvatarImage src={session.other_participant.image_url} alt={session.other_participant.name} />
+            <AvatarFallback>{session.other_participant.name?.[0]}</AvatarFallback>
+          </Avatar>
           <div>
             <p className="font-bold">{session.other_participant.name}</p>
             <span className="text-sm">
@@ -25,13 +31,13 @@ export default function Card({ session }) {
 
         <div className="w-full mt-6 md:mt-0 md:w-1/2">
           <div className="w-full flex items-center justify-center md:justify-end gap-x-1">
-            <div className="rounded-xl text-sm border-2 border-black px-3 py-0.5 font-semibold bg-white">
+            <Badge variant="neutral" className="text-sm px-3">
               {formatShort(session.start_at)}
-            </div>
+            </Badge>
             <span className="block font-bold">:</span>
-            <div className="rounded-xl text-sm border-2 border-black px-3 py-0.5 font-semibold bg-white">
+            <Badge variant="neutral" className="text-sm px-3">
               {formatShort(session.end_at)}
-            </div>
+            </Badge>
           </div>
         </div>
       </div>
@@ -42,34 +48,23 @@ export default function Card({ session }) {
             {({ processing }) => (
               <>
                 <div className="flex flex-col justify-end w-full">
-                  <label className="font-bold">Call link</label>
-                  <input
-                    name="call_link"
-                    defaultValue={session.call_link || ""}
-                    className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none"
-                  />
+                  <Label className="mb-1">Call link</Label>
+                  <Input name="call_link" defaultValue={session.call_link || ""} />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={processing}
-                  className="w-3/4 md:w-1/4 flex cursor-pointer justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none"
-                >
+                <Button type="submit" disabled={processing} className="w-3/4 md:w-1/4">
                   {processing ? "..." : "Add"}
-                </button>
+                </Button>
               </>
             )}
           </Form>
         ) : (
           session.call_link ? (
-            <a
-              href={session.call_link}
-              rel="noopener noreferrer"
-              target="_blank"
-              className="w-3/4 flex cursor-pointer justify-center rounded-md border-2 border-black bg-purple px-10 py-3 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none truncate"
-            >
-              Join Call
-            </a>
+            <Button asChild className="w-3/4 truncate">
+              <a href={session.call_link} rel="noopener noreferrer" target="_blank">
+                Join Call
+              </a>
+            </Button>
           ) : (
             <p className="font-semibold text-gray-600">
               Waiting for {session.holder_name} to provide the link
