@@ -12,7 +12,7 @@ const StatusBadge = ({ status }) => {
   };
 
   return (
-    <Badge className={`rounded-xl ${styles[status] || 'bg-white'}`}>
+    <Badge className={styles[status] || 'bg-white'}>
       {status}
     </Badge>
   );
@@ -25,11 +25,11 @@ export default function Card({ offer }) {
         <p className="font-bold">{offer.subject}</p>
 
         <div className="flex items-center gap-x-2">
-          <Badge className="bg-orange rounded-xl">
+          <Badge className="bg-orange">
             {formatShort(offer.start_at)}
           </Badge>
           <span className="block font-bold">:</span>
-          <Badge className="bg-orange rounded-xl">
+          <Badge className="bg-orange">
             {formatShort(offer.end_at)}
           </Badge>
         </div>

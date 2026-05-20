@@ -35,11 +35,11 @@ export default function Card({ offer, pairRequestId }) {
 
       <div className="px-4 md:flex md:items-center">
         <div className="md:w-1/2 flex items-center gap-x-2">
-          <Badge className="bg-orange rounded-xl">
+          <Badge className="bg-orange">
             {formatShort(offer.start_at)}
           </Badge>
           <span className="block font-bold">:</span>
-          <Badge className="bg-orange rounded-xl">
+          <Badge className="bg-orange">
             {formatShort(offer.end_at)}
           </Badge>
         </div>

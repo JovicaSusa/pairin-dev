@@ -31,11 +31,11 @@ export default function Card({ session }) {
 
         <div className="w-full mt-6 md:mt-0 md:w-1/2">
           <div className="w-full flex items-center justify-center md:justify-end gap-x-1">
-            <Badge variant="neutral" className="rounded-xl text-sm px-3">
+            <Badge variant="neutral" className="text-sm px-3">
               {formatShort(session.start_at)}
             </Badge>
             <span className="block font-bold">:</span>
-            <Badge variant="neutral" className="rounded-xl text-sm px-3">
+            <Badge variant="neutral" className="text-sm px-3">
               {formatShort(session.end_at)}
             </Badge>
           </div>

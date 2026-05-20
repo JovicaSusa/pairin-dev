@@ -27,13 +27,13 @@ export default function Card({ pairRequest, currentUserId }) {
               key={period.id}
               className="w-full flex md:items-center md:justify-end gap-x-1 mt-1"
             >
-              <Badge variant="neutral" className="rounded-xl text-sm">
+              <Badge variant="neutral" className="text-sm">
                 {formatShort(period.start_at)}
               </Badge>
 
               <span className="block font-bold">:</span>
 
-              <Badge variant="neutral" className="rounded-xl text-sm">
+              <Badge variant="neutral" className="text-sm">
                 {formatShort(period.end_at)}
               </Badge>
             </div>
@@ -45,7 +45,7 @@ export default function Card({ pairRequest, currentUserId }) {
         {pairRequest.tags.map((tag) => (
           <Badge
             key={tag.id}
-            className="bg-orange rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none 2xl:text-sm"
+            className="bg-orange shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none 2xl:text-sm"
           >
             {tag.name}
           </Badge>

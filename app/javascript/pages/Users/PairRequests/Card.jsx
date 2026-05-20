@@ -38,7 +38,7 @@ export default function Card({ request }) {
           {request.tags?.map((tag) => (
             <Badge
               key={tag.id}
-              className="bg-orange rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] 2xl:text-sm"
+              className="bg-orange shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] 2xl:text-sm"
             >
               {tag.name}
             </Badge>
