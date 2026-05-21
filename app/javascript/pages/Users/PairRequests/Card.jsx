@@ -25,7 +25,7 @@ export default function UserPairRequestCard({ request }) {
 
   return (
     <Card className="mb-12 bg-white gap-0 py-0 pb-4">
-      <CardHeader className="flex flex-col md:flex-row justify-between items-center border-b-2 border-border bg-green py-4 px-4 rounded-t-base">
+      <CardHeader className="flex flex-col md:flex-row justify-between items-center border-b-2 border-border bg-main py-4 px-4 rounded-t-base">
         <CardTitle className="text-xl">{request.subject}</CardTitle>
         <Button asChild variant="neutral" className="mt-4 md:mt-0">
           <Link href={`/pair_requests/${request.id}/offers`}>See applications</Link>

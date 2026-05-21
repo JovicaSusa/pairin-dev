@@ -15,7 +15,7 @@ export default function Activities({ activities }) {
           {activities.length > 0 ? (
             activities.map((activity) => (
               <Card key={activity.id} className="mb-8 bg-white gap-0 py-0">
-                <CardHeader className="border-b-2 border-border bg-green py-4 px-2 rounded-t-base">
+                <CardHeader className="border-b-2 border-border bg-main py-4 px-2 rounded-t-base">
                   <CardTitle>{activity.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="px-2 py-4">

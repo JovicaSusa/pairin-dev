@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 export default function SessionCard({ session }) {
   return (
     <Card className="mb-12 bg-white gap-0 py-0 pb-4">
-      <CardHeader className="border-b-2 border-border bg-green py-4 px-2 rounded-t-base">
+      <CardHeader className="border-b-2 border-border bg-main py-4 px-2 rounded-t-base">
         <CardTitle className="text-xl">{session.subject}</CardTitle>
       </CardHeader>
 

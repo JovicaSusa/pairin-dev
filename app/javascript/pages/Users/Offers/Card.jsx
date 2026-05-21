@@ -22,7 +22,7 @@ const StatusBadge = ({ status }) => {
 export default function UserOfferCard({ offer }) {
   return (
     <Card className="mb-12 bg-white gap-0 py-0 pb-4">
-      <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-border bg-green px-2 py-3 rounded-t-base gap-y-2">
+      <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-border bg-main px-2 py-3 rounded-t-base gap-y-2">
         <CardTitle>{offer.subject}</CardTitle>
         <div className="flex items-center gap-x-2">
           <Badge className="bg-orange">
