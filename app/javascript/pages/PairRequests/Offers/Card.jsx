@@ -4,19 +4,20 @@ import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 
-export default function Card({ offer, pairRequestId }) {
+export default function OfferCard({ offer, pairRequestId }) {
   const handleAccept = () => {
     router.post(`/pair_requests/${pairRequestId}/offers/${offer.id}/accept`);
   };
 
   return (
-    <div className="relative mb-12 border-2 pb-4 border-black rounded-t-md bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+    <Card className="relative mb-12 bg-white gap-0 py-0 pb-4">
       {offer.should_overlay && (
-        <div className="absolute w-full h-full bg-black opacity-20 rounded-t-md z-10" />
+        <div className="absolute w-full h-full bg-black opacity-20 rounded-base z-10" />
       )}
 
-      <div className="flex items-center gap-x-2 px-4 pt-4">
+      <CardHeader className="flex flex-row items-center gap-x-2 px-4 pt-4 pb-0">
         <Avatar className="w-12 h-12 shrink-0">
           <AvatarImage src={offer.offerer.image_url} alt={offer.offerer.name} />
           <AvatarFallback>{offer.offerer.name?.[0]}</AvatarFallback>
@@ -27,13 +28,13 @@ export default function Card({ offer, pairRequestId }) {
             ACCEPTED
           </Badge>
         )}
-      </div>
+      </CardHeader>
 
-      <div className="px-2 py-4">
+      <CardContent className="px-2 py-4">
         <ExpandableText className="whitespace-pre-wrap">{offer.message}</ExpandableText>
-      </div>
+      </CardContent>
 
-      <div className="px-4 md:flex md:items-center">
+      <CardFooter className="px-4 flex-col md:flex-row items-start md:items-center">
         <div className="md:w-1/2 flex items-center gap-x-2">
           <Badge className="bg-orange">
             {formatShort(offer.start_at)}
@@ -51,7 +52,7 @@ export default function Card({ offer, pairRequestId }) {
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
