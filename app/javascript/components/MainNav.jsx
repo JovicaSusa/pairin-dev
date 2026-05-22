@@ -14,8 +14,8 @@ export default function MainNav({ currentUser, currentPath }) {
   const getLinkClasses = (path, isSubmenu = false) => {
     const baseClasses = "h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]";
     const active = path ? isActive(path) : isPairRequestSubmenuActive();
-    const activeClasses = active 
-      ? "bg-purple text-white active" 
+    const activeClasses = active
+      ? "bg-main text-main-foreground active"
       : isSubmenu ? "hover:bg-orange bg-black/10" : "hover:bg-orange";
       
     return `${baseClasses} ${activeClasses}`;
