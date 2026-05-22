@@ -1,14 +1,18 @@
 import { Head, Form } from "@inertiajs/react";
-import Reveal from "@/components/Reveal";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Profile({ user, countries, languages, levels }) {
   const [previewUrl, setPreviewUrl] = useState(user.image_url);
+  const [country, setCountry] = useState(user.country || "");
+  const [language, setLanguage] = useState(user.language || "");
+  const [level, setLevel] = useState(user.level || "");
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -32,23 +36,23 @@ export default function Profile({ user, countries, languages, levels }) {
                 </Avatar>
 
                 <div className="mt-4">
-                  <Reveal
-                    key={user.image_url}
-                    button={
+                  <Collapsible key={user.image_url}>
+                    <CollapsibleTrigger asChild>
                       <Button type="button" variant="neutral" size="sm">
                         Change Avatar
                       </Button>
-                    }
-                  >
-                    <div className="mt-4">
-                      <input
-                        type="file"
-                        name="image"
-                        onChange={handleFileChange}
-                        className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white"
-                      />
-                    </div>
-                  </Reveal>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="mt-4">
+                        <input
+                          type="file"
+                          name="image"
+                          onChange={handleFileChange}
+                          className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white"
+                        />
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
               </div>
 
@@ -100,44 +104,47 @@ export default function Profile({ user, countries, languages, levels }) {
                 <div className="w-full flex flex-wrap md:flex-nowrap gap-4 mt-6">
                   <div className="w-full md:w-1/3 text-left">
                     <Label className="block mb-1">Country</Label>
-                    <select
-                      name="country"
-                      defaultValue={user.country || ""}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                    >
-                      <option value="">Select a country</option>
-                      {countries.map(([label, value]) => (
-                        <option key={value} value={value}>{label}</option>
-                      ))}
-                    </select>
+                    <input type="hidden" name="country" value={country} />
+                    <Select value={country} onValueChange={setCountry}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map(([label, value]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="w-full md:w-1/3 text-left">
                     <Label className="block mb-1">Language</Label>
-                    <select
-                      name="language"
-                      defaultValue={user.language || ""}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                    >
-                      <option value="">Select a language</option>
-                      {languages.map(([label, value]) => (
-                        <option key={value} value={value}>{label}</option>
-                      ))}
-                    </select>
+                    <input type="hidden" name="language" value={language} />
+                    <Select value={language} onValueChange={setLanguage}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {languages.map(([label, value]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="w-full md:w-1/3 text-left">
                     <Label className="block mb-1">Level</Label>
-                    <select
-                      name="level"
-                      defaultValue={user.level || ""}
-                      className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                    >
-                      <option value="">Select a level</option>
-                      {levels.map(([label, value]) => (
-                        <option key={value} value={value}>{label}</option>
-                      ))}
-                    </select>
+                    <input type="hidden" name="level" value={level} />
+                    <Select value={level} onValueChange={setLevel}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {levels.map(([label, value]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 

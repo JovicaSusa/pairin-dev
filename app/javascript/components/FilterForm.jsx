@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function FilterForm({ tags, userLevels, languages, filters = {}, onSubmit }) {
   const [form, setForm] = useState({
@@ -15,6 +16,10 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleSelectChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
 
@@ -32,20 +37,16 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
         <Label htmlFor="tags_name_eq" className="block mb-1">
           Tags
         </Label>
-        <select
-          id="tags_name_eq"
-          name="tags_name_eq"
-          value={form.tags_name_eq}
-          onChange={handleChange}
-          className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none"
-        >
-          <option value="">Select tag</option>
-          {tags.map((tag) => (
-            <option key={tag.id} value={tag.name}>
-              {tag.name}
-            </option>
-          ))}
-        </select>
+        <Select value={form.tags_name_eq} onValueChange={(val) => handleSelectChange("tags_name_eq", val)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select tag" />
+          </SelectTrigger>
+          <SelectContent>
+            {tags.map((tag) => (
+              <SelectItem key={tag.id} value={tag.name}>{tag.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="md:w-5/12">
@@ -66,40 +67,32 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
         <Label htmlFor="user_level_eq" className="block mb-1">
           User level
         </Label>
-        <select
-          id="user_level_eq"
-          name="user_level_eq"
-          value={form.user_level_eq}
-          onChange={handleChange}
-          className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none"
-        >
-          <option value="">Select level</option>
-          {userLevels.map((lvl) => (
-            <option key={lvl} value={lvl}>
-              {lvl.charAt(0).toUpperCase() + lvl.slice(1)}
-            </option>
-          ))}
-        </select>
+        <Select value={form.user_level_eq} onValueChange={(val) => handleSelectChange("user_level_eq", val)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select level" />
+          </SelectTrigger>
+          <SelectContent>
+            {userLevels.map((lvl) => (
+              <SelectItem key={lvl} value={lvl}>{lvl.charAt(0).toUpperCase() + lvl.slice(1)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="md:w-5/12">
         <Label htmlFor="user_language_eq" className="block mb-1">
           User language
         </Label>
-        <select
-          id="user_language_eq"
-          name="user_language_eq"
-          value={form.user_language_eq}
-          onChange={handleChange}
-          className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none"
-        >
-          <option value="">Select language</option>
-          {languages.map(([name, code]) => (
-            <option key={code} value={code}>
-              {name}
-            </option>
-          ))}
-        </select>
+        <Select value={form.user_language_eq} onValueChange={(val) => handleSelectChange("user_language_eq", val)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select language" />
+          </SelectTrigger>
+          <SelectContent>
+            {languages.map(([name, code]) => (
+              <SelectItem key={code} value={code}>{name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="md:w-5/12">

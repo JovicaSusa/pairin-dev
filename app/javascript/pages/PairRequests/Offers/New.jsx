@@ -1,10 +1,14 @@
 import { Form, Head } from '@inertiajs/react';
 import { formatShort } from "@/helpers/date";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function New({ pairRequestId, periods }) {
+  const [periodId, setPeriodId] = useState(String(periods[0]?.id || ""));
+
   return (
     <div className="flex flex-col items-center w-full px-4">
       <Head title="Send application" />
@@ -26,17 +30,19 @@ export default function New({ pairRequestId, periods }) {
 
               <div className="w-full mt-4">
                 <Label className="block mb-1">Select period</Label>
-                <select
-                  name="period_id"
-                  defaultValue={periods[0]?.id || ''}
-                  className="w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                >
-                  {periods.map(period => (
-                    <option key={period.id} value={period.id}>
-                      {formatShort(period.start_at)} : {formatShort(period.end_at)}
-                    </option>
-                  ))}
-                </select>
+                <input type="hidden" name="period_id" value={periodId} />
+                <Select value={periodId} onValueChange={setPeriodId}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {periods.map(period => (
+                      <SelectItem key={period.id} value={String(period.id)}>
+                        {formatShort(period.start_at)} : {formatShort(period.end_at)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {(errors.period || errors.period_id) && (
                   <div className="text-orange font-bold mt-1">{errors.period || errors.period_id}</div>
                 )}
