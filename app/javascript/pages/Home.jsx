@@ -1,6 +1,7 @@
 import InfoCard from "@/components/InfoCard";
-import FlashMessages from "@/components/FlashMessages";
 import LandingNav from "@/components/LandingNav";
+import { Toaster } from "@/components/ui/sonner";
+import { useFlash } from "@/hooks/use-flash";
 import { Button } from "@/components/ui/button";
 import collaborateImage from "@/assets/images/collaborate.svg";
 import arrowImage from "@/assets/images/arrow.svg"
@@ -14,9 +15,11 @@ import reviewImg from "@/assets/images/review.svg";
 import acceptImg from "@/assets/images/accept.svg";
 
 export default function Home({ auth }) {
+  useFlash();
+
   return (
     <div>
-      <FlashMessages />
+      <Toaster position="top-center" />
       <LandingNav user={auth.user} />
       <div className="w-full flex justify-center">
         <div className="flex w-full md:w-1/2 justify-center px-5 py-12 md:px-12 lg:px-16 lg:py-24">
