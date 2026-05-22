@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react";
-import Reveal from "@/components/Reveal";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import logoImg from "@/assets/images/logo.svg";
 import hamburgerImg from "@/assets/images/hamburger.svg";
 
@@ -34,24 +34,24 @@ export default function MainNav({ currentUser, currentPath }) {
             Search
           </Link>
 
-          <Reveal
-            defaultOpen={isPairRequestSubmenuActive()}
-            button={
+          <Collapsible defaultOpen={isPairRequestSubmenuActive()}>
+            <CollapsibleTrigger asChild>
               <div className={`${getLinkClasses(null)} border-b-4 border-black font-bold`}>
                 Pair Requests
               </div>
-            }
-          >
-            <Link href="/users/pair_requests/new" className={`${getLinkClasses('/users/pair_requests/new', true)} border-b-2 border-black`}>
-              New
-            </Link>
-            <Link href="/users/pair_requests" className={`${getLinkClasses('/users/pair_requests', true)} border-b-2 border-black`}>
-              Opened
-            </Link>
-            <Link href="/users/offers" className={`${getLinkClasses('/users/offers', true)} border-b-2 border-black`}>
-              Applied
-            </Link>
-          </Reveal>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Link href="/users/pair_requests/new" className={`${getLinkClasses('/users/pair_requests/new', true)} border-b-2 border-black`}>
+                New
+              </Link>
+              <Link href="/users/pair_requests" className={`${getLinkClasses('/users/pair_requests', true)} border-b-2 border-black`}>
+                Opened
+              </Link>
+              <Link href="/users/offers" className={`${getLinkClasses('/users/offers', true)} border-b-2 border-black`}>
+                Applied
+              </Link>
+            </CollapsibleContent>
+          </Collapsible>
 
           <Link href="/activities" className={`${getLinkClasses('/activities')} border-b-4 border-black`}>
             Feed
@@ -62,28 +62,29 @@ export default function MainNav({ currentUser, currentPath }) {
           </Link>
         </div>
         <div className="mt-auto border-t-4 border-black bg-yellow-50">
-          <Reveal
-            button={
+          <Collapsible>
+            <CollapsibleTrigger asChild>
               <div className="w-full h-16 flex justify-center items-center cursor-pointer hover:bg-orange transition-all font-bold">
                 Account
               </div>
-            }
-          >
-            <Link
-              href={`/profiles/${currentUser.id}`}
-              className="border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
-            >
-              Profile
-            </Link>
-            <Link
-              href="/users/sign_out"
-              method="delete"
-              as="button"
-              className="w-full border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
-            >
-              Log out
-            </Link>
-          </Reveal>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <Link
+                href={`/profiles/${currentUser.id}`}
+                className="border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
+              >
+                Profile
+              </Link>
+              <Link
+                href="/users/sign_out"
+                method="delete"
+                as="button"
+                className="w-full border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
+              >
+                Log out
+              </Link>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       </aside>
 
@@ -92,46 +93,48 @@ export default function MainNav({ currentUser, currentPath }) {
         <div className="relative h-full flex items-center px-4">
           <img src={logoImg} className="w-10 h-10" alt="Logo" />
           
-          <Reveal
-            button={
+          <Collapsible>
+            <CollapsibleTrigger asChild>
               <button type="button" className="absolute top-1 right-2 p-1">
                 <img src={hamburgerImg} className="w-8 h-8" alt="Menu" />
               </button>
-            }
-          >
-            <div className="absolute top-[60px] left-[-4px] w-[calc(100%+8px)] bg-yellow-50 border-b-4 border-black flex flex-col shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <Link href="/pair_requests" className={`${getLinkClasses('/pair_requests')} border-t-4 border-black`}>
-                Search
-              </Link>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="absolute top-[60px] left-[-4px] w-[calc(100%+8px)] bg-yellow-50 border-b-4 border-black flex flex-col shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <Link href="/pair_requests" className={`${getLinkClasses('/pair_requests')} border-t-4 border-black`}>
+                  Search
+                </Link>
 
-              <Reveal
-                defaultOpen={isPairRequestSubmenuActive()}
-                button={
-                  <div className={`${getLinkClasses(null)} border-t-4 border-black font-bold`}>
-                    Pair Requests
-                  </div>
-                }
-              >
-                <Link href="/users/pair_requests/new" className={`${getLinkClasses('/users/pair_requests/new', true)} border-t-2 border-black`}>New</Link>
-                <Link href="/users/pair_requests" className={`${getLinkClasses('/users/pair_requests', true)} border-b-2 border-black`}>Opened</Link>
-                <Link href="/users/offers" className={`${getLinkClasses('/users/offers', true)} border-b-2 border-black`}>Applied</Link>
-              </Reveal>
+                <Collapsible defaultOpen={isPairRequestSubmenuActive()}>
+                  <CollapsibleTrigger asChild>
+                    <div className={`${getLinkClasses(null)} border-t-4 border-black font-bold`}>
+                      Pair Requests
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <Link href="/users/pair_requests/new" className={`${getLinkClasses('/users/pair_requests/new', true)} border-t-2 border-black`}>New</Link>
+                    <Link href="/users/pair_requests" className={`${getLinkClasses('/users/pair_requests', true)} border-b-2 border-black`}>Opened</Link>
+                    <Link href="/users/offers" className={`${getLinkClasses('/users/offers', true)} border-b-2 border-black`}>Applied</Link>
+                  </CollapsibleContent>
+                </Collapsible>
 
-              <Link href="/activities" className={`${getLinkClasses('/activities')} border-t-4 border-black`}>Feed</Link>
-              <Link href="/sessions" className={`${getLinkClasses('/sessions')} border-t-4 border-black`}>Sessions</Link>
+                <Link href="/activities" className={`${getLinkClasses('/activities')} border-t-4 border-black`}>Feed</Link>
+                <Link href="/sessions" className={`${getLinkClasses('/sessions')} border-t-4 border-black`}>Sessions</Link>
 
-              <Reveal
-                button={
-                  <div className="border-t-4 border-black h-16 flex justify-center items-center cursor-pointer hover:bg-orange font-bold">
-                    Account
-                  </div>
-                }
-              >
-                <Link href={`/profiles/${currentUser.id}`} className="border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange">Profile</Link>
-                <Link href="/users/sign_out" method="delete" as="button" className="w-full border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange">Log out</Link>
-              </Reveal>
-            </div>
-          </Reveal>
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <div className="border-t-4 border-black h-16 flex justify-center items-center cursor-pointer hover:bg-orange font-bold">
+                      Account
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <Link href={`/profiles/${currentUser.id}`} className="border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange">Profile</Link>
+                    <Link href="/users/sign_out" method="delete" as="button" className="w-full border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange">Log out</Link>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       </div>
     </>

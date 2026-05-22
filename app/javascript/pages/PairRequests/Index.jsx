@@ -1,4 +1,4 @@
-import Reveal from "@/components/Reveal";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import FilterForm from "@/components/FilterForm";
 import Card from "./Card";
 import { Head, router, usePage, InfiniteScroll } from "@inertiajs/react";
@@ -21,26 +21,27 @@ export default function Index({ pairRequests, filterOptions, filters }) {
           </div>
 
           <div className="mt-12">
-            <Reveal
-              button={
+            <Collapsible>
+              <CollapsibleTrigger asChild>
                 <button className="relative group overflow-hidden items-center w-full flex justify-end mb-2">
                   <span className="absolute block font-bold top-0 -right-[60px] transition ease-in-out duration-500 group-hover:-translate-x-24">
                     Filter
                   </span>
                   <img src={preferencesImg} className="z-10 bg-yellow-50" />
                 </button>
-              }
-            >
-              <FilterForm
-                tags={tags}
-                userLevels={userLevels}
-                languages={languages}
-                filters={filters}
-                onSubmit={(q) => {
-                  router.get("/pair_requests", { q });
-                }}
-              />
-            </Reveal>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <FilterForm
+                  tags={tags}
+                  userLevels={userLevels}
+                  languages={languages}
+                  filters={filters}
+                  onSubmit={(q) => {
+                    router.get("/pair_requests", { q });
+                  }}
+                />
+              </CollapsibleContent>
+            </Collapsible>
           </div>
 
           <div className="mt-12 mb-12">

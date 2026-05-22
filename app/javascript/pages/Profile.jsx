@@ -1,5 +1,5 @@
 import { Head, Form } from "@inertiajs/react";
-import Reveal from "@/components/Reveal";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -36,23 +36,23 @@ export default function Profile({ user, countries, languages, levels }) {
                 </Avatar>
 
                 <div className="mt-4">
-                  <Reveal
-                    key={user.image_url}
-                    button={
+                  <Collapsible key={user.image_url}>
+                    <CollapsibleTrigger asChild>
                       <Button type="button" variant="neutral" size="sm">
                         Change Avatar
                       </Button>
-                    }
-                  >
-                    <div className="mt-4">
-                      <input
-                        type="file"
-                        name="image"
-                        onChange={handleFileChange}
-                        className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white"
-                      />
-                    </div>
-                  </Reveal>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="mt-4">
+                        <input
+                          type="file"
+                          name="image"
+                          onChange={handleFileChange}
+                          className="w-full rounded-md border-2 border-black p-2 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white"
+                        />
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
               </div>
 
