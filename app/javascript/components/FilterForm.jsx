@@ -11,7 +11,7 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
     user_level_eq: filters.user_level_eq || "",
     user_language_eq: filters.user_language_eq || "",
     periods_start_at_gteq: filters.periods_start_at_gteq || "",
-    periods_start_at_lt: filters.periods_start_at_lt || "",
+    periods_start_at_lteq: filters.periods_start_at_lteq || "",
   });
 
   const handleChange = (e) => {
@@ -110,14 +110,14 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div className="md:w-5/12">
-        <Label htmlFor="periods_start_at_lt" className="block mb-1">
+        <Label htmlFor="periods_start_at_lteq" className="block mb-1">
           Session starts before
         </Label>
         <Input
           type="date"
-          id="periods_start_at_lt"
-          name="periods_start_at_lt"
-          value={form.periods_start_at_lt}
+          id="periods_start_at_lteq"
+          name="periods_start_at_lteq"
+          value={form.periods_start_at_lteq}
           onChange={handleChange}
         />
       </div>
