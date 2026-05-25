@@ -1,18 +1,8 @@
 import { useState } from "react";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-
-const parseLocalDate = (str) => {
-  if (!str) return undefined;
-  const [year, month, day] = str.split('-').map(Number);
-  return new Date(year, month - 1, day);
-};
 
 export default function FilterForm({ tags, userLevels, languages, filters = {}, onSubmit }) {
   const [form, setForm] = useState({
@@ -21,21 +11,22 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
     user_level_eq: filters.user_level_eq || "",
     user_language_eq: filters.user_language_eq || "",
     periods_start_at_gteq: filters.periods_start_at_gteq || "",
-    periods_start_at_lteq: filters.periods_start_at_lteq || "",
+    periods_start_at_lt: filters.periods_start_at_lt || "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name, value) => {
-    setForm({ ...form, [name]: value });
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    const compacted = Object.fromEntries(Object.entries(form).filter(([, v]) => v !== ""));
+    onSubmit(compacted);
   };
 
   return (
@@ -106,43 +97,29 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div className="md:w-5/12">
-        <Label className="block mb-1">Session starts after</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="neutral" className="w-full justify-start font-base">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {form.periods_start_at_gteq ? format(parseLocalDate(form.periods_start_at_gteq), "PPP") : <span className="text-muted-foreground">Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={parseLocalDate(form.periods_start_at_gteq)}
-              onSelect={(date) => handleSelectChange("periods_start_at_gteq", date ? format(date, 'yyyy-MM-dd') : "")}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        <Label htmlFor="periods_start_at_gteq" className="block mb-1">
+          Session starts from
+        </Label>
+        <Input
+          type="date"
+          id="periods_start_at_gteq"
+          name="periods_start_at_gteq"
+          value={form.periods_start_at_gteq}
+          onChange={handleChange}
+        />
       </div>
 
       <div className="md:w-5/12">
-        <Label className="block mb-1">Session starts before</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="neutral" className="w-full justify-start font-base">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {form.periods_start_at_lteq ? format(parseLocalDate(form.periods_start_at_lteq), "PPP") : <span className="text-muted-foreground">Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={parseLocalDate(form.periods_start_at_lteq)}
-              onSelect={(date) => handleSelectChange("periods_start_at_lteq", date ? format(date, 'yyyy-MM-dd') : "")}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        <Label htmlFor="periods_start_at_lt" className="block mb-1">
+          Session starts before
+        </Label>
+        <Input
+          type="date"
+          id="periods_start_at_lt"
+          name="periods_start_at_lt"
+          value={form.periods_start_at_lt}
+          onChange={handleChange}
+        />
       </div>
 
       <div className="md:w-full flex justify-center mt-6">

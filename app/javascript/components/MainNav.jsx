@@ -11,7 +11,7 @@ export default function MainNav({ currentUser, currentPath }) {
     return ['/users/pair_requests/new', '/users/pair_requests', '/users/offers'].includes(cleanPath);
   };
 
-  const isAccountActive = () => cleanPath.startsWith('/profiles');
+  const isAccountActive = () => cleanPath === `/profiles/${currentUser.id}`;
 
   const getLinkClasses = (path, isSubmenu = false) => {
     const baseClasses = "h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]";
