@@ -50,7 +50,9 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
+
 
 #how-it-works {
   scroll-margin-top: 200px;

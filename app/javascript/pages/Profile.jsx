@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
 
 export default function Profile({ user, countries, languages, levels }) {
   const [previewUrl, setPreviewUrl] = useState(user.image_url);
@@ -58,7 +59,7 @@ export default function Profile({ user, countries, languages, levels }) {
 
               <div className="flex flex-col items-center mt-8 pb-20">
                 {progress && (
-                  <progress value={progress.percentage ?? 0} max="100" className="w-full mb-4" />
+                  <Progress value={progress.percentage ?? 0} className="w-full mb-4" />
                 )}
 
                 <div className="w-full flex flex-wrap md:flex-nowrap gap-4">
