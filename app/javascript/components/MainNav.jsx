@@ -63,15 +63,10 @@ export default function MainNav({ currentUser, currentPath }) {
         </div>
         <div className="mt-auto border-t-4 border-black bg-yellow-50">
           <Collapsible>
-            <CollapsibleTrigger asChild>
-              <div className="w-full h-16 flex justify-center items-center cursor-pointer hover:bg-orange transition-all font-bold">
-                Account
-              </div>
-            </CollapsibleTrigger>
             <CollapsibleContent>
               <Link
                 href={`/profiles/${currentUser.id}`}
-                className="border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
+                className="border-b-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
               >
                 Profile
               </Link>
@@ -79,11 +74,16 @@ export default function MainNav({ currentUser, currentPath }) {
                 href="/users/sign_out"
                 method="delete"
                 as="button"
-                className="w-full border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
+                className="w-full border-b-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
               >
                 Log out
               </Link>
             </CollapsibleContent>
+            <CollapsibleTrigger asChild>
+              <div className="w-full h-16 flex justify-center items-center cursor-pointer hover:bg-orange transition-all font-bold">
+                Account
+              </div>
+            </CollapsibleTrigger>
           </Collapsible>
         </div>
       </aside>
