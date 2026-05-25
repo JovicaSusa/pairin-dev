@@ -16,11 +16,11 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm({ ...form, [name]: value });
   };
 
   const handleSelectChange = (name, value) => {
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = (e) => {
