@@ -106,8 +106,8 @@ export default function New({ tags }) {
             {errors.description && <div className="text-orange font-bold mt-1">{errors.description}</div>}
           </div>
 
-          <div className="flex w-full gap-x-4 mt-8 items-start">
-            <div className="w-1/2">
+          <div className="flex flex-col gap-y-8 mt-8 items-start w-full md:flex-row md:gap-x-4 md:gap-y-0">
+            <div className="w-full md:w-1/2">
               <h4 className="font-bold mb-4 underline">Periods</h4>
               
               {data.periods_attributes.map((period, index) => (
@@ -143,7 +143,7 @@ export default function New({ tags }) {
               </Button>
             </div>
 
-            <div className="w-1/2">
+            <div className="w-full md:w-1/2">
               <h4 className="font-bold mb-4 underline">Tags</h4>
               
               {data.taggings_attributes.map((tagging, index) => (
@@ -185,7 +185,7 @@ export default function New({ tags }) {
                 </div>
               ))}
 
-              <div className="flex justify-end mt-2">
+              <div className="flex justify-start md:justify-end mt-2">
                 <Button type="button" size="sm" variant="neutral" onClick={addTag}>
                   + Add tag
                 </Button>

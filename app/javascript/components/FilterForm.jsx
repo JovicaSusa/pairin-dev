@@ -1,8 +1,18 @@
 import { useState } from "react";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+
+const parseLocalDate = (str) => {
+  if (!str) return undefined;
+  const [year, month, day] = str.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
 
 export default function FilterForm({ tags, userLevels, languages, filters = {}, onSubmit }) {
   const [form, setForm] = useState({
@@ -30,7 +40,7 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
 
   return (
     <form
-      className="md:flex md:flex-wrap md:justify-between md:gap-y-4 mb-12"
+      className="flex flex-col gap-4 mb-12 md:flex-row md:flex-wrap md:justify-between"
       onSubmit={handleSubmit}
     >
       <div className="md:w-5/12">
@@ -96,29 +106,43 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div className="md:w-5/12">
-        <Label htmlFor="periods_start_at_gteq" className="block mb-1">
-          Session starts after
-        </Label>
-        <Input
-          type="date"
-          id="periods_start_at_gteq"
-          name="periods_start_at_gteq"
-          value={form.periods_start_at_gteq}
-          onChange={handleChange}
-        />
+        <Label className="block mb-1">Session starts after</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="neutral" className="w-full justify-start font-base">
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {form.periods_start_at_gteq ? format(parseLocalDate(form.periods_start_at_gteq), "PPP") : <span className="text-muted-foreground">Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={parseLocalDate(form.periods_start_at_gteq)}
+              onSelect={(date) => handleSelectChange("periods_start_at_gteq", date ? format(date, 'yyyy-MM-dd') : "")}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="md:w-5/12">
-        <Label htmlFor="periods_start_at_lteq" className="block mb-1">
-          Session starts before
-        </Label>
-        <Input
-          type="date"
-          id="periods_start_at_lteq"
-          name="periods_start_at_lteq"
-          value={form.periods_start_at_lteq}
-          onChange={handleChange}
-        />
+        <Label className="block mb-1">Session starts before</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="neutral" className="w-full justify-start font-base">
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {form.periods_start_at_lteq ? format(parseLocalDate(form.periods_start_at_lteq), "PPP") : <span className="text-muted-foreground">Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={parseLocalDate(form.periods_start_at_lteq)}
+              onSelect={(date) => handleSelectChange("periods_start_at_lteq", date ? format(date, 'yyyy-MM-dd') : "")}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="md:w-full flex justify-center mt-6">
