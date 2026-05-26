@@ -3,9 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
+import { TIME_SLOTS } from "@/helpers/time-slots";
+
+const splitStartAt = (startAt) => {
+  if (!startAt) return { date: '', time: '' };
+  const [date = '', time = ''] = startAt.split('T');
+  return { date, time: time.slice(0, 5) };
+};
+
+const combineStartAt = (date, time) => (date || time ? `${date}T${time}` : '');
+
+const isValidStartAt = (s) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(s);
 
 export default function New({ tags }) {
-  const { data, setData, post, processing, errors} = useForm({
+  const { data, setData, post, processing, errors, transform } = useForm({
     subject: '',
     duration: 45,
     description: '',
@@ -15,6 +28,13 @@ export default function New({ tags }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    transform((formData) => ({
+      ...formData,
+      periods_attributes: formData.periods_attributes.map((p) => ({
+        ...p,
+        start_at: isValidStartAt(p.start_at) ? new Date(p.start_at).toISOString() : '',
+      })),
+    }));
     post('/users/pair_requests');
   }
 
@@ -32,10 +52,12 @@ export default function New({ tags }) {
     setData('periods_attributes', updatedPeriods);
   };
 
-  const updatePeriod = (index, value) => {
+  const updatePeriodPart = (index, part, value) => {
     const updatedPeriods = [...data.periods_attributes];
+    const { date, time } = splitStartAt(updatedPeriods[index].start_at);
 
-    updatedPeriods[index].start_at = value;
+    updatedPeriods[index].start_at =
+      part === 'date' ? combineStartAt(value, time) : combineStartAt(date, value);
     setData('periods_attributes', updatedPeriods);
   };
 
@@ -82,7 +104,7 @@ export default function New({ tags }) {
                 value={data.subject}
                 onChange={e => setData('subject', e.target.value)}
               />
-              {errors.subject && <div className="text-orange font-bold mt-1">{errors.subject}</div>}
+              {errors.subject && <div className="text-red-600 font-bold mt-1">{errors.subject}</div>}
             </div>
 
             <div className="w-1/4">
@@ -92,7 +114,7 @@ export default function New({ tags }) {
                 value={data.duration}
                 onChange={e => setData('duration', e.target.value)}
               />
-              {errors.duration && <div className="text-orange font-bold mt-1">{errors.duration}</div>}
+              {errors.duration && <div className="text-red-600 font-bold mt-1">{errors.duration}</div>}
             </div>
           </div>
 
@@ -103,40 +125,60 @@ export default function New({ tags }) {
               onChange={e => setData('description', e.target.value)}
               rows="4"
             />
-            {errors.description && <div className="text-orange font-bold mt-1">{errors.description}</div>}
+            {errors.description && <div className="text-red-600 font-bold mt-1">{errors.description}</div>}
           </div>
 
           <div className="flex flex-col gap-y-8 mt-8 items-start w-full md:flex-row md:gap-x-4 md:gap-y-0">
             <div className="w-full md:w-1/2">
               <h4 className="font-bold mb-4 underline">Periods</h4>
               
-              {data.periods_attributes.map((period, index) => (
-                <div key={index} className="mb-4 p-2 border-2 border-black rounded-md bg-white">
-                  <Label className="block mb-1 text-gray-700">Start at</Label>
-                  <div className="flex gap-x-2">
-                    <Input
-                      type="datetime-local"
-                      value={period.start_at}
-                      onChange={(e) => updatePeriod(index, e.target.value)}
-                      className="w-10/12"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="neutral"
-                      onClick={() => removePeriod(index)}
-                      className="w-2/12 text-red-500"
-                    >
-                      X
-                    </Button>
-                  </div>
-                  {errors[`periods_attributes.${index}.start_at`] && (
-                    <div className="text-orange text-xs font-bold mt-1">
-                      {errors[`periods_attributes.${index}.start_at`]}
+              {data.periods_attributes.map((period, index) => {
+                const { date, time } = splitStartAt(period.start_at);
+
+                return (
+                  <div key={index} className="mb-4 p-2 border-2 border-black rounded-md bg-white">
+                    <Label className="block mb-1 text-gray-700">Start at</Label>
+                    <div className="flex flex-col gap-2 md:flex-row md:gap-x-2">
+                      <div className="md:w-7/12">
+                        <DatePicker
+                          value={date}
+                          onChange={(v) => updatePeriodPart(index, 'date', v)}
+                          placeholder="Pick a date"
+                          disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                        />
+                      </div>
+                      <div className="flex gap-x-2 md:w-5/12">
+                        <div className="flex-1">
+                          <Select value={time} onValueChange={(v) => updatePeriodPart(index, 'time', v)}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Time" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {TIME_SLOTS.map((slot) => (
+                                <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="neutral"
+                          onClick={() => removePeriod(index)}
+                          className="text-red-500"
+                        >
+                          X
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
+                    {errors["periods.start_at"] && !isValidStartAt(period.start_at) && (
+                      <div className="text-red-600 font-bold mt-1">
+                        {errors["periods.start_at"]}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
 
               <Button type="button" size="sm" variant="neutral" onClick={addPeriod} className="mt-2">
                 + Add period
@@ -178,7 +220,7 @@ export default function New({ tags }) {
                     </Button>
                   </div>
                   {errors[`taggings_attributes.${index}.tag_attributes.name`] && (
-                    <div className="text-orange text-xs font-bold mt-1">
+                    <div className="text-red-600 text-xs font-bold mt-1">
                       {errors[`taggings_attributes.${index}.tag_attributes.name`]}
                     </div>
                   )}
