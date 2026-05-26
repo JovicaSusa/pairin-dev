@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Progress } from "@/components/ui/progress";
 
 export default function Profile({ user, countries, languages, levels }) {
@@ -14,6 +15,15 @@ export default function Profile({ user, countries, languages, levels }) {
   const [country, setCountry] = useState(user.country || "");
   const [language, setLanguage] = useState(user.language || "");
   const [level, setLevel] = useState(user.level || "");
+  const [programmingSince, setProgrammingSince] = useState(
+    user.programming_since ? String(user.programming_since) : ""
+  );
+  const [dateOfBirth, setDateOfBirth] = useState(
+    user.date_of_birth ? user.date_of_birth.split("T")[0] : ""
+  );
+
+  const currentYear = new Date().getFullYear();
+  const programmingYears = Array.from({ length: 51 }, (_, i) => currentYear - i);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -83,22 +93,32 @@ export default function Profile({ user, countries, languages, levels }) {
                 <div className="w-full flex flex-wrap md:flex-nowrap gap-4 mt-6">
                   <div className="w-full md:w-1/2 text-left">
                     <Label className="block mb-1">Date of Birth</Label>
-                    <Input
-                      type="date"
-                      name="date_of_birth"
-                      max={new Date().toISOString().split("T")[0]}
-                      defaultValue={user.date_of_birth ? user.date_of_birth.split("T")[0] : "1995-01-01"}
+                    <input type="hidden" name="date_of_birth" value={dateOfBirth} />
+                    <DatePicker
+                      value={dateOfBirth}
+                      onChange={setDateOfBirth}
+                      placeholder="Pick your birth date"
+                      captionLayout="dropdown-buttons"
+                      fromYear={currentYear - 100}
+                      toYear={currentYear}
+                      defaultMonth={new Date(1995, 0)}
+                      disabled={(date) => date > new Date()}
                     />
                   </div>
 
                   <div className="w-full md:w-1/2 text-left">
                     <Label className="block mb-1">Programming Since</Label>
-                    <Input
-                      type="date"
-                      name="programming_since"
-                      max={new Date().toISOString().split("T")[0]}
-                      defaultValue={user.programming_since ? user.programming_since.split("T")[0] : "2015-01-01"}
-                    />
+                    <input type="hidden" name="programming_since" value={programmingSince} />
+                    <Select value={programmingSince} onValueChange={setProgrammingSince}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {programmingYears.map((year) => (
+                          <SelectItem key={year} value={String(year)}>{year}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
