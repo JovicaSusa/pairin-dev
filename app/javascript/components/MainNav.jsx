@@ -11,12 +11,14 @@ export default function MainNav({ currentUser, currentPath }) {
     return ['/users/pair_requests/new', '/users/pair_requests', '/users/offers'].includes(cleanPath);
   };
 
+  const isAccountActive = () => cleanPath === `/profiles/${currentUser.id}`;
+
   const getLinkClasses = (path, isSubmenu = false) => {
     const baseClasses = "h-16 flex justify-center items-center cursor-pointer transition-all hover:translate-x-[3px] hover:translate-y-[3px]";
     const active = path ? isActive(path) : isPairRequestSubmenuActive();
     const activeClasses = active
       ? "bg-main text-main-foreground active"
-      : isSubmenu ? "hover:bg-orange bg-black/10" : "hover:bg-orange";
+      : isSubmenu ? "hover:bg-orange bg-secondary-background" : "hover:bg-orange data-[state=open]:bg-main data-[state=open]:text-main-foreground";
       
     return `${baseClasses} ${activeClasses}`;
   };
@@ -63,15 +65,10 @@ export default function MainNav({ currentUser, currentPath }) {
         </div>
         <div className="mt-auto border-t-4 border-black bg-yellow-50">
           <Collapsible>
-            <CollapsibleTrigger asChild>
-              <div className="w-full h-16 flex justify-center items-center cursor-pointer hover:bg-orange transition-all font-bold">
-                Account
-              </div>
-            </CollapsibleTrigger>
             <CollapsibleContent>
               <Link
                 href={`/profiles/${currentUser.id}`}
-                className="border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
+                className={`border-b-2 border-black h-16 flex justify-center items-center transition-all ${isAccountActive() ? 'bg-main text-main-foreground' : 'bg-secondary-background hover:bg-orange'}`}
               >
                 Profile
               </Link>
@@ -79,11 +76,16 @@ export default function MainNav({ currentUser, currentPath }) {
                 href="/users/sign_out"
                 method="delete"
                 as="button"
-                className="w-full border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange transition-all"
+                className="w-full border-b-2 border-black h-16 flex justify-center items-center bg-secondary-background hover:bg-orange transition-all"
               >
                 Log out
               </Link>
             </CollapsibleContent>
+            <CollapsibleTrigger asChild>
+              <div className={`w-full h-16 flex justify-center items-center cursor-pointer transition-all font-bold ${isAccountActive() ? 'bg-main text-main-foreground' : 'hover:bg-orange data-[state=open]:bg-main data-[state=open]:text-main-foreground'}`}>
+                Account
+              </div>
+            </CollapsibleTrigger>
           </Collapsible>
         </div>
       </aside>
@@ -113,8 +115,8 @@ export default function MainNav({ currentUser, currentPath }) {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <Link href="/users/pair_requests/new" className={`${getLinkClasses('/users/pair_requests/new', true)} border-t-2 border-black`}>New</Link>
-                    <Link href="/users/pair_requests" className={`${getLinkClasses('/users/pair_requests', true)} border-b-2 border-black`}>Opened</Link>
-                    <Link href="/users/offers" className={`${getLinkClasses('/users/offers', true)} border-b-2 border-black`}>Applied</Link>
+                    <Link href="/users/pair_requests" className={`${getLinkClasses('/users/pair_requests', true)} border-t-2 border-black`}>Opened</Link>
+                    <Link href="/users/offers" className={`${getLinkClasses('/users/offers', true)} border-t-2 border-black`}>Applied</Link>
                   </CollapsibleContent>
                 </Collapsible>
 
@@ -123,13 +125,13 @@ export default function MainNav({ currentUser, currentPath }) {
 
                 <Collapsible>
                   <CollapsibleTrigger asChild>
-                    <div className="border-t-4 border-black h-16 flex justify-center items-center cursor-pointer hover:bg-orange font-bold">
+                    <div className={`border-t-4 border-black h-16 flex justify-center items-center cursor-pointer font-bold ${isAccountActive() ? 'bg-main text-main-foreground' : 'hover:bg-orange data-[state=open]:bg-main data-[state=open]:text-main-foreground'}`}>
                       Account
                     </div>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <Link href={`/profiles/${currentUser.id}`} className="border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange">Profile</Link>
-                    <Link href="/users/sign_out" method="delete" as="button" className="w-full border-t-2 border-black h-16 flex justify-center items-center hover:bg-orange">Log out</Link>
+                    <Link href={`/profiles/${currentUser.id}`} className={`border-t-2 border-black h-16 flex justify-center items-center transition-all ${isAccountActive() ? 'bg-main text-main-foreground' : 'bg-secondary-background hover:bg-orange'}`}>Profile</Link>
+                    <Link href="/users/sign_out" method="delete" as="button" className="w-full border-t-2 border-black h-16 flex justify-center items-center bg-secondary-background hover:bg-orange">Log out</Link>
                   </CollapsibleContent>
                 </Collapsible>
               </div>

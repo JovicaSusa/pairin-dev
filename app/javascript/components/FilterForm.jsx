@@ -25,12 +25,13 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    const compacted = Object.fromEntries(Object.entries(form).filter(([, v]) => v !== ""));
+    onSubmit(compacted);
   };
 
   return (
     <form
-      className="md:flex md:flex-wrap md:justify-between md:gap-y-4 mb-12"
+      className="flex flex-col gap-4 mb-12 md:flex-row md:flex-wrap md:justify-between"
       onSubmit={handleSubmit}
     >
       <div className="md:w-5/12">
@@ -97,7 +98,7 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
 
       <div className="md:w-5/12">
         <Label htmlFor="periods_start_at_gteq" className="block mb-1">
-          Session starts after
+          Session starts from
         </Label>
         <Input
           type="date"

@@ -23,7 +23,7 @@ export default function Index({ pairRequests, filterOptions, filters }) {
           <div className="mt-12">
             <Collapsible>
               <CollapsibleTrigger asChild>
-                <button className="relative group overflow-hidden items-center w-full flex justify-end mb-2">
+                <button className="relative group overflow-hidden items-center w-full flex justify-end mb-2 pr-4 md:pr-0">
                   <span className="absolute block font-bold top-0 -right-[60px] transition ease-in-out duration-500 group-hover:-translate-x-24">
                     Filter
                   </span>

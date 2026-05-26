@@ -25,11 +25,11 @@ export default function UserOfferCard({ offer }) {
       <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-border bg-main px-2 py-3 rounded-t-base gap-y-2">
         <CardTitle>{offer.subject}</CardTitle>
         <div className="flex items-center gap-x-2">
-          <Badge className="bg-orange">
+          <Badge variant="neutral">
             {formatShort(offer.start_at)}
           </Badge>
           <span className="block font-bold">:</span>
-          <Badge className="bg-orange">
+          <Badge variant="neutral">
             {formatShort(offer.end_at)}
           </Badge>
         </div>
