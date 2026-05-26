@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export default function FilterForm({ tags, userLevels, languages, filters = {}, onSubmit }) {
   const [form, setForm] = useState({
@@ -97,28 +98,20 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div className="md:w-5/12">
-        <Label htmlFor="periods_start_at_gteq" className="block mb-1">
-          Session starts from
-        </Label>
-        <Input
-          type="date"
-          id="periods_start_at_gteq"
-          name="periods_start_at_gteq"
+        <Label className="block mb-1">Session starts from</Label>
+        <DatePicker
           value={form.periods_start_at_gteq}
-          onChange={handleChange}
+          onChange={(v) => setForm({ ...form, periods_start_at_gteq: v })}
+          placeholder="Pick a start date"
         />
       </div>
 
       <div className="md:w-5/12">
-        <Label htmlFor="periods_start_at_lteq" className="block mb-1">
-          Session starts before
-        </Label>
-        <Input
-          type="date"
-          id="periods_start_at_lteq"
-          name="periods_start_at_lteq"
+        <Label className="block mb-1">Session starts before</Label>
+        <DatePicker
           value={form.periods_start_at_lteq}
-          onChange={handleChange}
+          onChange={(v) => setForm({ ...form, periods_start_at_lteq: v })}
+          placeholder="Pick an end date"
         />
       </div>
 
