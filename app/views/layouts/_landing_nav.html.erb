@@ -1,30 +1,51 @@
-<div data-controller="home" class="w-full border-b-4 px-2 border-black bg-yellow-50 font-bold sticky top-0 z-10">
-  <div class="flex flex-col max-w-screen-xl py-2 mx-auto md:items-center md:justify-between md:flex-row md:px-6 lg:px-8">
-    <div class="flex items-center justify-between lg:justify-start">
-      <div class="flex items-center justify-center space-x-2">
-        <%= link_to root, class: "flex flex-col justify-center items-center" do %>
-          <%= image_tag "logo.svg", class: "w-fit h-8 md:h-12" %>
-          <span class="text-xl font-bold">pairin</span>
-        <% end %>
-      </div>
+<div data-controller="home" class="w-full border-b-2 border-black px-4 bg-yellow-50 font-bold sticky top-0 z-10">
+  <div class="flex items-center justify-between max-w-screen-xl py-2 mx-auto md:px-6 lg:px-8 h-14">
 
-      <button data-action="click->home#toggleNav" class="rounded-lg md:hidden focus:outline-none focus:shadow-outline">
-        <%= image_tag "hamburger.svg", class: "w-8 h-8 md:h-20" %>
-      </button>
+    <%# Logo %>
+    <div class="flex items-center gap-3">
+      <%= link_to root, class: "flex items-center gap-1.5" do %>
+        <%= image_tag "logo.svg", class: "h-8" %>
+        <span class="font-display font-bold text-base tracking-tight">pairin</span>
+      <% end %>
     </div>
 
-    <nav data-home-target="nav" class="flex-col flex-grow mt-4 hidden md:flex md:justify-end md:flex-row">
-      <ul class="space-y-2 list-none lg:space-y-0 lg:items-center lg:inline-flex">
-        <% if user_signed_in? %>
-          <li>
-            <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "text-sm" %>
-          </li>
-        <% else %>
-          <li>
-            <%= link_to "Login", new_user_session_path, class: "px-2 lg:px-6 py-6 text-sm border-b-2 border-transparent leading-[22px] md:px-3 text-black" %>
-          </li>
-        <% end %>
-      </ul>
+    <%# Desktop nav links %>
+    <nav class="hidden md:flex items-center gap-6">
+      <%= link_to "How it works", "#how-it-works", class: "text-sm font-semibold text-gray-500 hover:text-black transition-colors" %>
+      <%= link_to "Community", "#community", class: "text-sm font-semibold text-gray-500 hover:text-black transition-colors" %>
     </nav>
+
+    <%# Desktop actions %>
+    <div class="hidden md:flex items-center gap-2">
+      <% if user_signed_in? %>
+        <%= button_to "Logout", destroy_user_session_path, method: :delete,
+            class: "text-sm font-semibold text-gray-500 hover:text-black transition-colors px-3 py-2" %>
+      <% else %>
+        <%= link_to "Log in", new_user_session_path,
+            class: "text-sm font-semibold text-gray-600 hover:text-black transition-colors px-3 py-2" %>
+        <%= link_to "Sign up free", new_user_registration_path,
+            class: "text-sm font-bold px-4 py-2 rounded-md border-2 border-black bg-purple text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all" %>
+      <% end %>
+    </div>
+
+    <%# Mobile hamburger %>
+    <button data-action="click->home#toggleNav" class="md:hidden rounded-lg focus:outline-none p-1">
+      <%= image_tag "hamburger.svg", class: "w-7 h-7" %>
+    </button>
   </div>
+
+  <%# Mobile nav menu %>
+  <nav data-home-target="nav" class="hidden flex-col pb-4 md:hidden">
+    <div class="flex flex-col gap-3 pt-3 border-t border-black/10">
+      <%= link_to "How it works", "#how-it-works", class: "text-sm font-semibold text-gray-600 py-2" %>
+      <%= link_to "Community", "#community", class: "text-sm font-semibold text-gray-600 py-2" %>
+      <% if user_signed_in? %>
+        <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "text-sm text-left font-semibold text-gray-600 py-2" %>
+      <% else %>
+        <%= link_to "Log in", new_user_session_path, class: "text-sm font-semibold text-gray-600 py-2" %>
+        <%= link_to "Sign up free →", new_user_registration_path,
+            class: "inline-block text-sm font-bold px-5 py-2.5 rounded-md border-2 border-black bg-purple text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] w-fit" %>
+      <% end %>
+    </div>
+  </nav>
 </div>
