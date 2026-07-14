@@ -4,6 +4,31 @@
     <title>Pairin - Find pair programming partner or coding buddy quick and easy</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="Discover the perfect pair programming partner or coding buddy with Pairin.dev. Enhance your coding skills and collaborate in real-time with developers around the world." />
+    <link rel="canonical" href="<%= request.base_url + request.path %>">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Pairin">
+    <meta property="og:title" content="Pairin - Find pair programming partner or coding buddy quick and easy">
+    <meta property="og:description" content="Discover the perfect pair programming partner or coding buddy with Pairin.dev. Enhance your coding skills and collaborate in real-time with developers around the world.">
+    <meta property="og:url" content="<%= request.base_url + request.path %>">
+    <meta property="og:image" content="<%= image_url('logo.svg') %>">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Pairin - Find pair programming partner or coding buddy quick and easy">
+    <meta name="twitter:description" content="Discover the perfect pair programming partner or coding buddy with Pairin.dev. Enhance your coding skills and collaborate in real-time with developers around the world.">
+    <meta name="twitter:image" content="<%= image_url('logo.svg') %>">
+
+    <script type="application/ld+json">
+      <%== {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Pairin",
+        "url": root_url,
+        "logo": image_url("logo.svg"),
+        "description": "A community of developers connecting for pair programming and collaboration."
+      }.to_json %>
+    </script>
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
