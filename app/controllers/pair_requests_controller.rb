@@ -19,7 +19,7 @@ class PairRequestsController < ApplicationController
       pairRequests: InertiaRails.scroll(@pagy) {
         @pair_requests.as_json(
           include: {
-            user: { only: [:id, :name], methods: [:image_url] },
+            user: { only: [:id, :name, :profession], methods: [:image_url, :level_titleized] },
             tags: { only: [:id, :name] },
             periods: { only: [:id, :start_at, :end_at] },
             offers: { only: [:offerer_id] }

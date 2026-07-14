@@ -13,7 +13,7 @@ class ProfilesController < ApplicationController
   end
 
   def update
-    @user = User.find(params[:id])
+    @user = current_user
 
     if @user.update(profile_attributes)
       redirect_to profile_path(@user.id), notice: "Your profile has been updated!"
