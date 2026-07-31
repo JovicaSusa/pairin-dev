@@ -10,7 +10,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 export default function SessionCard({ session }) {
   return (
     <div className="mb-6 rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:p-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <h3 className="text-xl">{session.subject}</h3>
+
+      <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <Avatar className="h-11 w-11 border-2 border-black">
             <AvatarImage src={session.other_participant.image_url} alt={session.other_participant.name} />

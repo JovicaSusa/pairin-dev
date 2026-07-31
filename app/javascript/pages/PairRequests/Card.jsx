@@ -60,7 +60,7 @@ export default function PairRequestCard({ pairRequest, currentUserId }) {
         </div>
 
         {alreadyOffered ? (
-          <span className="text-sm font-bold italic text-black/40">Application sent</span>
+          <span className="text-sm font-bold italic text-black/40">You have already sent an offer</span>
         ) : (
           <Button asChild>
             <Link href={`/pair_requests/${pairRequest.id}/offers/new`}>Apply</Link>

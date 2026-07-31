@@ -17,9 +17,11 @@ export default function Index({ pairRequests }) {
       />
 
       {pairRequests && pairRequests.length > 0 ? (
-        pairRequests.map((request) => (
-          <Card key={request.id} request={request} />
-        ))
+        <div id="pair_requests">
+          {pairRequests.map((request) => (
+            <Card key={request.id} request={request} />
+          ))}
+        </div>
       ) : (
         <EmptyState icon={ClipboardList} title="You haven't opened any requests yet" description="Post what you're working on and let the community come to you.">
           <Button asChild className="mt-2">

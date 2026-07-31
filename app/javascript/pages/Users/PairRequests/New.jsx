@@ -101,7 +101,7 @@ export default function New({ tags }) {
 
       <form onSubmit={handleSubmit} className="flex flex-col items-stretch">
         <div className="flex flex-col gap-4 md:flex-row">
-          <div className="w-full md:w-3/4">
+          <div className="pair_request_subject w-full md:w-3/4">
             <Label htmlFor="subject" className="block mb-1">Subject</Label>
             <Input
               id="subject"
@@ -112,7 +112,7 @@ export default function New({ tags }) {
             {errors.subject && <div className="text-red font-bold mt-1 text-sm">{errors.subject}</div>}
           </div>
 
-          <div className="w-full md:w-1/4">
+          <div className="pair_request_duration w-full md:w-1/4">
             <Label htmlFor="duration" className="block mb-1">Duration (min)</Label>
             <Input
               id="duration"
@@ -124,7 +124,7 @@ export default function New({ tags }) {
           </div>
         </div>
 
-        <div className="w-full mt-4">
+        <div className="pair_request_description w-full mt-4">
           <Label htmlFor="description" className="block mb-1">Description</Label>
           <Textarea
             id="description"
