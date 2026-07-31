@@ -1,45 +1,51 @@
 import { Head, Link } from "@inertiajs/react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Bell, Sparkles } from "lucide-react"
+import PageHeader from "@/components/PageHeader"
+import EmptyState from "@/components/EmptyState"
 
 export default function Activities({ activities }) {
   return (
-    <div className="flex flex-col items-center w-full px-4">
+    <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
       <Head title="Activity Feed"/>
 
-      <div className="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
-        <div className="flex w-full items-center justify-center md:justify-start mt-12 pb-8 border-b-4 border-black border-dashed text-center md:text-left">
-          <h3 className="text-4xl md:text-5xl font-bold">Activity Feed</h3>
-        </div>
+      <PageHeader
+        eyebrow="Feed"
+        title="Activity Feed"
+        description="Updates from your requests, applications, and matches, all in one place."
+      />
 
-        <div className="mt-12">
-          {activities.length > 0 ? (
-            activities.map((activity) => (
-              <Card key={activity.id} className="mb-8 bg-white gap-0 py-0">
-                <CardHeader className="border-b-2 border-border bg-main py-4 px-2 rounded-t-base">
-                  <CardTitle>{activity.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="px-2 py-4">
-                  <p>{activity.content}</p>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <div className="text-center p-8 border-2 border-black border-dashed rounded-md bg-white">
-              <p className="mb-4">Nothing new from community for you!</p>
-              <p>
-                But we know how to help you, you can start by{" "}
-                <Link href="/users/pair_requests/new" className="font-bold underline text-purple">
-                  creating a pair request
-                </Link>{" "}
-                or maybe{" "}
-                <Link href="/pair_requests" className="font-bold underline text-purple">
-                  sending an offer
-                </Link>
-              </p>
+      {activities.length > 0 ? (
+        <div className="flex flex-col gap-5">
+          {activities.map((activity) => (
+            <div
+              key={activity.id}
+              className="flex gap-4 rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-black bg-purple/10">
+                <Bell className="h-5 w-5 text-purple" strokeWidth={2.25} />
+              </div>
+              <div className="min-w-0">
+                <p className="font-bold">{activity.title}</p>
+                <p className="mt-1 text-black/60">{activity.content}</p>
+              </div>
             </div>
-          )}
+          ))}
         </div>
-      </div>
+      ) : (
+        <EmptyState icon={Sparkles} title="Nothing new from the community yet">
+          <p className="mt-1 text-black/50">
+            Start by{" "}
+            <Link href="/users/pair_requests/new" className="font-bold text-purple underline">
+              creating a pair request
+            </Link>{" "}
+            or{" "}
+            <Link href="/pair_requests" className="font-bold text-purple underline">
+              sending an offer
+            </Link>
+            .
+          </p>
+        </EmptyState>
+      )}
     </div>
   )
 }

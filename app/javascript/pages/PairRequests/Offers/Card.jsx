@@ -1,10 +1,10 @@
 import { router } from '@inertiajs/react';
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 
 export default function OfferCard({ offer, pairRequestId }) {
   const handleAccept = () => {
@@ -12,47 +12,42 @@ export default function OfferCard({ offer, pairRequestId }) {
   };
 
   return (
-    <Card className="relative mb-12 bg-white gap-0 py-0 pb-4">
-      {offer.should_overlay && (
-        <div className="absolute w-full h-full bg-black opacity-20 rounded-base z-10" />
-      )}
-
-      <CardHeader className="flex flex-row items-center gap-x-2 px-4 pt-4 pb-0">
-        <Avatar className="w-12 h-12 shrink-0">
+    <div
+      className={`relative mb-6 rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:p-6 ${
+        offer.should_overlay ? "opacity-50" : ""
+      }`}
+    >
+      <div className="flex flex-wrap items-center gap-3">
+        <Avatar className="h-11 w-11 shrink-0 border-2 border-black">
           <AvatarImage src={offer.offerer.image_url} alt={offer.offerer.name} />
-          <AvatarFallback>{offer.offerer.name?.[0]}</AvatarFallback>
+          <AvatarFallback className="bg-orange text-white font-bold">{offer.offerer.name?.[0]}</AvatarFallback>
         </Avatar>
-        <p>{offer.offerer.name}</p>
+        <p className="font-bold">{offer.offerer.name}</p>
         {offer.status === "ACCEPTED" && (
-          <Badge className="ml-auto bg-green-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            ACCEPTED
+          <Badge className="ml-auto rounded-full border-black bg-green text-black">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            Accepted
           </Badge>
         )}
-      </CardHeader>
+      </div>
 
-      <CardContent className="px-2 py-4">
-        <ExpandableText className="whitespace-pre-wrap">{offer.message}</ExpandableText>
-      </CardContent>
+      <ExpandableText className="mt-4 whitespace-pre-wrap leading-relaxed text-black/60">{offer.message}</ExpandableText>
 
-      <CardFooter className="px-4 flex-col md:flex-row items-start md:items-center">
-        <div className="md:w-1/2 flex items-center gap-x-2">
-          <Badge variant="neutral">
+      <div className="mt-4 flex flex-col gap-4 border-t-2 border-black/10 pt-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-1.5">
+          <Badge variant="neutral" className="rounded-full text-xs">
             {formatShort(offer.start_at)}
           </Badge>
-          <span className="block font-bold">:</span>
-          <Badge variant="neutral">
+          <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
+          <Badge variant="neutral" className="rounded-full text-xs">
             {formatShort(offer.end_at)}
           </Badge>
         </div>
 
-        <div className="md:w-1/2 md:flex md:justify-end">
-          {offer.show_accept_button && (
-            <div className="flex justify-center mt-6">
-              <Button onClick={handleAccept}>Accept</Button>
-            </div>
-          )}
-        </div>
-      </CardFooter>
-    </Card>
+        {offer.show_accept_button && (
+          <Button onClick={handleAccept}>Accept</Button>
+        )}
+      </div>
+    </div>
   );
 }

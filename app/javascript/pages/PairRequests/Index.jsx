@@ -1,8 +1,11 @@
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
+import PageHeader from "@/components/PageHeader";
+import EmptyState from "@/components/EmptyState";
 import FilterForm from "@/components/FilterForm";
 import Card from "./Card";
 import { Head, router, usePage, InfiniteScroll } from "@inertiajs/react";
-import preferencesImg from "@/assets/images/preferences.svg";
+import { SlidersHorizontal, SearchX } from "lucide-react";
 
 export default function Index({ pairRequests, filterOptions, filters }) {
   const { auth } = usePage().props;
@@ -11,26 +14,23 @@ export default function Index({ pairRequests, filterOptions, filters }) {
   const { tags, userLevels, languages } = filterOptions;
 
   return (
-    <>
-      <div className="flex flex-col items-center w-full">
-        <Head title="Pair Programming Requests" />
+    <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
+      <Head title="Pair Programming Requests" />
 
-        <div className="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
-          <div className="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed text-center">
-            <h3 className="text-5xl font-bold">Pair Programming Requests</h3>
-          </div>
-
-          <div className="mt-12">
-            <Collapsible>
-              <CollapsibleTrigger asChild>
-                <button className="relative group overflow-hidden items-center w-full flex justify-end mb-2 pr-4 md:pr-0">
-                  <span className="absolute block font-bold top-0 -right-[60px] transition ease-in-out duration-500 group-hover:-translate-x-24">
-                    Filter
-                  </span>
-                  <img src={preferencesImg} className="z-10 bg-yellow-50" />
-                </button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
+      <PageHeader
+        eyebrow="Search"
+        title="Pair Programming Requests"
+        description="Browse open requests from the community and find a partner to build or learn with."
+        action={
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button variant="neutral" size="sm">
+                <SlidersHorizontal className="h-4 w-4" />
+                Filters
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="w-full">
+              <div className="fixed inset-x-4 top-24 z-40 rounded-2xl border-2 border-black bg-white p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:absolute md:inset-x-auto md:right-0 md:top-full md:mt-3 md:w-[560px]">
                 <FilterForm
                   tags={tags}
                   userLevels={userLevels}
@@ -40,33 +40,37 @@ export default function Index({ pairRequests, filterOptions, filters }) {
                     router.get("/pair_requests", { q });
                   }}
                 />
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        }
+      />
 
-          <div className="mt-12 mb-12">
-            <InfiniteScroll
-              data="pairRequests"
-              loading={() => (
-                <div className="flex justify-center py-8">
-                  <div className="text-lg font-bold">Loading more...</div>
-                </div>
-              )}
-              next={({ hasMore }) =>
-                !hasMore && pairRequests.length > 0 ? (
-                  <div className="flex justify-center py-8">
-                    <div className="text-lg font-bold text-gray-500">No more requests</div>
-                  </div>
-                ) : null
-              }
-            >
-              {pairRequests.map((req) => (
-                <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} />
-              ))}
-            </InfiniteScroll>
-          </div>
-        </div>
+      <div className="relative flex flex-col gap-6">
+        <InfiniteScroll
+          data="pairRequests"
+          loading={() => (
+            <div className="flex justify-center py-8 font-bold text-black/50">Loading more...</div>
+          )}
+          next={({ hasMore }) =>
+            !hasMore && pairRequests.length > 0 ? (
+              <div className="flex justify-center py-8 text-black/40">No more requests</div>
+            ) : null
+          }
+        >
+          {pairRequests.map((req) => (
+            <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} />
+          ))}
+        </InfiniteScroll>
+
+        {pairRequests.length === 0 && (
+          <EmptyState
+            icon={SearchX}
+            title="No requests match your search"
+            description="Try widening your filters or check back soon — new requests come in all the time."
+          />
+        )}
       </div>
-    </>
+    </div>
   );
 }

@@ -1,31 +1,32 @@
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
+import { Send } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
+import EmptyState from "@/components/EmptyState";
+import { Button } from "@/components/ui/button";
 import Card from './Card';
 
 export default function Index({ offers }) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
       <Head title="Applications" />
 
-      <div className="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
-        <div className="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed">
-          <h3 className="text-5xl font-bold">Applications</h3>
-        </div>
+      <PageHeader
+        eyebrow="Pair Requests"
+        title="Applications"
+        description="Every offer you've sent, and where it stands."
+      />
 
-        <div className="mt-12">
-          {offers.length > 0 ? (
-            offers.map((offer) => (
-              <Card key={offer.id} offer={offer} />
-            ))
-          ) : (
-            <div className="border-4 border-dashed border-black rounded-md p-12 text-center bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <p className="text-2xl font-bold italic text-gray-400">
-                You haven't applied to any pair requests yet.
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
+      {offers.length > 0 ? (
+        offers.map((offer) => (
+          <Card key={offer.id} offer={offer} />
+        ))
+      ) : (
+        <EmptyState icon={Send} title="You haven't applied to any pair requests yet" description="Browse open requests and find someone to build or learn with.">
+          <Button asChild className="mt-2">
+            <Link href="/pair_requests">Browse requests</Link>
+          </Button>
+        </EmptyState>
+      )}
     </div>
   );
 }
-

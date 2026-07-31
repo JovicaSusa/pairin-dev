@@ -1,29 +1,32 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { ClipboardList } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
+import EmptyState from "@/components/EmptyState";
+import { Button } from "@/components/ui/button";
 import Card from './Card';
 
 export default function Index({ pairRequests }) {
   return (
-    <div className="flex justify-center">
+    <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
       <Head title="Your Requests" />
 
-      <div className="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
-        <div className="flex w-full flex-wrap items-center justify-center mt-12 pb-8 border-b-4 border-black border-dashed">
-          <h3 className="w-full text-5xl font-bold">Your requests</h3>
-        </div>
+      <PageHeader
+        eyebrow="Pair Requests"
+        title="Your requests"
+        description="Requests you've opened, and who's applied to work with you."
+      />
 
-        <div id="pair_requests" className="mt-12">
-          {pairRequests && pairRequests.length > 0 ? (
-            pairRequests.map((request) => (
-              <Card key={request.id} request={request} />
-            ))
-          ) : (
-            <div className="text-center py-20 bg-white border-4 border-black border-dashed rounded-lg">
-              <p className="text-xl font-bold">You haven't opened any requests yet.</p>
-            </div>
-          )}
-        </div>
-      </div>
+      {pairRequests && pairRequests.length > 0 ? (
+        pairRequests.map((request) => (
+          <Card key={request.id} request={request} />
+        ))
+      ) : (
+        <EmptyState icon={ClipboardList} title="You haven't opened any requests yet" description="Post what you're working on and let the community come to you.">
+          <Button asChild className="mt-2">
+            <Link href="/users/pair_requests/new">Create a request</Link>
+          </Button>
+        </EmptyState>
+      )}
     </div>
   );
 }
-
