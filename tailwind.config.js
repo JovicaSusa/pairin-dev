@@ -26,7 +26,8 @@ module.exports = {
       },
       fontFamily: {
         "sans": ["Cabin", "sans-serif"],
-        "headline": ["Work Sans"]
+        "headline": ["Work Sans"],
+        "display": ["Outfit", "sans-serif"]
       },
       fontWeight: {
         base: '500',
@@ -46,12 +47,17 @@ module.exports = {
       },
       animation: {
         marquee: "marquee 120s linear infinite",
+        marquee2: "marquee2 120s linear infinite",
         appearThenFade: "appearThenFade 5s linear"
       },
       keyframes: {
         marquee: {
           "0%": { transform: "translateX(0%)" },
           "100%": { transform: "translateX(-100%)" },
+        },
+        marquee2: {
+          "0%": { transform: "translateX(100%)" },
+          "100%": { transform: "translateX(0%)" },
         },
         appearThenFade: {
           "0%, 100%": { opacity: 0 },

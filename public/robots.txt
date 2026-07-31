@@ -2,6 +2,9 @@
 User-agent: *
 Disallow: /queues/
 Disallow: /jobs/
-Disallow: /users/
+Disallow: /users/pair_requests/
+Disallow: /users/offers/
 Disallow: /pair_requests/
 Disallow: /sessions/
+
+Sitemap: https://pairin.dev/sitemap.xml
