@@ -86,8 +86,9 @@ export default function UserPairRequestCard({ request }) {
         <div className="px-4 mt-6">
           <form onSubmit={submitCallLink} className="flex flex-col md:flex-row w-full gap-y-4 md:gap-x-2 items-center md:items-end">
             <div className="flex flex-col w-full">
-              <Label className="mb-1">Call link</Label>
+              <Label htmlFor="pair_request_sessions_attributes_0_call_link" className="mb-1">Call link</Label>
               <Input
+                id="pair_request_sessions_attributes_0_call_link"
                 type="text"
                 value={data.pair_request.sessions_attributes[0]?.call_link}
                 onChange={e => {

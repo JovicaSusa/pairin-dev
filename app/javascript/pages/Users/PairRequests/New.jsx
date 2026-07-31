@@ -97,9 +97,10 @@ export default function New({ tags }) {
 
         <form onSubmit={handleSubmit} className="flex flex-col items-center pb-12 mt-12">
           <div className="flex w-full gap-x-4">
-            <div className="w-3/4">
-              <Label className="block mb-1">Subject</Label>
+            <div className="w-3/4 pair_request_subject">
+              <Label htmlFor="subject" className="block mb-1">Subject</Label>
               <Input
+                id="subject"
                 type="text"
                 value={data.subject}
                 onChange={e => setData('subject', e.target.value)}
@@ -107,9 +108,10 @@ export default function New({ tags }) {
               {errors.subject && <div className="text-red-600 font-bold mt-1">{errors.subject}</div>}
             </div>
 
-            <div className="w-1/4">
-              <Label className="block mb-1">Duration (min)</Label>
+            <div className="w-1/4 pair_request_duration">
+              <Label htmlFor="duration" className="block mb-1">Duration (min)</Label>
               <Input
+                id="duration"
                 type="number"
                 value={data.duration}
                 onChange={e => setData('duration', e.target.value)}
@@ -118,9 +120,10 @@ export default function New({ tags }) {
             </div>
           </div>
 
-          <div className="w-full mt-4">
-            <Label className="block mb-1">Description</Label>
+          <div className="w-full mt-4 pair_request_description">
+            <Label htmlFor="description" className="block mb-1">Description</Label>
             <Textarea
+              id="description"
               value={data.description}
               onChange={e => setData('description', e.target.value)}
               rows="4"

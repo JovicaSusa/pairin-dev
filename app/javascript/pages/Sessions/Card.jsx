@@ -49,8 +49,8 @@ export default function SessionCard({ session }) {
             {({ processing }) => (
               <>
                 <div className="flex flex-col justify-end w-full">
-                  <Label className="mb-1">Call link</Label>
-                  <Input name="call_link" defaultValue={session.call_link || ""} />
+                  <Label htmlFor="session_call_link" className="mb-1">Call link</Label>
+                  <Input id="session_call_link" name="call_link" defaultValue={session.call_link || ""} />
                 </div>
 
                 <Button type="submit" disabled={processing} className="w-3/4 md:w-1/4">

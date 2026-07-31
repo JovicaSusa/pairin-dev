@@ -6,7 +6,7 @@ class PairRequestResource < ApplicationResource
   many :sessions, resource: SessionResource
 
   attribute :accepted_offer do |pair_request|
-    offer = pair_request.offers.find(&:accepted?)
+    offer = pair_request.accepted_offer
     if offer
       {
         offerer_name: offer.offerer.name,

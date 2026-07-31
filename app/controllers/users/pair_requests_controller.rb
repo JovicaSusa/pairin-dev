@@ -4,7 +4,7 @@ class Users::PairRequestsController < ApplicationController
 
   def index
     @pair_requests = current_user.pair_requests
-      .includes(:tags, :sessions, offers: :offerer)
+      .includes(:tags, :sessions, accepted_offer: :offerer)
       .order(created_at: :desc)
 
     render inertia: 'Users/PairRequests/Index', props: {
