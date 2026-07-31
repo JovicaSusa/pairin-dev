@@ -42,3 +42,8 @@
 .vscode/
 
 /public/uploads/
+
+# Claude Code skills lockfile and downloaded skill content (local tooling metadata, not app code)
+/skills-lock.json
+/.claude/skills/
+/.agents/skills/
