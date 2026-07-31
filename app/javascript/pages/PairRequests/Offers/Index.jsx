@@ -1,31 +1,23 @@
 import { Head } from "@inertiajs/react";
+import { Inbox } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
+import EmptyState from "@/components/EmptyState";
 import Card from './Card';
 
 export default function Index({ offers, pairRequestId }) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
       <Head title="Applications" />
 
-      <div className="w-full md:w-3/4 xl:w-4/6 2xl:w-1/2">
-        <div className="flex w-full items-center mt-12 pb-8 border-b-4 border-black border-dashed">
-          <h3 className="text-5xl font-bold">Applications</h3>
-        </div>
+      <PageHeader eyebrow="Pair Requests" title="Applications" description="Who's applied to pair with you on this request." />
 
-        <div className="mt-12">
-          {offers.length > 0 ? (
-            offers.map((offer) => (
-              <Card key={offer.id} offer={offer} pairRequestId={pairRequestId} />
-            ))
-          ) : (
-            <div className="border-4 border-dashed border-black rounded-md p-12 text-center bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              <p className="text-2xl font-bold italic text-gray-400">
-                No applications yet.
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
+      {offers.length > 0 ? (
+        offers.map((offer) => (
+          <Card key={offer.id} offer={offer} pairRequestId={pairRequestId} />
+        ))
+      ) : (
+        <EmptyState icon={Inbox} title="No applications yet" description="Share your request in the feed or hang tight — new applicants show up here." />
+      )}
     </div>
   );
 }
-

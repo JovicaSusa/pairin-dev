@@ -9,10 +9,10 @@
 
 @layer base {
   :root {
-    /* neobrutalism lime theme — translated from neobrutalism.dev/styling */
-    --main: oklch(83.29% 0.2331 132.51);
-    --main-foreground: oklch(0% 0 0);
-    --background: oklch(95.37% 0.0549 125.19);
+    /* pairin brand theme — purple primary, matched to the landing page palette */
+    --main: #7B5FF1;
+    --main-foreground: #FFFFFF;
+    --background: #FEFCE8;
     --secondary-background: oklch(100% 0 0);
     --foreground: oklch(0% 0 0);
     --border: oklch(0% 0 0);
@@ -20,22 +20,22 @@
     --overlay: oklch(0% 0 0 / 0.8);
     --shadow: 4px 4px 0px 0px var(--border);
 
-    /* shadcn compatibility — mapped to neobrutalism equivalents */
+    /* shadcn compatibility — mapped to brand equivalents */
     --card: oklch(100% 0 0);
     --card-foreground: oklch(0% 0 0);
     --popover: oklch(100% 0 0);
     --popover-foreground: oklch(0% 0 0);
-    --primary: oklch(83.29% 0.2331 132.51);
-    --primary-foreground: oklch(0% 0 0);
+    --primary: #7B5FF1;
+    --primary-foreground: #FFFFFF;
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
     --muted: oklch(0.97 0 0);
     --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(83.29% 0.2331 132.51);
-    --accent-foreground: oklch(0% 0 0);
+    --accent: #7B5FF1;
+    --accent-foreground: #FFFFFF;
     --destructive: oklch(0.577 0.245 27.325);
     --input: oklch(0% 0 0);
-    --radius: 0.3125rem;
+    --radius: 0.75rem;
   }
   * {
     border-color: var(--border);
@@ -44,7 +44,7 @@
     @apply bg-background text-foreground font-base;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
+    @apply font-display font-extrabold tracking-tight;
   }
 }
 

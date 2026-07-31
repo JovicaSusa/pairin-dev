@@ -22,10 +22,10 @@ export default function AppLayout({ children }) {
   }, []);
 
   return (
-    <main className='relative bg-yellow-50 min-h-screen pt-8 md:pt-0'>
+    <main className='relative bg-yellow-50 min-h-screen'>
       <Toaster position="top-center" />
       <MainNav currentUser={currentUser} currentPath={url} />
-      <article className="md:ml-[16.666667%] min-h-screen">{children}</article>
+      <article className="min-h-screen md:ml-64">{children}</article>
     </main>
   );
 }

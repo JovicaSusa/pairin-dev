@@ -12,9 +12,9 @@ export default function LandingNav({ user }) {
       <div className="flex flex-col max-w-screen-xl py-2 mx-auto md:items-center md:justify-between md:flex-row md:px-6 lg:px-8">
         <div className="flex items-center justify-between lg:justify-start">
           <div className="flex items-center justify-center space-x-2">
-            <Link href="/" className="flex flex-col justify-center items-center">
-              <img src={logoImage} alt="logo" className="w-fit h-8 md:h-12" />
-              <span className="text-xl font-bold">pairin</span>
+            <Link href="/" className="flex items-center gap-2">
+              <img src={logoImage} alt="logo" className="h-8 w-8" />
+              <span className="font-display text-xl font-extrabold tracking-tight">pairin</span>
             </Link>
           </div>
 

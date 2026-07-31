@@ -31,11 +31,11 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
   };
 
   return (
-    <form
-      className="flex flex-col gap-4 mb-12 md:flex-row md:flex-wrap md:justify-between"
-      onSubmit={handleSubmit}
-    >
-      <div className="md:w-5/12">
+    <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+      <p className="font-headline font-bold text-sm">Refine your search</p>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
         <Label htmlFor="tags_name_eq" className="block mb-1">
           Tags
         </Label>
@@ -51,7 +51,7 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
         </Select>
       </div>
 
-      <div className="md:w-5/12">
+      <div>
         <Label htmlFor="duration_eq" className="block mb-1">
           Duration
         </Label>
@@ -65,7 +65,7 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
         />
       </div>
 
-      <div className="md:w-5/12">
+      <div>
         <Label htmlFor="user_level_eq" className="block mb-1">
           User level
         </Label>
@@ -81,7 +81,7 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
         </Select>
       </div>
 
-      <div className="md:w-5/12">
+      <div>
         <Label htmlFor="user_language_eq" className="block mb-1">
           User language
         </Label>
@@ -97,7 +97,7 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
         </Select>
       </div>
 
-      <div className="md:w-5/12">
+      <div>
         <Label className="block mb-1">Session starts from</Label>
         <DatePicker
           value={form.periods_start_at_gteq}
@@ -106,7 +106,7 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
         />
       </div>
 
-      <div className="md:w-5/12">
+      <div>
         <Label className="block mb-1">Session starts before</Label>
         <DatePicker
           value={form.periods_start_at_lteq}
@@ -115,7 +115,9 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
         />
       </div>
 
-      <div className="md:w-full flex justify-center mt-6">
+      </div>
+
+      <div className="flex justify-end">
         <Button type="submit" size="lg">
           Search
         </Button>

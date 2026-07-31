@@ -1,10 +1,12 @@
 import { Link } from "@inertiajs/react";
+import { ArrowRight } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+
+const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
 
 export default function PairRequestCard({ pairRequest, currentUserId }) {
   const alreadyOffered = pairRequest.offers
@@ -12,72 +14,59 @@ export default function PairRequestCard({ pairRequest, currentUserId }) {
     .includes(currentUserId);
 
   return (
-    <Card className="mb-12 bg-white gap-0 py-0 pb-4">
-      <CardHeader className="border-b-2 border-border bg-main py-4 px-2 rounded-t-base">
-        <CardTitle className="text-xl">{pairRequest.subject}</CardTitle>
-      </CardHeader>
+    <div className="mb-6 rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:p-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <h3 className="text-xl">{pairRequest.subject}</h3>
 
-      <CardContent className="md:flex max-h-fit px-2 py-4">
-        <div className="w-full md:w-7/12">
-          <ExpandableText>{pairRequest.description}</ExpandableText>
-        </div>
-
-        <div className="w-full mt-4 md:mt-0 md:w-5/12">
+        <div className="flex flex-wrap gap-2 md:flex-col md:items-end">
           {pairRequest.periods.map((period) => (
-            <div
-              key={period.id}
-              className="w-full flex md:items-center md:justify-end gap-x-1 mt-1"
-            >
-              <Badge variant="neutral" className="text-sm">
+            <div key={period.id} className="flex items-center gap-1.5">
+              <Badge variant="neutral" className="rounded-full text-xs">
                 {formatShort(period.start_at)}
               </Badge>
-              <span className="block font-bold">:</span>
-              <Badge variant="neutral" className="text-sm">
+              <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
+              <Badge variant="neutral" className="rounded-full text-xs">
                 {formatShort(period.end_at)}
               </Badge>
             </div>
           ))}
         </div>
-      </CardContent>
+      </div>
 
-      <div className="flex w-full overflow-x-scroll justify-start space-x-2 py-2 px-2 mb-6">
-        {pairRequest.tags.map((tag) => (
-          <Badge
-            key={tag.id}
-            className="bg-orange shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none 2xl:text-sm"
-          >
+      <ExpandableText className="mt-3 leading-relaxed text-black/60">{pairRequest.description}</ExpandableText>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {pairRequest.tags.map((tag, i) => (
+          <Badge key={tag.id} className={`rounded-full border-black ${TAG_COLORS[i % TAG_COLORS.length]}`}>
             {tag.name}
           </Badge>
         ))}
       </div>
 
-      <CardFooter className="px-4 flex-col md:flex-row items-start md:items-center">
-        <div className="md:w-1/2 flex items-center gap-x-2">
-          <Avatar className="w-12 h-12">
+      <div className="mt-5 flex flex-col gap-4 border-t-2 border-black/10 pt-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-11 w-11 border-2 border-black">
             <AvatarImage src={pairRequest.user.image_url} alt={pairRequest.user.name} />
-            <AvatarFallback>{pairRequest.user.name?.[0]}</AvatarFallback>
+            <AvatarFallback className="bg-orange text-white font-bold">{pairRequest.user.name?.[0]}</AvatarFallback>
           </Avatar>
-
           <div>
-            <p>{pairRequest.user.name}</p>
-            <span className="text-sm">
+            <p className="font-bold text-sm">{pairRequest.user.name}</p>
+            <span className="text-xs text-black/50">
               {pairRequest.user.profession}
-              <span className="text-xl font-bold">.</span>
+              {pairRequest.user.profession && pairRequest.user.level_titleized && " · "}
               {pairRequest.user.level_titleized}
             </span>
           </div>
         </div>
 
-        <div className="md:w-1/2 mt-4 md:mt-0 md:flex md:justify-end">
-          {alreadyOffered ? (
-            <p>You have already sent an offer</p>
-          ) : (
-            <Button asChild className="md:w-1/2">
-              <Link href={`/pair_requests/${pairRequest.id}/offers/new`}>Apply</Link>
-            </Button>
-          )}
-        </div>
-      </CardFooter>
-    </Card>
+        {alreadyOffered ? (
+          <span className="text-sm font-bold italic text-black/40">You have already sent an offer</span>
+        ) : (
+          <Button asChild>
+            <Link href={`/pair_requests/${pairRequest.id}/offers/new`}>Apply</Link>
+          </Button>
+        )}
+      </div>
+    </div>
   );
 }

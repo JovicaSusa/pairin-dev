@@ -14,6 +14,7 @@ module.exports = {
         orange: "#FF8B37",
         purple: "#7B5FF1",
         green: "#55D087",
+        red: "#F1495F",
         // neobrutalism token colors (consumed by installed components)
         main: 'var(--main)',
         'main-foreground': 'var(--main-foreground)',
@@ -37,7 +38,7 @@ module.exports = {
         shadow: 'var(--shadow)',
       },
       borderRadius: {
-        base: '5px',
+        base: '0.75rem',
       },
       translate: {
         boxShadowX: '4px',
