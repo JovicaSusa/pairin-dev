@@ -1,25 +1,38 @@
 class PairRequestsController < ApplicationController
   include Authenticated
   def index
-    @q = PairRequest.ransack(params[:q])
-    @pagy, @pair_requests = pagy_countless(
-      PairRequest
-        .includes(:periods, :tags, :user)
-        .active
-        .where.not(user_id: current_user.id)
-        .all
+    base = PairRequest
+      .includes(:periods, :tags, :user, :offers)
+      .left_joins(:periods, :tags, :user)
+      .active
+      .where.not(user_id: current_user.id)
+
+    @q = base.ransack(params[:q]&.compact_blank)
+    @pagy, @pair_requests = pagy(
+      @q.result(distinct: true).order('periods.start_at ASC'),
+      items: 15,
+      overflow: :empty_page,
     )
 
-    render "scrollable_list" if params[:page]
-  end
-
-  def search
-    @q = PairRequest
-      .includes(:tags, :periods, :user)
-      .left_joins(:tags, :periods, :user)
-      .ransack(params[:q].compact_blank)
-    @pagy, @pair_requests = pagy_countless(@q.result(distinct: true))
-
-    render "scrollable_list" if params[:page]
+    render inertia: 'PairRequests/Index', props: {
+      filters: params[:q]&.compact_blank || {},
+      pairRequests: InertiaRails.scroll(@pagy) {
+        @pair_requests.as_json(
+          include: {
+            user: { only: [:id, :name, :profession], methods: [:image_url, :level_titleized] },
+            tags: { only: [:id, :name] },
+            periods: { only: [:id, :start_at, :end_at] },
+            offers: { only: [:offerer_id] }
+          }
+        )
+      },
+      filterOptions: InertiaRails.once {
+        {
+          tags: Tag.all.as_json(only: [:id, :name]),
+          userLevels: User::LEVELS,
+          languages: I18nData.languages.map { |k, v| [v, k] }
+        }
+      }
+    }
   end
 end
