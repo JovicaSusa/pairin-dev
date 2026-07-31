@@ -11,7 +11,7 @@ export default function Index({ pairRequests }) {
           <h3 className="w-full text-5xl font-bold">Your requests</h3>
         </div>
 
-        <div className="mt-12">
+        <div id="pair_requests" className="mt-12">
           {pairRequests && pairRequests.length > 0 ? (
             pairRequests.map((request) => (
               <Card key={request.id} request={request} />

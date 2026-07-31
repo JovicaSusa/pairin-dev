@@ -21,8 +21,8 @@ export default function New({ pairRequestId, periods }) {
           {({ errors, processing }) => (
             <>
               <div className="w-full">
-                <Label className="block mb-1">Message</Label>
-                <Textarea name="message" rows="4" className="w-full" />
+                <Label htmlFor="message" className="block mb-1">Message</Label>
+                <Textarea id="message" name="message" rows="4" className="w-full" />
                 {errors.message && (
                   <div className="text-red-600 font-bold mt-1">{errors.message}</div>
                 )}
