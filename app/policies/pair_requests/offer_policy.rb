@@ -7,5 +7,9 @@ module PairRequests
     def accept?
       user == record.pair_request.user
     end
+
+    def create?
+      record.pair_request.user != user
+    end
   end
 end

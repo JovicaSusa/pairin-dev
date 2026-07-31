@@ -2,7 +2,7 @@ module Authenticated
   extend ActiveSupport::Concern
 
   included do
-    layout "app"
+    layout "application"
 
     before_action :authenticate_user!
     around_action :set_timezone, if: :current_user

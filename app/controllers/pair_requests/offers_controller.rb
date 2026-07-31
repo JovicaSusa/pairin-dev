@@ -1,29 +1,44 @@
 class PairRequests::OffersController < ApplicationController
   include Authenticated
+  include Alba::Inertia::Controller
 
   def index
     @pair_request = current_user.pair_requests.find_by(id: params[:pair_request_id])
 
     authorize @pair_request, policy_class: PairRequests::OfferPolicy
 
-    @offers = @pair_request.offers.joins(:period).includes(:offerer, :period).order("accepted_at, periods.start_at desc")
+    @offers = @pair_request.offers.joins(:period).includes(:offerer, :period, pair_request: :offers).order("offers.accepted_at, periods.start_at desc")
+    
+    render inertia: 'PairRequests/Offers/Index', props: {
+      offers: ReceivedOfferResource.new(@offers),
+      pairRequestId: @pair_request.id
+    }
   end
 
   def new
     @pair_request = PairRequest.find(params[:pair_request_id])
     @offer = @pair_request.offers.build(offerer: current_user)
+
+    authorize @offer, :create?, policy_class: PairRequests::OfferPolicy
+
+    render inertia: 'PairRequests/Offers/New', props: {
+      pairRequestId: @pair_request.id,
+      periods: @pair_request.periods.future.map { |p|
+        { id: p.id, start_at: p.start_at, end_at: p.end_at }
+      }
+    }
   end
 
   def create
     @pair_request = PairRequest.find(params[:pair_request_id])
     @offer = @pair_request.offers.build(offer_params.merge(offerer: current_user))
 
+    authorize @offer, policy_class: PairRequests::OfferPolicy
+
     if @offer.save
-      respond_to do |format|
-        format.html { redirect_to pair_requests_path, notice: "We have sent your offer, good luck!" }
-      end
+      redirect_to pair_requests_path, notice: "We have sent your offer, good luck!"
     else
-      render :new, status: :unprocessable_entity
+      redirect_to new_pair_request_offer_path(@pair_request), inertia: { errors: @offer.errors.to_hash(true) }
     end
   end
 
@@ -35,8 +50,8 @@ class PairRequests::OffersController < ApplicationController
     Offers::Accept
       .call(offer)
       .either(
-        -> (success) { redirect_to pair_request_offers_path, notice: "You just scheduled yourself a new pairing session. Happy pairin!" },
-        -> (failure) { render :index, status: :unprocessable_entity }
+        -> (success) { redirect_to pair_request_offers_path(offer.pair_request_id), notice: "You just scheduled yourself a new pairing session. Happy pairin!" },
+        -> (failure) { redirect_to pair_request_offers_path(offer.pair_request_id), alert: "Could not accept offer." }
       )
   end
 

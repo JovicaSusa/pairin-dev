@@ -3,20 +3,46 @@ module.exports = {
     './app/views/**/*.html.erb',
     './app/helpers/**/*.rb',
     './app/assets/stylesheets/**/*.css',
-    './app/javascript/**/*.js',
+    './app/javascript/**/*.css',
+    './app/javascript/**/*.{js,jsx}',
     'config/initializers/simple_form.rb'
   ],
   theme: {
     extend: {
       colors: {
+        // brand colors (used directly in layout/semantic contexts)
         orange: "#FF8B37",
         purple: "#7B5FF1",
         green: "#55D087",
-        background: "#E3E3FF"
+        // neobrutalism token colors (consumed by installed components)
+        main: 'var(--main)',
+        'main-foreground': 'var(--main-foreground)',
+        background: 'var(--background)',
+        'secondary-background': 'var(--secondary-background)',
+        foreground: 'var(--foreground)',
+        border: 'var(--border)',
+        ring: 'var(--ring)',
+        overlay: 'var(--overlay)',
       },
       fontFamily: {
         "sans": ["Cabin", "sans-serif"],
         "headline": ["Work Sans"]
+      },
+      fontWeight: {
+        base: '500',
+        heading: '700',
+      },
+      boxShadow: {
+        shadow: 'var(--shadow)',
+      },
+      borderRadius: {
+        base: '5px',
+      },
+      translate: {
+        boxShadowX: '4px',
+        boxShadowY: '4px',
+        reverseBoxShadowX: '-4px',
+        reverseBoxShadowY: '-4px',
       },
       animation: {
         marquee: "marquee 120s linear infinite",
