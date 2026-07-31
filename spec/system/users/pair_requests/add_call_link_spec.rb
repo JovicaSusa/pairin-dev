@@ -14,6 +14,6 @@ RSpec.describe "update pair request call link", type: :system do
     fill_in :pair_request_sessions_attributes_0_call_link, with: "www.something.com"
     click_button "Add"
 
-    expect(page).to have_content("Successfuly added!")
+    expect(page).to have_content("Successfully added!")
   end
 end

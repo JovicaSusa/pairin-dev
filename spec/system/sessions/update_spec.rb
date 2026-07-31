@@ -15,6 +15,6 @@ RSpec.describe "update session call link", type: :system do
     fill_in :session_call_link, with: "www.something.com"
     click_button "Add"
 
-    expect(page).to have_content("Call link successfuly added!")
+    expect(page).to have_content("Call link successfully added!")
   end
 end

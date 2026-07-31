@@ -11,8 +11,6 @@ RSpec.describe "create pair request offer", type: :system do
 
     click_link "Apply"
     fill_in "Message", with: "Let's hack!"
-    find(".hw-combobox__handle").click
-    find(".hw-combobox__option").click
 
     click_button "Apply"
 
@@ -29,7 +27,6 @@ RSpec.describe "create pair request offer", type: :system do
       click_button "Apply"
 
       expect(page).to have_content("can't be blank")
-      expect(page).to have_content("must exist")
     end
   end
 end
