@@ -1,12 +1,6 @@
 class PairRequestsController < ApplicationController
   include Authenticated
-
-  PAIR_REQUEST_JSON_INCLUDE = {
-    user: { only: [:id, :name, :profession], methods: [:image_url, :level_titleized] },
-    tags: { only: [:id, :name] },
-    periods: { only: [:id, :start_at, :end_at] },
-    offers: { only: [:offerer_id] }
-  }.freeze
+  include Alba::Inertia::Controller
 
   def index
     live_pair_requests = PairRequest
@@ -30,9 +24,10 @@ class PairRequestsController < ApplicationController
 
     render inertia: 'PairRequests/Index', props: {
       filters: params[:q]&.compact_blank || {},
-      livePairRequests: live_pair_requests.as_json(include: PAIR_REQUEST_JSON_INCLUDE),
+      livePairRequests: PairRequestBrowseResource.new(live_pair_requests),
+      scheduledPairRequestsCount: @pagy.count,
       scheduledPairRequests: InertiaRails.scroll(@pagy) {
-        @scheduled_pair_requests.as_json(include: PAIR_REQUEST_JSON_INCLUDE)
+        PairRequestBrowseResource.new(@scheduled_pair_requests)
       },
       filterOptions: InertiaRails.once {
         {
