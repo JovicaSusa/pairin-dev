@@ -14,14 +14,17 @@ class Users::PairRequestsController < ApplicationController
 
   def new
     @pair_request = current_user.pair_requests.build
-    
+
     render inertia: 'Users/PairRequests/New', props: {
-      tags: TagResource.new(Tag.select(:id, :name))
+      tags: TagResource.new(Tag.select(:id, :name)),
+      waitMinutesOptions: PairRequest::WAIT_MINUTES_OPTIONS,
+      platformOptions: PairRequest::PLATFORMS
     }
   end
 
   def create
     @pair_request = current_user.pair_requests.build(pair_request_params)
+    @pair_request.periods = [Period.new(start_at: Time.current)] if @pair_request.mode == "immediate"
 
     if @pair_request.save
       redirect_to users_pair_requests_path, notice: "Request posted! Good luck"
@@ -54,6 +57,13 @@ class Users::PairRequestsController < ApplicationController
         :subject,
         :description,
         :duration,
+        :mode,
+        :wait_minutes,
+        :requires_approval,
+        :goal,
+        :platform,
+        :pairing_tool,
+        :plan,
         periods_attributes: [:start_at, :_destroy],
         taggings_attributes: [:_destroy, tag_attributes: [:name]]
       )

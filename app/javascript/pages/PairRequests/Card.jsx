@@ -8,7 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
 
-export default function PairRequestCard({ pairRequest, currentUserId }) {
+export default function PairRequestCard({ pairRequest, currentUserId, live = false }) {
   const alreadyOffered = pairRequest.offers
     ?.map(o => o.offerer_id)
     .includes(currentUserId);
@@ -18,22 +18,34 @@ export default function PairRequestCard({ pairRequest, currentUserId }) {
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <h3 className="text-xl">{pairRequest.subject}</h3>
 
-        <div className="flex flex-wrap gap-2 md:flex-col md:items-end">
-          {pairRequest.periods.map((period) => (
-            <div key={period.id} className="flex items-center gap-1.5">
-              <Badge variant="neutral" className="rounded-full text-xs">
-                {formatShort(period.start_at)}
-              </Badge>
-              <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
-              <Badge variant="neutral" className="rounded-full text-xs">
-                {formatShort(period.end_at)}
-              </Badge>
-            </div>
-          ))}
-        </div>
+        {live ? (
+          <Badge className="rounded-full border-black bg-green text-black text-xs">Live now</Badge>
+        ) : (
+          <div className="flex flex-wrap gap-2 md:flex-col md:items-end">
+            {pairRequest.periods.map((period) => (
+              <div key={period.id} className="flex items-center gap-1.5">
+                <Badge variant="neutral" className="rounded-full text-xs">
+                  {formatShort(period.start_at)}
+                </Badge>
+                <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
+                <Badge variant="neutral" className="rounded-full text-xs">
+                  {formatShort(period.end_at)}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <ExpandableText className="mt-3 leading-relaxed text-black/60">{pairRequest.description}</ExpandableText>
+
+      {live && pairRequest.goal && (
+        <p className="mt-3 text-sm text-black/60"><span className="font-bold text-black">Goal:</span> {pairRequest.goal}</p>
+      )}
+
+      {live && pairRequest.platform && (
+        <p className="mt-1 text-sm text-black/60"><span className="font-bold text-black">Platform:</span> {pairRequest.platform}</p>
+      )}
 
       <div className="mt-4 flex flex-wrap gap-2">
         {pairRequest.tags.map((tag, i) => (
@@ -59,12 +71,14 @@ export default function PairRequestCard({ pairRequest, currentUserId }) {
           </div>
         </div>
 
-        {alreadyOffered ? (
-          <span className="text-sm font-bold italic text-black/40">You have already sent an offer</span>
-        ) : (
-          <Button asChild>
-            <Link href={`/pair_requests/${pairRequest.id}/offers/new`}>Apply</Link>
-          </Button>
+        {!live && (
+          alreadyOffered ? (
+            <span className="text-sm font-bold italic text-black/40">You have already sent an offer</span>
+          ) : (
+            <Button asChild>
+              <Link href={`/pair_requests/${pairRequest.id}/offers/new`}>Apply</Link>
+            </Button>
+          )
         )}
       </div>
     </div>

@@ -7,7 +7,7 @@ import Card from "./Card";
 import { Head, router, usePage, InfiniteScroll } from "@inertiajs/react";
 import { SlidersHorizontal, SearchX } from "lucide-react";
 
-export default function Index({ pairRequests, filterOptions, filters }) {
+export default function Index({ livePairRequests, scheduledPairRequests, filterOptions, filters }) {
   const { auth } = usePage().props;
   const currentUser = auth.user;
 
@@ -46,30 +46,45 @@ export default function Index({ pairRequests, filterOptions, filters }) {
         }
       />
 
-      <div className="relative flex flex-col gap-6">
-        <InfiniteScroll
-          data="pairRequests"
-          loading={() => (
-            <div className="flex justify-center py-8 font-bold text-black/50">Loading more...</div>
-          )}
-          next={({ hasMore }) =>
-            !hasMore && pairRequests.length > 0 ? (
-              <div className="flex justify-center py-8 text-black/40">No more requests</div>
-            ) : null
-          }
-        >
-          {pairRequests.map((req) => (
-            <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} />
-          ))}
-        </InfiniteScroll>
+      {livePairRequests.length > 0 && (
+        <div className="mb-10">
+          <h2 className="mb-4 font-headline text-sm font-bold uppercase tracking-widest text-black/50">Live now</h2>
+          <div className="flex flex-col gap-6">
+            {livePairRequests.map((req) => (
+              <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} live />
+            ))}
+          </div>
+        </div>
+      )}
 
-        {pairRequests.length === 0 && (
-          <EmptyState
-            icon={SearchX}
-            title="No requests match your search"
-            description="Try widening your filters or check back soon — new requests come in all the time."
-          />
-        )}
+      <div>
+        <h2 className="mb-4 font-headline text-sm font-bold uppercase tracking-widest text-black/50">Scheduled</h2>
+
+        <div className="relative flex flex-col gap-6">
+          <InfiniteScroll
+            data="scheduledPairRequests"
+            loading={() => (
+              <div className="flex justify-center py-8 font-bold text-black/50">Loading more...</div>
+            )}
+            next={({ hasMore }) =>
+              !hasMore && scheduledPairRequests.length > 0 ? (
+                <div className="flex justify-center py-8 text-black/40">No more requests</div>
+              ) : null
+            }
+          >
+            {scheduledPairRequests.map((req) => (
+              <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} />
+            ))}
+          </InfiniteScroll>
+
+          {scheduledPairRequests.length === 0 && (
+            <EmptyState
+              icon={SearchX}
+              title="No requests match your search"
+              description="Try widening your filters or check back soon — new requests come in all the time."
+            />
+          )}
+        </div>
       </div>
     </div>
   );
