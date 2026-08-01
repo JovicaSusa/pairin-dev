@@ -29,6 +29,14 @@ RSpec.describe Session, type: :model do
         expect(session.errors[:start_at]).to contain_exactly("must be in future")
       end
     end
+
+    describe "dates within the grace window" do
+      let(:session) { build(:session, start_at: 2.seconds.ago, end_at: 30.minutes.from_now) }
+
+      it "is valid" do
+        expect(session.valid?).to be true
+      end
+    end
   end
 
   describe "holder" do
@@ -81,6 +89,48 @@ RSpec.describe Session, type: :model do
       let(:participant) { participant_2 }
 
       it { is_expected.to eq(participant_1) }
+    end
+  end
+
+  describe "#feedback_from" do
+    subject(:feedback_from) { session.feedback_from(participant) }
+
+    let(:session) { create(:session, with_holder: false, with_partner: false) }
+    let(:participant) { create(:user) }
+
+    context "when participant left feedback" do
+      let!(:feedback) { create(:session_feedback, session:, participant:) }
+
+      it { is_expected.to eq(feedback) }
+    end
+
+    context "when participant did not leave feedback" do
+      it { is_expected.to be_nil }
+    end
+  end
+
+  describe "#feedback_complete?" do
+    subject(:feedback_complete?) { session.feedback_complete? }
+
+    let(:session) { create(:session, with_holder: false, with_partner: false) }
+    let(:participant_1) { create(:user) }
+    let(:participant_2) { create(:user) }
+    let!(:participation_1) { create(:participation, participable: session, participant: participant_1) }
+    let!(:participation_2) { create(:participation, participable: session, participant: participant_2) }
+
+    context "when all participants left feedback" do
+      before do
+        create(:session_feedback, session:, participant: participant_1)
+        create(:session_feedback, session:, participant: participant_2)
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context "when some participants have not left feedback" do
+      before { create(:session_feedback, session:, participant: participant_1) }
+
+      it { is_expected.to be false }
     end
   end
 end

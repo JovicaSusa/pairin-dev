@@ -1,6 +1,10 @@
 class PairRequest < ApplicationRecord
   include ActivityGeneratable
 
+  MODES = %w(immediate scheduled).freeze
+  PLATFORMS = %w(zoom google_meet discord other).freeze
+  WAIT_MINUTES_OPTIONS = [15, 30, 60, 120].freeze
+
   belongs_to :user
   has_many :offers, dependent: nil # TODO: Reconsider
   has_one :accepted_offer, -> { accepted }, class_name: "Offer"
@@ -11,8 +15,18 @@ class PairRequest < ApplicationRecord
 
   validates :description, :subject, :duration, presence: true
   validates :duration, numericality: { greater_than: 0 }
+  validates :mode, inclusion: { in: MODES }
+  validates :wait_minutes, inclusion: { in: WAIT_MINUTES_OPTIONS }, allow_nil: true
+  validates :platform, inclusion: { in: PLATFORMS }, allow_blank: true
 
   scope :active, -> { joins(:periods).merge(Period.future) }
+  scope :scheduled_active, -> { active.where(mode: "scheduled") }
+  scope :live_now, lambda {
+    joins(:periods)
+      .where(mode: "immediate")
+      .where.not(id: Offer.accepted.select(:pair_request_id))
+      .where("periods.start_at + (COALESCE(pair_requests.wait_minutes, 0) * interval '1 minute') > ?", Time.current)
+  }
 
   accepts_nested_attributes_for :periods, allow_destroy: true
   accepts_nested_attributes_for :taggings,

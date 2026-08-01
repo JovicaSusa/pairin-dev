@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_26_113522) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_01_170828) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -44,6 +44,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_26_113522) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "duration", null: false
+    t.string "mode", default: "scheduled", null: false
+    t.integer "wait_minutes"
+    t.boolean "requires_approval", default: false, null: false
+    t.text "goal"
+    t.string "platform"
+    t.string "pairing_tool"
+    t.text "plan"
+    t.index ["mode"], name: "index_pair_requests_on_mode"
     t.index ["user_id"], name: "index_pair_requests_on_user_id"
   end
 
@@ -64,6 +72,21 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_26_113522) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["periodable_type", "periodable_id"], name: "index_periods_on_periodable"
+  end
+
+  create_table "session_feedbacks", force: :cascade do |t|
+    t.bigint "session_id", null: false
+    t.bigint "participant_id", null: false
+    t.string "went_well"
+    t.text "learned"
+    t.text "notes"
+    t.text "code_snippet"
+    t.string "code_snippet_language"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["participant_id"], name: "index_session_feedbacks_on_participant_id"
+    t.index ["session_id", "participant_id"], name: "index_session_feedbacks_on_session_id_and_participant_id", unique: true
+    t.index ["session_id"], name: "index_session_feedbacks_on_session_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -129,5 +152,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_26_113522) do
   add_foreign_key "offers", "users", column: "offerer_id"
   add_foreign_key "pair_requests", "users"
   add_foreign_key "participations", "users", column: "participant_id"
+  add_foreign_key "session_feedbacks", "sessions"
+  add_foreign_key "session_feedbacks", "users", column: "participant_id"
   add_foreign_key "taggings", "tags"
 end

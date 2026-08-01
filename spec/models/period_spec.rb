@@ -9,6 +9,14 @@ RSpec.describe Period, type: :model do
         expect(period.errors[:start_at]).to contain_exactly("must be in future")
       end
     end
+
+    describe "dates within the grace window" do
+      let(:period) { build(:period, start_at: 2.seconds.ago) }
+
+      it "is valid" do
+        expect(period.valid?).to be true
+      end
+    end
   end
 
   describe "scopes" do
