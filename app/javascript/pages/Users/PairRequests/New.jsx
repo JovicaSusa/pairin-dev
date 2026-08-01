@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { TIME_SLOTS } from "@/helpers/time-slots";
+import TagCombobox from "./TagCombobox";
 
 const splitStartAt = (startAt) => {
   if (!startAt) return { date: '', time: '' };
@@ -346,18 +347,12 @@ export default function New({ tags, waitMinutesOptions, platformOptions }) {
                   </Label>
 
                   <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Input
-                        list={`tags-list-${index}`}
+                    <div className="flex-1">
+                      <TagCombobox
+                        tags={tags}
                         value={tagging.tag_attributes.name}
-                        onChange={(e) => updateTag(index, e.target.value)}
-                        placeholder="Search or create..."
+                        onChange={(name) => updateTag(index, name)}
                       />
-                      <datalist id={`tags-list-${index}`}>
-                        {tags.map((t) => (
-                          <option key={t.value} value={t.label} />
-                        ))}
-                      </datalist>
                     </div>
 
                     <Button
