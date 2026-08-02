@@ -32,8 +32,6 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
 
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-      <p className="font-headline font-bold text-sm">Refine your search</p>
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div>
         <Label htmlFor="tags_name_eq" className="block mb-1">

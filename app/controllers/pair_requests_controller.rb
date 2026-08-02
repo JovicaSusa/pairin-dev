@@ -1,14 +1,22 @@
 class PairRequestsController < ApplicationController
   include Authenticated
+  include Alba::Inertia::Controller
+
   def index
+    live_pair_requests = PairRequest
+      .includes(:periods, :tags, :user, :offers)
+      .live_now
+      .where.not(user_id: current_user.id)
+      .distinct
+
     base = PairRequest
       .includes(:periods, :tags, :user, :offers)
       .left_joins(:periods, :tags, :user)
-      .active
+      .scheduled_active
       .where.not(user_id: current_user.id)
 
     @q = base.ransack(params[:q]&.compact_blank)
-    @pagy, @pair_requests = pagy(
+    @pagy, @scheduled_pair_requests = pagy(
       @q.result(distinct: true).order('periods.start_at ASC'),
       items: 15,
       overflow: :empty_page,
@@ -16,15 +24,10 @@ class PairRequestsController < ApplicationController
 
     render inertia: 'PairRequests/Index', props: {
       filters: params[:q]&.compact_blank || {},
-      pairRequests: InertiaRails.scroll(@pagy) {
-        @pair_requests.as_json(
-          include: {
-            user: { only: [:id, :name, :profession], methods: [:image_url, :level_titleized] },
-            tags: { only: [:id, :name] },
-            periods: { only: [:id, :start_at, :end_at] },
-            offers: { only: [:offerer_id] }
-          }
-        )
+      livePairRequests: PairRequestBrowseResource.new(live_pair_requests),
+      scheduledPairRequestsCount: @pagy.count,
+      scheduledPairRequests: InertiaRails.scroll(@pagy) {
+        PairRequestBrowseResource.new(@scheduled_pair_requests)
       },
       filterOptions: InertiaRails.once {
         {
