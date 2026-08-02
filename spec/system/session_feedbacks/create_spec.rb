@@ -23,6 +23,19 @@ RSpec.describe "submit session feedback", type: :system do
       expect(feedback.learned).to eq("Learned a ton about pairing")
     end
 
+    it "allows submitting without picking a reaction" do
+      visit new_session_feedback_path(session_id: session.id)
+
+      fill_in "Notes", with: "No strong reaction, just some notes"
+      click_button "Submit retro"
+
+      expect(page).to have_content("Thanks for sharing your retro!")
+
+      feedback = session.session_feedbacks.find_by!(participant: current_user)
+      expect(feedback.went_well).to be_blank
+      expect(feedback.notes).to eq("No strong reaction, just some notes")
+    end
+
     context "when feedback was already submitted for this session" do
       let!(:existing_feedback) { create(:session_feedback, session: session, participant: current_user) }
 

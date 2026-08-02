@@ -9,6 +9,12 @@ RSpec.describe SessionFeedback, type: :model do
         expect(session_feedback).to be_valid
       end
 
+      it "allows an empty string (the unselected state the form submits)" do
+        session_feedback.went_well = ""
+
+        expect(session_feedback).to be_valid
+      end
+
       it "allows values in the allowed set" do
         session_feedback.went_well = "great"
 
