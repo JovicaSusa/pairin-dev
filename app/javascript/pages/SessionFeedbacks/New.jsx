@@ -39,6 +39,12 @@ export default function New({ sessionId, subject, otherParticipantName, wentWell
               </div>
             )}
 
+            {errors.session && (
+              <div className="mb-4 rounded-xl border-2 border-black bg-orange/10 p-3 text-sm font-bold">
+                This session {errors.session}.
+              </div>
+            )}
+
             <div className="w-full">
               <Label className="block mb-1">How did it go?</Label>
               <input type="hidden" name="went_well" value={wentWell} />

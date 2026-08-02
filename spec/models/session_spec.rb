@@ -95,7 +95,7 @@ RSpec.describe Session, type: :model do
   describe "#feedback_from" do
     subject(:feedback_from) { session.feedback_from(participant) }
 
-    let(:session) { create(:session, with_holder: false, with_partner: false) }
+    let(:session) { create(:session, :past, with_holder: false, with_partner: false) }
     let(:participant) { create(:user) }
 
     context "when participant left feedback" do
@@ -112,7 +112,7 @@ RSpec.describe Session, type: :model do
   describe "#feedback_complete?" do
     subject(:feedback_complete?) { session.feedback_complete? }
 
-    let(:session) { create(:session, with_holder: false, with_partner: false) }
+    let(:session) { create(:session, :past, with_holder: false, with_partner: false) }
     let(:participant_1) { create(:user) }
     let(:participant_2) { create(:user) }
     let!(:participation_1) { create(:participation, participable: session, participant: participant_1) }

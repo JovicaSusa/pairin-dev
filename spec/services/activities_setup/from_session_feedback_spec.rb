@@ -3,7 +3,7 @@ RSpec.describe ActivitiesSetup::FromSessionFeedback, type: :unit do
     subject(:call) { described_class.call(record, previous_changes) }
 
     let(:record) { create(:session_feedback, session: session, participant: participant) }
-    let(:session) { create(:session) }
+    let(:session) { create(:session, :past) }
     let(:participant) { session.participants.first }
     let(:other_participant) { session.other_participant(participant) }
     let(:previous_changes) { changes }

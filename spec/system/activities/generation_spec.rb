@@ -84,7 +84,7 @@ RSpec.describe "generates expected activites", type: :system do
   end
 
   context "when session feedback submitted" do
-    let(:session) { create(:session, with_holder: false) }
+    let(:session) { create(:session, :past, with_holder: false) }
     let!(:current_user_participation) { create(:participation, participable: session, participant: current_user) }
     let(:other_participant) { session.other_participant(current_user) }
 

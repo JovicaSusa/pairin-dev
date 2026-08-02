@@ -5,7 +5,7 @@ RSpec.describe "submit session feedback", type: :system do
   before { sign_in(current_user) }
 
   context "when current user is a participant" do
-    let(:session) { create(:session, with_holder: false) }
+    let(:session) { create(:session, :past, with_holder: false) }
     let!(:participation) { create(:participation, participable: session, participant: current_user) }
 
     it "creates a session feedback for the current user" do
@@ -56,6 +56,21 @@ RSpec.describe "submit session feedback", type: :system do
       visit new_session_feedback_path(session_id: session.id)
 
       expect(page).to have_content("Not authorized for this action")
+    end
+  end
+
+  context "when the session hasn't ended yet" do
+    let(:session) { create(:session, with_holder: false) }
+    let!(:participation) { create(:participation, participable: session, participant: current_user) }
+
+    it "rejects the submission cleanly" do
+      visit new_session_feedback_path(session_id: session.id)
+
+      click_button "Great"
+      click_button "Submit retro"
+
+      expect(page).to have_content("hasn't ended yet")
+      expect(session.session_feedbacks.count).to eq(0)
     end
   end
 end
