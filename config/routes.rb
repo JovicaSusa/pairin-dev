@@ -30,5 +30,7 @@ Rails.application.routes.draw do
     resources :offers, only: [:index]
   end
 
+  resources :session_feedbacks, only: [:new, :create]
+
   resources :activities, only: [:index]
 end
