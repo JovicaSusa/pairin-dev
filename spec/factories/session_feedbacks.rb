@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory(:session_feedback) do
-    session
+    association :session, :past
     participant factory: :user
 
     went_well { SessionFeedback::WENT_WELL_VALUES.sample }

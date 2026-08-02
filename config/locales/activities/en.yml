@@ -119,3 +119,12 @@ en:
         - Your pair request is now live!
       content:
         - Thanks for keeping community alive. Hope you'll get first responses soon!
+    session_feedback_received:
+      titles:
+        - Your partner left feedback!
+        - New retro notes from your pairing partner!
+        - Your partner shared their session retro!
+      content:
+        - Your partner just left feedback on your last session. Take a look and see what they thought!
+        - There's new retro feedback waiting for you from your pairing partner.
+        - Your pairing partner shared their thoughts on your last session together. Check it out!
