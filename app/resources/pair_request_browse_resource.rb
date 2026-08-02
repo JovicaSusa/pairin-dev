@@ -1,5 +1,5 @@
 class PairRequestBrowseResource < ApplicationResource
-  attributes :id, :subject, :description, :goal, :platform
+  attributes :id, :subject, :description, :goal, :platform, :requires_approval
 
   many :tags, resource: TagResource
 
