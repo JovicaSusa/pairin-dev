@@ -47,4 +47,8 @@ class PairRequest < ApplicationRecord
   def has_accepted_offer?
     offers.accepted.exists?
   end
+
+  def immediate?
+    mode == "immediate"
+  end
 end

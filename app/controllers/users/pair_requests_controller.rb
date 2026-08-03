@@ -24,7 +24,7 @@ class Users::PairRequestsController < ApplicationController
 
   def create
     @pair_request = current_user.pair_requests.build(pair_request_params)
-    @pair_request.periods = [Period.new(start_at: Time.current)] if @pair_request.mode == "immediate"
+    @pair_request.periods = [Period.new(start_at: Time.current)] if @pair_request.immediate?
 
     if @pair_request.save
       PairRequests::ScheduleImmediateExpiry.call(@pair_request)
@@ -52,11 +52,12 @@ class Users::PairRequestsController < ApplicationController
 
     authorize @pair_request, policy_class: Users::PairRequestPolicy
 
-    if PairRequests::ExtendWait.call(@pair_request)
-      redirect_to users_pair_requests_path, notice: "We'll keep waiting a bit longer!"
-    else
-      redirect_to users_pair_requests_path, alert: "Could not extend waiting time."
-    end
+    PairRequests::ExtendWait
+      .call(@pair_request)
+      .either(
+        -> (success) { redirect_to users_pair_requests_path, notice: "We'll keep waiting a bit longer!" },
+        -> (failure) { redirect_to users_pair_requests_path, alert: "Could not extend waiting time." }
+      )
   end
 
   private

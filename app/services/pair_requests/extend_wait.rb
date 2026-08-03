@@ -1,25 +1,26 @@
 module PairRequests
-  class ExtendWait
-    def self.call(pair_request) = new(pair_request).call
+  class ExtendWait < Dry::Operation
+    def self.call(...) = new.call(...)
 
-    def initialize(pair_request)
-      @pair_request = pair_request
-    end
-
-    def call
-      return false unless pair_request.mode == "immediate"
-      return false if pair_request.has_accepted_offer?
+    def call(pair_request)
+      step validate(pair_request)
 
       period = pair_request.periods.first
       period.update!(start_at: Time.current)
 
-      PairRequests::ScheduleImmediateExpiry.call(pair_request)
+      step PairRequests::ScheduleImmediateExpiry.call(pair_request)
 
-      true
+      Success(pair_request)
     end
 
     private
 
-    attr_reader :pair_request
+    def validate(pair_request)
+      if !pair_request.immediate? || pair_request.has_accepted_offer?
+        Failure(:not_extendable)
+      else
+        Success()
+      end
+    end
   end
 end

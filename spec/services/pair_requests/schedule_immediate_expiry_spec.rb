@@ -6,8 +6,8 @@ RSpec.describe PairRequests::ScheduleImmediateExpiry, type: :unit do
 
     let(:pair_request) { create(:pair_request, :immediate, wait_minutes: 30) }
 
-    it "returns true" do
-      expect(call).to be true
+    it "returns success" do
+      expect(call.success?).to be true
     end
 
     it "schedules the immediate expiry job for the period's start_at + wait_minutes" do
@@ -22,8 +22,8 @@ RSpec.describe PairRequests::ScheduleImmediateExpiry, type: :unit do
     context "when the pair request is not in immediate mode" do
       let(:pair_request) { create(:pair_request) }
 
-      it "returns false and does not enqueue a job" do
-        expect { expect(call).to be false }.not_to have_enqueued_job(PairRequests::ImmediateExpiryJob)
+      it "returns failure and does not enqueue a job" do
+        expect { expect(call.success?).to be false }.not_to have_enqueued_job(PairRequests::ImmediateExpiryJob)
       end
     end
   end

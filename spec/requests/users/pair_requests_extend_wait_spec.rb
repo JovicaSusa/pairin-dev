@@ -39,5 +39,16 @@ RSpec.describe "Users::PairRequests extend_wait", type: :request do
         expect(response).to have_http_status(:not_found)
       end
     end
+
+    context "when the pair request is scheduled mode" do
+      let(:pair_request) { create(:pair_request, user: current_user) }
+
+      it "is not authorized" do
+        patch extend_wait_users_pair_request_path(pair_request)
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:error]).to be_present
+      end
+    end
   end
 end

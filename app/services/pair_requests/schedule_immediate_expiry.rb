@@ -1,26 +1,25 @@
 module PairRequests
-  class ScheduleImmediateExpiry
-    def self.call(pair_request) = new(pair_request).call
+  class ScheduleImmediateExpiry < Dry::Operation
+    def self.call(...) = new.call(...)
 
-    def initialize(pair_request)
-      @pair_request = pair_request
-    end
-
-    def call
-      return false unless pair_request.mode == "immediate"
+    def call(pair_request)
+      step validate(pair_request)
 
       period = pair_request.periods.first
-      return false unless period
 
       PairRequests::ImmediateExpiryJob
         .set(wait_until: period.start_at + (pair_request.wait_minutes || 0).minutes)
         .perform_later(pair_request.id)
 
-      true
+      Success(pair_request)
     end
 
     private
 
-    attr_reader :pair_request
+    def validate(pair_request)
+      return Failure(:not_immediate) unless pair_request.immediate?
+
+      pair_request.periods.first ? Success() : Failure(:no_period)
+    end
   end
 end

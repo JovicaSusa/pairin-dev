@@ -6,8 +6,8 @@ RSpec.describe PairRequests::ExtendWait, type: :unit do
 
     let(:pair_request) { create(:pair_request, :immediate, wait_minutes: 30) }
 
-    it "returns true" do
-      expect(call).to be true
+    it "returns success" do
+      expect(call.success?).to be true
     end
 
     it "bumps the period's start_at to now" do
@@ -36,8 +36,8 @@ RSpec.describe PairRequests::ExtendWait, type: :unit do
     context "when the pair request already has an accepted offer" do
       before { create(:offer, :accepted, pair_request:) }
 
-      it "returns false" do
-        expect(call).to be false
+      it "returns failure" do
+        expect(call.success?).to be false
       end
 
       it "doesn't change the period" do
@@ -52,8 +52,8 @@ RSpec.describe PairRequests::ExtendWait, type: :unit do
     context "when the pair request is not in immediate mode" do
       let(:pair_request) { create(:pair_request) }
 
-      it "returns false" do
-        expect(call).to be false
+      it "returns failure" do
+        expect(call.success?).to be false
       end
     end
   end

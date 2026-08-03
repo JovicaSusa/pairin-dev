@@ -23,7 +23,7 @@ module PairRequests
 
     def validate(pair_request, joiner)
       if pair_request.user == joiner ||
-         pair_request.mode != "immediate" ||
+         !pair_request.immediate? ||
          pair_request.requires_approval? ||
          pair_request.has_accepted_offer?
         Failure(:not_joinable)

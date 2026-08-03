@@ -5,7 +5,7 @@ module Users
     end
 
     def extend_wait?
-      user == record.user
+      user == record.user && record.immediate?
     end
   end
 end
