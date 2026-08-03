@@ -1,4 +1,4 @@
-import { Link } from "@inertiajs/react";
+import { Link, Form } from "@inertiajs/react";
 import { ArrowRight } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
@@ -71,7 +71,17 @@ export default function PairRequestCard({ pairRequest, currentUserId, live = fal
           </div>
         </div>
 
-        {!live && (
+        {live && !pairRequest.requires_approval && (
+          <Form method="post" action={`/pair_requests/${pairRequest.id}/join`}>
+            {({ processing }) => (
+              <Button type="submit" disabled={processing}>
+                {processing ? "..." : "Join"}
+              </Button>
+            )}
+          </Form>
+        )}
+
+        {(!live || pairRequest.requires_approval) && (
           alreadyOffered ? (
             <span className="text-sm font-bold italic text-black/40">You have already sent an offer</span>
           ) : (

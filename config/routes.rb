@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       resources :offers, only: [:index, :new, :create] do
         post "accept", on: :member
       end
+      resource :join, only: [:create], controller: "joins"
     end
 
     get :search, on: :collection
