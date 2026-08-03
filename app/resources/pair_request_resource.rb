@@ -1,9 +1,13 @@
 class PairRequestResource < ApplicationResource
-  attributes :id, :subject, :description
+  attributes :id, :subject, :description, :mode, :wait_minutes
 
   many :tags, resource: TagResource
 
   many :sessions, resource: SessionResource
+
+  attribute :periods do |pair_request|
+    pair_request.periods.map { |period| { id: period.id, start_at: period.start_at, end_at: period.end_at } }
+  end
 
   attribute :accepted_offer do |pair_request|
     offer = pair_request.accepted_offer

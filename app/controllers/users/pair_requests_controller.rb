@@ -4,7 +4,7 @@ class Users::PairRequestsController < ApplicationController
 
   def index
     @pair_requests = current_user.pair_requests
-      .includes(:tags, :sessions, accepted_offer: :offerer)
+      .includes(:tags, :sessions, :periods, accepted_offer: :offerer)
       .order(created_at: :desc)
 
     render inertia: 'Users/PairRequests/Index', props: {
@@ -27,6 +27,8 @@ class Users::PairRequestsController < ApplicationController
     @pair_request.periods = [Period.new(start_at: Time.current)] if @pair_request.mode == "immediate"
 
     if @pair_request.save
+      PairRequests::ScheduleImmediateExpiry.call(@pair_request)
+
       redirect_to users_pair_requests_path, notice: "Request posted! Good luck"
     else
       redirect_back_or_to new_users_pair_request_path, inertia: { errors: @pair_request.errors.to_hash(true) }
@@ -42,6 +44,18 @@ class Users::PairRequestsController < ApplicationController
       redirect_to users_pair_requests_path, notice: "Successfully added!"
     else
       redirect_back fallback_location: users_pair_requests_path, alert: "Something went wrong."
+    end
+  end
+
+  def extend_wait
+    @pair_request = current_user.pair_requests.find(params[:id])
+
+    authorize @pair_request, policy_class: Users::PairRequestPolicy
+
+    if PairRequests::ExtendWait.call(@pair_request)
+      redirect_to users_pair_requests_path, notice: "We'll keep waiting a bit longer!"
+    else
+      redirect_to users_pair_requests_path, alert: "Could not extend waiting time."
     end
   end
 
