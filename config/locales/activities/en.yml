@@ -137,3 +137,12 @@ en:
         - Nobody has joined your pair request within the wait time you set. Head back to your request whenever you're ready to keep waiting a bit longer.
         - Your request has been live for a while with no takers yet. Visit your request page to extend the wait time if you'd like to keep it open.
         - Still no one has joined your request. You can extend the wait time from your request page whenever you're ready.
+    retro_nag:
+      titles:
+        - Don't forget to leave feedback!
+        - Your retro is waiting for you
+        - How did your last session go?
+      content:
+        - Your last pairing session has ended and we haven't heard from you yet. Take a minute to leave your retro feedback.
+        - Don't forget to share your retro for your last session—it only takes a minute.
+        - You still have feedback to leave for your last pairing session. Head back and let us know how it went.

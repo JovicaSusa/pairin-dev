@@ -38,6 +38,13 @@ RSpec.describe Offers::Accept, type: :unit do
       expect { call }.to have_enqueued_mail(SessionMailer, :session_scheduled_email).twice
     end
 
+    it "schedules the retro nag job for 5 minutes after the session ends" do
+      expect { call }
+        .to have_enqueued_job(SessionFeedbackNagJob)
+        .with(kind_of(Integer))
+        .at(offer.period.end_at + 5.minutes)
+    end
+
     context "when failure" do
       context "when pair request already have accepted offer" do
         before { create(:offer, :accepted, pair_request: offer.pair_request) }
