@@ -121,6 +121,18 @@ RSpec.describe PairRequest, type: :model do
         expect(live_now).to contain_exactly(live_request)
       end
     end
+
+    describe ".with_completed_session" do
+      subject(:with_completed_session) { described_class.with_completed_session }
+
+      let!(:completed_request) { create(:session, :past).sessionable }
+      let!(:upcoming_request) { create(:session).sessionable }
+      let!(:no_session_request) { create(:pair_request) }
+
+      it "returns only pair requests with a session that has ended" do
+        expect(with_completed_session).to contain_exactly(completed_request)
+      end
+    end
   end
 
   describe "#has_accepted_offer?" do

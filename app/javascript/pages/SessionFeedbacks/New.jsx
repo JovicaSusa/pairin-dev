@@ -17,6 +17,7 @@ const humanize = (value) => value.charAt(0).toUpperCase() + value.slice(1);
 
 export default function New({ sessionId, subject, otherParticipantName, wentWellValues }) {
   const [wentWell, setWentWell] = useState("");
+  const [sharedPublicly, setSharedPublicly] = useState(false);
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 md:px-8">
@@ -25,7 +26,7 @@ export default function New({ sessionId, subject, otherParticipantName, wentWell
       <PageHeader
         eyebrow="Retro"
         title={subject || "How did it go?"}
-        description={otherParticipantName ? `Share a private retro on your session with ${otherParticipantName}. Only you and your partner can see this.` : "Share a private retro on this session."}
+        description={otherParticipantName ? `Share a retro on your session with ${otherParticipantName}. By default, only you and your partner can see this.` : "Share a retro on this session. By default, only you can see this."}
       />
 
       <Form method="post" action="/session_feedbacks" className="flex flex-col items-stretch">
@@ -102,6 +103,36 @@ export default function New({ sessionId, subject, otherParticipantName, wentWell
               {errors.code_snippet_language && (
                 <div className="text-red font-bold mt-1 text-sm">{errors.code_snippet_language}</div>
               )}
+            </div>
+
+            <div className="w-full mt-4">
+              <Label className="block mb-1">Visibility</Label>
+              <input type="hidden" name="shared_publicly" value={sharedPublicly ? "true" : "false"} />
+              <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Visibility">
+                <Button
+                  type="button"
+                  role="radio"
+                  aria-checked={!sharedPublicly}
+                  variant={!sharedPublicly ? "default" : "neutral"}
+                  onClick={() => setSharedPublicly(false)}
+                >
+                  <span className="mr-1.5">🔒</span>
+                  Private
+                </Button>
+                <Button
+                  type="button"
+                  role="radio"
+                  aria-checked={sharedPublicly}
+                  variant={sharedPublicly ? "default" : "neutral"}
+                  onClick={() => setSharedPublicly(true)}
+                >
+                  <span className="mr-1.5">🌐</span>
+                  Public
+                </Button>
+              </div>
+              <p className="mt-1 text-xs text-black/50">
+                Public retros appear in Session Summaries, visible to any signed-in user. Private stays between you and your partner.
+              </p>
             </div>
 
             <Button type="submit" size="lg" disabled={processing} className="mt-10 self-center">

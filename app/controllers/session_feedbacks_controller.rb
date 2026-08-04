@@ -35,6 +35,6 @@ class SessionFeedbacksController < ApplicationController
   private
 
   def session_feedback_params
-    params.require(:session_feedback).permit(:session_id, :went_well, :learned, :notes, :code_snippet, :code_snippet_language)
+    params.require(:session_feedback).permit(:session_id, :went_well, :learned, :notes, :code_snippet, :code_snippet_language, :shared_publicly)
   end
 end

@@ -8,6 +8,7 @@ import {
   Send,
   Rss,
   CalendarClock,
+  BookOpen,
   ChevronDown,
   LogOut,
   Menu,
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { href: "/pair_requests", label: "Search", icon: Search },
   { href: "/activities", label: "Feed", icon: Rss },
   { href: "/sessions", label: "Sessions", icon: CalendarClock },
+  { href: "/session_summaries", label: "Summaries", icon: BookOpen },
 ];
 
 const PAIR_REQUEST_SUBMENU = [
@@ -91,6 +93,7 @@ function NavContent({ currentPath, currentUser, onNavigate }) {
 
           <NavLink {...NAV_ITEMS[1]} active={isActive(NAV_ITEMS[1].href)} onClick={onNavigate} />
           <NavLink {...NAV_ITEMS[2]} active={isActive(NAV_ITEMS[2].href)} onClick={onNavigate} />
+          <NavLink {...NAV_ITEMS[3]} active={isActive(NAV_ITEMS[3].href)} onClick={onNavigate} />
         </div>
       </nav>
 

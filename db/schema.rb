@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_04_035828) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_04_060219) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -85,6 +85,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_04_035828) do
     t.string "code_snippet_language"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "shared_publicly", default: false, null: false
     t.index ["participant_id"], name: "index_session_feedbacks_on_participant_id"
     t.index ["session_id", "participant_id"], name: "index_session_feedbacks_on_session_id_and_participant_id", unique: true
     t.index ["session_id"], name: "index_session_feedbacks_on_session_id"
@@ -98,6 +99,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_04_035828) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "call_link"
+    t.index ["end_at"], name: "index_sessions_on_end_at"
     t.index ["sessionable_type", "sessionable_id"], name: "index_sessions_on_sessionable"
   end
 

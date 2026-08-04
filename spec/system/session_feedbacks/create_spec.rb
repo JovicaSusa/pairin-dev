@@ -23,6 +23,27 @@ RSpec.describe "submit session feedback", type: :system do
       expect(feedback.learned).to eq("Learned a ton about pairing")
     end
 
+    it "defaults to keeping the retro private" do
+      visit new_session_feedback_path(session_id: session.id)
+
+      click_button "Great"
+      click_button "Submit retro"
+
+      feedback = session.session_feedbacks.find_by!(participant: current_user)
+      expect(feedback.shared_publicly).to be false
+    end
+
+    it "shares the retro publicly when the user opts in" do
+      visit new_session_feedback_path(session_id: session.id)
+
+      click_button "Great"
+      click_button "Public"
+      click_button "Submit retro"
+
+      feedback = session.session_feedbacks.find_by!(participant: current_user)
+      expect(feedback.shared_publicly).to be true
+    end
+
     it "allows submitting without picking a reaction" do
       visit new_session_feedback_path(session_id: session.id)
 
