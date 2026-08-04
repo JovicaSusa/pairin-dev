@@ -47,6 +47,18 @@ RSpec.describe Offers::Accept, type: :unit do
         end
       end
 
+      context "when the pair request has been cancelled" do
+        before { offer.pair_request.update!(cancelled_at: Time.current) }
+
+        it "returns failure" do
+          expect(call.success?).to be false
+        end
+
+        it "doesn't mark the offer as accepted" do
+          expect { call }.not_to change { offer.reload.accepted_at }
+        end
+      end
+
       context "when there's an error" do
         before { allow(Session).to receive(:create!).and_raise(ActiveRecord::RecordInvalid) }
 

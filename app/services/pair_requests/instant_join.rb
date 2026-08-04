@@ -25,6 +25,7 @@ module PairRequests
       if pair_request.user == joiner ||
          !pair_request.immediate? ||
          pair_request.requires_approval? ||
+         pair_request.cancelled? ||
          pair_request.has_accepted_offer?
         Failure(:not_joinable)
       else

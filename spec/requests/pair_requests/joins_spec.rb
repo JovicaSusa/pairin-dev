@@ -52,6 +52,18 @@ RSpec.describe "PairRequests::Joins", type: :request do
       end
     end
 
+    context "when the pair request has been cancelled" do
+      let(:pair_request) { create(:pair_request, :immediate, :cancelled) }
+
+      it "does not authorize the join and redirects with an alert" do
+        expect {
+          post pair_request_join_path(pair_request)
+        }.not_to change { Session.count }
+
+        expect(response).to redirect_to(root_path)
+      end
+    end
+
     context "when the pair request is already matched" do
       before { create(:offer, :accepted, pair_request:) }
 

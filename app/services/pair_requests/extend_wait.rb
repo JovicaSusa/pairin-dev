@@ -16,7 +16,7 @@ module PairRequests
     private
 
     def validate(pair_request)
-      if !pair_request.immediate? || pair_request.has_accepted_offer?
+      if !pair_request.immediate? || pair_request.cancelled? || pair_request.has_accepted_offer?
         Failure(:not_extendable)
       else
         Success()

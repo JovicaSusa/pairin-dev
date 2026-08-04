@@ -53,6 +53,18 @@ RSpec.describe PairRequests::ImmediateExpiryJob, type: :job do
       end
     end
 
+    context "when the pair request has been cancelled" do
+      before { pair_request.update!(cancelled_at: Time.current) }
+
+      it "does not create an activity" do
+        expect { perform }.not_to change { Activity.count }
+      end
+
+      it "does not send mail" do
+        expect { perform }.not_to have_enqueued_mail(PairRequestMailer, :immediate_expired_email)
+      end
+    end
+
     context "when the wait was extended after this job was scheduled (stale job)" do
       let(:pair_request) { create(:pair_request, :immediate, wait_minutes: 30) }
 

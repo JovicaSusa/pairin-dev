@@ -7,5 +7,13 @@ module Users
     def extend_wait?
       user == record.user && record.immediate?
     end
+
+    def reschedule?
+      user == record.user && record.immediate?
+    end
+
+    def destroy?
+      user == record.user
+    end
   end
 end

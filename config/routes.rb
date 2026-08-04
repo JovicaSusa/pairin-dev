@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     resources :pair_requests, except: [:edit, :update] do
       patch :add_call_link, on: :member
       patch :extend_wait, on: :member
+      patch :reschedule, on: :member
     end
     resources :offers, only: [:index]
   end

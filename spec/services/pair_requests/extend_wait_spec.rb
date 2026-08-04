@@ -56,5 +56,17 @@ RSpec.describe PairRequests::ExtendWait, type: :unit do
         expect(call.success?).to be false
       end
     end
+
+    context "when the pair request has been cancelled" do
+      let(:pair_request) { create(:pair_request, :immediate, :cancelled, wait_minutes: 30) }
+
+      it "returns failure" do
+        expect(call.success?).to be false
+      end
+
+      it "doesn't change the period" do
+        expect { call }.not_to change { pair_request.periods.first.reload.start_at }
+      end
+    end
   end
 end

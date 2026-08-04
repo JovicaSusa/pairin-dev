@@ -62,6 +62,20 @@ RSpec.describe PairRequests::InstantJoin, type: :unit do
       end
     end
 
+    context "when the pair request has been cancelled" do
+      let(:pair_request) { create(:pair_request, :immediate, :cancelled) }
+
+      it "returns failure" do
+        expect(call.success?).to be false
+      end
+
+      it "doesn't create an offer or a session" do
+        expect { call }
+          .to not_change { Offer.count }
+          .and not_change { Session.count }
+      end
+    end
+
     context "when the pair request requires approval" do
       let(:pair_request) { create(:pair_request, :immediate, requires_approval: true) }
 

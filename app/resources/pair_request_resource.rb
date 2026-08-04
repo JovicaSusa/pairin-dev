@@ -1,5 +1,5 @@
 class PairRequestResource < ApplicationResource
-  attributes :id, :subject, :description, :mode, :wait_minutes
+  attributes :id, :subject, :description, :mode, :wait_minutes, :cancelled_at
 
   many :tags, resource: TagResource
 
