@@ -47,4 +47,24 @@ class PairRequest < ApplicationRecord
   def has_accepted_offer?
     offers.accepted.exists?
   end
+
+  def immediate?
+    mode == "immediate"
+  end
+
+  def wait_deadline
+    period = periods.first
+    return nil unless period
+
+    period.start_at + (wait_minutes || 0).minutes
+  end
+
+  def wait_time_expired?
+    return false unless immediate?
+
+    deadline = wait_deadline
+    return false unless deadline
+
+    Time.current >= deadline
+  end
 end

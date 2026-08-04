@@ -1,4 +1,4 @@
-import { useForm, Link } from '@inertiajs/react';
+import { useForm, Link, router } from '@inertiajs/react';
 import { Inbox, CheckCircle2 } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
@@ -11,6 +11,13 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
 
 export default function UserPairRequestCard({ request }) {
+  const period = request.periods?.[0];
+  const isImmediateWaiting = request.mode === "immediate" && !request.accepted_offer && period;
+  const waitUntil = isImmediateWaiting
+    ? new Date(period.start_at).getTime() + (request.wait_minutes || 0) * 60000
+    : null;
+  const isLive = isImmediateWaiting && waitUntil > Date.now();
+
   const { data, setData, patch, processing } = useForm({
     pair_request: {
       sessions_attributes: request.sessions.map(s => ({
@@ -46,6 +53,21 @@ export default function UserPairRequestCard({ request }) {
           </Badge>
         ))}
       </div>
+
+      {isImmediateWaiting && (
+        <div className="mt-4 flex flex-col items-stretch gap-3 rounded-xl border-2 border-black bg-yellow-50 p-4 md:flex-row md:items-center md:justify-between">
+          <Badge className={`rounded-full border-black ${isLive ? "bg-green text-black" : "bg-white text-black"}`}>
+            {isLive ? "Live now" : "Wait time elapsed"}
+          </Badge>
+          <Button
+            variant="neutral"
+            size="sm"
+            onClick={() => router.patch(`/users/pair_requests/${request.id}/extend_wait`)}
+          >
+            Keep waiting
+          </Button>
+        </div>
+      )}
 
       {request.accepted_offer && (
         <div className="mt-5 rounded-xl border-2 border-black bg-green/10 p-4">
