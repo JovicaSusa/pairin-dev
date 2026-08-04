@@ -22,5 +22,9 @@ FactoryBot.define do
     trait :requires_approval do
       requires_approval { true }
     end
+
+    trait :cancelled do
+      cancelled_at { Time.current }
+    end
   end
 end

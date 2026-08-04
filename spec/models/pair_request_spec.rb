@@ -77,6 +77,7 @@ RSpec.describe PairRequest, type: :model do
           create(:period, periodable: pair_request, start_at: 1.minute.from_now)
         end
       end
+      let!(:cancelled_request) { create(:pair_request, :cancelled, mode: "scheduled") }
 
       it "returns only active scheduled requests" do
         travel 2.minutes do
@@ -110,7 +111,13 @@ RSpec.describe PairRequest, type: :model do
         pair_request
       end
 
-      it "returns only unmatched immediate requests still within their wait window" do
+      let!(:cancelled_request) do
+        pair_request = create(:pair_request, :immediate, :cancelled, wait_minutes: 15, with_periods: false)
+        create(:period, periodable: pair_request, start_at: Time.current)
+        pair_request
+      end
+
+      it "returns only unmatched, uncancelled immediate requests still within their wait window" do
         expect(live_now).to contain_exactly(live_request)
       end
     end
@@ -128,6 +135,22 @@ RSpec.describe PairRequest, type: :model do
     end
 
     context "when pair request doesn't have accepted offer" do
+      it { is_expected.to be false }
+    end
+  end
+
+  describe "#cancelled?" do
+    subject(:cancelled?) { pair_request.cancelled? }
+
+    context "when cancelled_at is set" do
+      let(:pair_request) { create(:pair_request, :cancelled) }
+
+      it { is_expected.to be true }
+    end
+
+    context "when cancelled_at is nil" do
+      let(:pair_request) { create(:pair_request) }
+
       it { is_expected.to be false }
     end
   end

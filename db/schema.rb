@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_01_170828) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_04_035828) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -51,6 +51,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_01_170828) do
     t.string "platform"
     t.string "pairing_tool"
     t.text "plan"
+    t.datetime "cancelled_at"
     t.index ["mode"], name: "index_pair_requests_on_mode"
     t.index ["user_id"], name: "index_pair_requests_on_user_id"
   end

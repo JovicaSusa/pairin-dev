@@ -5,6 +5,7 @@ module PairRequests
     def perform(pair_request_id)
       pair_request = PairRequest.find_by(id: pair_request_id)
       return unless pair_request
+      return if pair_request.cancelled?
       return if pair_request.has_accepted_offer?
       return unless pair_request.wait_time_expired?
 

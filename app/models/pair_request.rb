@@ -19,11 +19,11 @@ class PairRequest < ApplicationRecord
   validates :wait_minutes, inclusion: { in: WAIT_MINUTES_OPTIONS }, allow_nil: true
   validates :platform, inclusion: { in: PLATFORMS }, allow_blank: true
 
-  scope :active, -> { joins(:periods).merge(Period.future) }
+  scope :active, -> { joins(:periods).merge(Period.future).where(cancelled_at: nil) }
   scope :scheduled_active, -> { active.where(mode: "scheduled") }
   scope :live_now, lambda {
     joins(:periods)
-      .where(mode: "immediate")
+      .where(mode: "immediate", cancelled_at: nil)
       .where.not(id: Offer.accepted.select(:pair_request_id))
       .where("periods.start_at + (COALESCE(pair_requests.wait_minutes, 0) * interval '1 minute') > ?", Time.current)
   }
@@ -50,6 +50,10 @@ class PairRequest < ApplicationRecord
 
   def immediate?
     mode == "immediate"
+  end
+
+  def cancelled?
+    cancelled_at?
   end
 
   def wait_deadline

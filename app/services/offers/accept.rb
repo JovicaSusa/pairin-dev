@@ -19,7 +19,11 @@ module Offers
     private
 
     def validate(offer)
-      offer.pair_request.has_accepted_offer? ? Failure(:no_longer_acceptable) : Success()
+      if offer.pair_request.has_accepted_offer? || offer.pair_request.cancelled?
+        Failure(:no_longer_acceptable)
+      else
+        Success()
+      end
     end
 
     def accept_offer(offer)
