@@ -9,12 +9,13 @@ RSpec.describe "Users::PairRequests reschedule", type: :request do
 
     before { sign_in(current_user) }
 
-    it "flips the mode to scheduled, replaces the period, and redirects with a notice" do
-      patch reschedule_users_pair_request_path(pair_request), params: params
+    it "flips the mode to scheduled, adds the new period, and redirects with a notice" do
+      expect {
+        patch reschedule_users_pair_request_path(pair_request), params: params
+      }.to change { pair_request.reload.periods.count }.by(1)
 
-      pair_request.reload
       expect(pair_request.mode).to eq("scheduled")
-      expect(pair_request.periods.first.start_at).to be_within(1.second).of(new_start_at)
+      expect(pair_request.periods.order(:start_at).last.start_at).to be_within(1.second).of(new_start_at)
       expect(response).to redirect_to(users_pair_requests_path)
       expect(flash[:notice]).to be_present
     end

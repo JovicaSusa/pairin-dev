@@ -27,4 +27,14 @@ RSpec.describe "reschedule an unmatched immediate pair request", type: :system d
 
     expect(pair_request.reload.mode).to eq("scheduled")
   end
+
+  it "stays in immediate mode when no period is picked" do
+    visit users_pair_requests_path
+
+    click_button "Reschedule"
+    click_button "Confirm reschedule"
+
+    expect(page).to have_content("Wait time elapsed")
+    expect(pair_request.reload.mode).to eq("immediate")
+  end
 end

@@ -5,8 +5,9 @@ module PairRequests
     def call(pair_request, periods_attributes)
       step validate(pair_request)
 
-      pair_request.periods.destroy_all
-
+      # The old immediate period is left in place rather than destroyed: any
+      # pending offer against it still needs a valid period to point at, and
+      # once it's in the past it naturally reads as expired (Offer#status).
       if pair_request.update(mode: "scheduled", periods_attributes:)
         Success(pair_request)
       else
