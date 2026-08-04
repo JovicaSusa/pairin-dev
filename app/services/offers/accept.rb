@@ -43,6 +43,8 @@ module Offers
         end_at: offer.period.end_at
       )
 
+      SessionFeedbackNagJob.set(wait_until: session.end_at + 5.minutes).perform_later(session.id)
+
       session.participations.create!(participant: offer.offerer, role: Participation::ROLE_PAIR)
       session.participations.create!(participant: pair_request.user, role: Participation::ROLE_INITIATOR)
 
