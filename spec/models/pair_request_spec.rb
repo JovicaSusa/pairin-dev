@@ -131,4 +131,79 @@ RSpec.describe PairRequest, type: :model do
       it { is_expected.to be false }
     end
   end
+
+  describe "#wait_deadline" do
+    subject(:wait_deadline) { pair_request.wait_deadline }
+
+    context "when it has no periods" do
+      let(:pair_request) { create(:pair_request, with_periods: false) }
+
+      it { is_expected.to be_nil }
+    end
+
+    context "when it has a period" do
+      let(:start_at) { Time.current }
+      let(:pair_request) do
+        pr = create(:pair_request, wait_minutes: 15, with_periods: false)
+        create(:period, periodable: pr, start_at:)
+        pr
+      end
+
+      it "returns the period start time plus the wait minutes" do
+        expect(wait_deadline).to eq(start_at + 15.minutes)
+      end
+    end
+
+    context "when wait_minutes is nil" do
+      let(:start_at) { Time.current }
+      let(:pair_request) do
+        pr = create(:pair_request, wait_minutes: nil, with_periods: false)
+        create(:period, periodable: pr, start_at:)
+        pr
+      end
+
+      it "returns the period start time" do
+        expect(wait_deadline).to eq(start_at)
+      end
+    end
+  end
+
+  describe "#wait_time_expired?" do
+    subject(:wait_time_expired?) { pair_request.wait_time_expired? }
+
+    context "when the pair request is scheduled" do
+      let(:pair_request) { create(:pair_request, mode: "scheduled") }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the pair request is immediate" do
+      context "when it has no periods" do
+        let(:pair_request) { create(:pair_request, :immediate, with_periods: false) }
+
+        it { is_expected.to be false }
+      end
+
+      context "when the wait window has not elapsed" do
+        let(:pair_request) do
+          pr = create(:pair_request, :immediate, wait_minutes: 15, with_periods: false)
+          create(:period, periodable: pr, start_at: Time.current)
+          pr
+        end
+
+        it { is_expected.to be false }
+      end
+
+      context "when the wait window has elapsed" do
+        let(:pair_request) do
+          pr = create(:pair_request, :immediate, wait_minutes: 15, with_periods: false)
+          period = create(:period, periodable: pr, start_at: Time.current)
+          period.update_column(:start_at, 20.minutes.ago)
+          pr
+        end
+
+        it { is_expected.to be true }
+      end
+    end
+  end
 end

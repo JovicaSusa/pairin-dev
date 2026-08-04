@@ -5,12 +5,8 @@ module PairRequests
     def perform(pair_request_id)
       pair_request = PairRequest.find_by(id: pair_request_id)
       return unless pair_request
-      return unless pair_request.immediate?
       return if pair_request.has_accepted_offer?
-
-      period = pair_request.periods.first
-      return unless period
-      return if Time.current < period.start_at + (pair_request.wait_minutes || 0).minutes
+      return unless pair_request.wait_time_expired?
 
       Activity.create!(
         receiver: pair_request.user,

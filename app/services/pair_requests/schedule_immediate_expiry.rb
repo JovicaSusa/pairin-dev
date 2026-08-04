@@ -5,10 +5,8 @@ module PairRequests
     def call(pair_request)
       step validate(pair_request)
 
-      period = pair_request.periods.first
-
       PairRequests::ImmediateExpiryJob
-        .set(wait_until: period.start_at + (pair_request.wait_minutes || 0).minutes)
+        .set(wait_until: pair_request.wait_deadline)
         .perform_later(pair_request.id)
 
       Success(pair_request)
