@@ -142,7 +142,7 @@ RSpec.describe PairRequest, type: :model do
     end
 
     context "when it has a period" do
-      let(:start_at) { Time.current }
+      let(:start_at) { Time.current.round(6) }
       let(:pair_request) do
         pr = create(:pair_request, wait_minutes: 15, with_periods: false)
         create(:period, periodable: pr, start_at:)
@@ -155,7 +155,7 @@ RSpec.describe PairRequest, type: :model do
     end
 
     context "when wait_minutes is nil" do
-      let(:start_at) { Time.current }
+      let(:start_at) { Time.current.round(6) }
       let(:pair_request) do
         pr = create(:pair_request, wait_minutes: nil, with_periods: false)
         create(:period, periodable: pr, start_at:)
