@@ -1,0 +1,55 @@
+<% content_for :title, "Terms of Service - Pairin" %>
+<% content_for :description, "The terms for using Pairin to find and run pair-programming sessions." %>
+
+<div class="px-6 md:px-16 lg:px-24 py-16 md:py-20 max-w-3xl mx-auto">
+  <a href="<%= root_path %>" class="text-sm font-bold text-purple hover:underline">&larr; Back to Pairin</a>
+
+  <h1 class="font-display font-extrabold text-4xl md:text-5xl tracking-tight leading-none mt-6 mb-2">Terms of Service</h1>
+  <p class="text-gray-500 text-sm mb-10">Last updated <%= Date.current.strftime("%B %-d, %Y") %></p>
+
+  <div class="prose max-w-none text-gray-700 leading-relaxed space-y-6">
+    <p>
+      By creating an account or using <a href="<%= root_url %>" class="text-purple font-bold">pairin.dev</a>, you
+      agree to these terms. Pairin is currently in beta &mdash; features, availability, and these terms may change
+      as the product evolves.
+    </p>
+
+    <h2 class="font-display font-bold text-2xl text-black mt-10 mb-3">Using Pairin</h2>
+    <p>
+      Pairin is free during its beta period. You're responsible for the accuracy of what you post (pair requests,
+      profile details, retros) and for your conduct toward other members. Be respectful &mdash; Pairin exists to
+      help developers pair and learn together.
+    </p>
+
+    <h2 class="font-display font-bold text-2xl text-black mt-10 mb-3">Your account</h2>
+    <p>
+      You're responsible for keeping your login credentials secure and for activity that happens under your
+      account. You must be able to enter into this agreement to sign up.
+    </p>
+
+    <h2 class="font-display font-bold text-2xl text-black mt-10 mb-3">Content you share</h2>
+    <p>
+      You keep ownership of what you post. By sharing a retro publicly via Session Summaries, you're giving other
+      signed-in Pairin members permission to view it within the product. You can stop sharing future retros at any
+      time; this doesn't retroactively unpublish retros you've already shared.
+    </p>
+
+    <h2 class="font-display font-bold text-2xl text-black mt-10 mb-3">Beta disclaimer</h2>
+    <p>
+      Pairin is provided "as is" during its beta period, without warranties of any kind. We'll do our best to keep
+      things running smoothly, but availability and features aren't guaranteed while we're actively building.
+    </p>
+
+    <h2 class="font-display font-bold text-2xl text-black mt-10 mb-3">Ending your account</h2>
+    <p>
+      You can stop using Pairin at any time. We may suspend or terminate accounts that violate these terms or misuse
+      the platform.
+    </p>
+
+    <h2 class="font-display font-bold text-2xl text-black mt-10 mb-3">Contact</h2>
+    <p>
+      Questions about these terms? Reach us at
+      <a href="mailto:hello@pairin.dev" class="text-purple font-bold">hello@pairin.dev</a>.
+    </p>
+  </div>
+</div>

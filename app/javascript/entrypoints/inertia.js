@@ -23,10 +23,7 @@ createInertiaApp({
       console.error(`Missing Inertia page component: '${name}.jsx'`)
     }
 
-    // Home uses LandingNav and manages its own layout; skip the default.
-    if (name !== 'Home') {
-      page.default.layout ||= (page) => createElement(AppLayout, null, page)
-    }
+    page.default.layout ||= (page) => createElement(AppLayout, null, page)
 
     return page
   },
