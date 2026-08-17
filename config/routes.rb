@@ -10,6 +10,9 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
+  get "privacy" => "pages#privacy", as: :privacy
+  get "terms" => "pages#terms", as: :terms
+
   resources :sessions, only: [:index, :update]
   resources :profiles, only: [:show, :update]
 

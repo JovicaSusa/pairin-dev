@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title inertia>Pairin - Find pair programming partner or coding buddy quick and easy</title>
+    <title><%= content_for(:title) || "Pairin - Find pair programming partner or coding buddy quick and easy" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="Discover the perfect pair programming partner or coding buddy with Pairin.dev. Enhance your coding skills and collaborate in real-time with developers around the world." />
+    <meta name="description" content="<%= content_for(:description) || "Discover the perfect pair programming partner or coding buddy with Pairin.dev. Enhance your coding skills and collaborate in real-time with developers around the world." %>" />
     <link rel="canonical" href="<%= canonical_url %>">
 
     <meta property="og:type" content="website">
@@ -32,12 +32,7 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= vite_react_refresh_tag %>
-    <%= vite_client_tag %>
-    <%= vite_javascript_tag "inertia" %>
-    <%= inertia_ssr_head %>
     <%= vite_stylesheet_tag 'application', data: { 'turbo-track': 'reload' } %>
-    <%= vite_javascript_tag 'application', data: { 'turbo-track': 'reload' } %>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
 
