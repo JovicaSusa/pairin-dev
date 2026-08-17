@@ -65,4 +65,15 @@ RSpec.describe SessionFeedback, type: :model do
       end
     end
   end
+
+  describe "scopes" do
+    describe ".shared_publicly" do
+      subject(:shared_publicly) { described_class.shared_publicly }
+
+      let!(:public_feedback) { create(:session_feedback, :shared_publicly) }
+      let!(:private_feedback) { create(:session_feedback) }
+
+      it { is_expected.to contain_exactly(public_feedback) }
+    end
+  end
 end

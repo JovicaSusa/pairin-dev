@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   root "home#index"
 
   resources :sessions, only: [:index, :update]
+  resources :session_summaries, only: [:index]
   resources :profiles, only: [:show, :update]
 
   resources :pair_requests, only: [:index] do

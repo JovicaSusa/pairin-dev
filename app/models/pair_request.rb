@@ -21,6 +21,7 @@ class PairRequest < ApplicationRecord
 
   scope :active, -> { joins(:periods).merge(Period.future).where(cancelled_at: nil) }
   scope :scheduled_active, -> { active.where(mode: "scheduled") }
+  scope :with_completed_session, -> { joins(:sessions).merge(Session.past).distinct }
   scope :live_now, lambda {
     joins(:periods)
       .where(mode: "immediate", cancelled_at: nil)

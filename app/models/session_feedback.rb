@@ -10,6 +10,8 @@ class SessionFeedback < ApplicationRecord
   validates :participant_id, uniqueness: { scope: :session_id }
   validate :session_has_ended
 
+  scope :shared_publicly, -> { where(shared_publicly: true) }
+
   private
 
   def session_has_ended

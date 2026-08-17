@@ -11,6 +11,7 @@ class Session < ApplicationRecord
   validate :dates_in_future, :dates_in_order
 
   scope :future, -> { where(start_at: Time.current..) }
+  scope :past, -> { where(end_at: ...Time.current) }
 
   def hold_by_user?(user)
     holder == user

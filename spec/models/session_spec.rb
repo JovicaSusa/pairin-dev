@@ -8,6 +8,15 @@ RSpec.describe Session, type: :model do
 
       it { is_expected.to contain_exactly(future_session) }
     end
+
+    describe ".past" do
+      subject(:past) { described_class.past }
+
+      let!(:past_session) { create(:session, :past) }
+      let!(:future_session) { create(:session) }
+
+      it { is_expected.to contain_exactly(past_session) }
+    end
   end
 
   describe "validations" do
