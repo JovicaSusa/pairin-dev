@@ -5,6 +5,7 @@ class SessionSummariesController < ApplicationController
   def index
     base = PairRequest
       .eager_load(sessions: { session_feedbacks: :participant })
+      .includes(:tags)
       .with_completed_session
 
     @q = base.ransack(params[:q]&.compact_blank)
