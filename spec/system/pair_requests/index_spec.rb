@@ -29,4 +29,19 @@ RSpec.describe "display pair requests", type: :system do
       expect(page).to have_content("You have already sent an offer")
     end
   end
+
+  context "when another user has an immediate pair request live now" do
+    let!(:live_pair_request) do
+      pair_request = create(:pair_request, :immediate, subject: "GGG", description: "HHH", with_periods: false)
+      create(:period, periodable: pair_request, start_at: Time.current)
+      pair_request
+    end
+
+    it "displays it in the Live now section" do
+      visit pair_requests_path
+
+      expect(page).to have_content("Live now")
+      expect(page).to have_content("GGG")
+    end
+  end
 end

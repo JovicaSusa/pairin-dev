@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       resources :offers, only: [:index, :new, :create] do
         post "accept", on: :member
       end
+      resource :join, only: [:create], controller: "joins"
     end
 
     get :search, on: :collection
@@ -29,9 +30,13 @@ Rails.application.routes.draw do
   namespace :users do
     resources :pair_requests, except: [:edit, :update] do
       patch :add_call_link, on: :member
+      patch :extend_wait, on: :member
+      patch :reschedule, on: :member
     end
     resources :offers, only: [:index]
   end
+
+  resources :session_feedbacks, only: [:new, :create]
 
   resources :activities, only: [:index]
 end

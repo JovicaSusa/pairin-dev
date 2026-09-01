@@ -19,7 +19,11 @@ module Offers
     private
 
     def validate(offer)
-      offer.pair_request.has_accepted_offer? ? Failure(:no_longer_acceptable) : Success()
+      if offer.pair_request.has_accepted_offer? || offer.pair_request.cancelled?
+        Failure(:no_longer_acceptable)
+      else
+        Success()
+      end
     end
 
     def accept_offer(offer)
@@ -38,6 +42,8 @@ module Offers
         start_at: offer.period.start_at,
         end_at: offer.period.end_at
       )
+
+      SessionFeedbackNagJob.set(wait_until: session.end_at + 5.minutes).perform_later(session.id)
 
       session.participations.create!(participant: offer.offerer, role: Participation::ROLE_PAIR)
       session.participations.create!(participant: pair_request.user, role: Participation::ROLE_INITIATOR)

@@ -9,7 +9,7 @@ module PairRequests
     end
 
     def create?
-      record.pair_request.user != user
+      record.pair_request.user != user && !record.pair_request.cancelled?
     end
   end
 end

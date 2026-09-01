@@ -33,5 +33,15 @@ RSpec.describe ActivitiesSetup::Proxy, type: :unit do
         call
       end
     end
+
+    context "when record is SessionFeedback" do
+      let(:record) { build(:session_feedback) }
+
+      it "calls expected service" do
+        expect(ActivitiesSetup::FromSessionFeedback).to receive(:call).with(record, previous_changes)
+
+        call
+      end
+    end
   end
 end

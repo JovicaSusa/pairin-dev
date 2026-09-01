@@ -6,62 +6,48 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
-import { TIME_SLOTS } from "@/helpers/time-slots";
+import TagCombobox from "./TagCombobox";
+import PeriodPicker, { isValidStartAt } from "./PeriodPicker";
 
-const splitStartAt = (startAt) => {
-  if (!startAt) return { date: '', time: '' };
-  const [date = '', time = ''] = startAt.split('T');
-  return { date, time: time.slice(0, 5) };
-};
+const humanize = (value) => value.split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
-const combineStartAt = (date, time) => (date || time ? `${date}T${time}` : '');
-
-const isValidStartAt = (s) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(s);
-
-export default function New({ tags }) {
+export default function New({ tags, waitMinutesOptions, platformOptions }) {
   const { data, setData, post, processing, errors, transform } = useForm({
     subject: '',
     duration: 45,
     description: '',
+    mode: 'scheduled',
+    wait_minutes: '',
+    requires_approval: false,
+    goal: '',
+    platform: '',
+    pairing_tool: '',
+    plan: '',
     periods_attributes: [{start_at: ''}],
     taggings_attributes: [{ tag_attributes: { name: '' } }]
   })
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    transform((formData) => ({
-      ...formData,
-      periods_attributes: formData.periods_attributes.map((p) => ({
-        ...p,
-        start_at: isValidStartAt(p.start_at) ? new Date(p.start_at).toISOString() : '',
-      })),
-    }));
+    transform((formData) => (
+      formData.mode === 'scheduled'
+        ? {
+            ...formData,
+            wait_minutes: '',
+            requires_approval: false,
+            goal: '',
+            platform: '',
+            pairing_tool: '',
+            plan: '',
+            periods_attributes: formData.periods_attributes.map((p) => ({
+              ...p,
+              start_at: isValidStartAt(p.start_at) ? new Date(p.start_at).toISOString() : '',
+            })),
+          }
+        : { ...formData, periods_attributes: [] }
+    ));
     post('/users/pair_requests');
   }
-
-  const addPeriod = () => {
-    const updatedPeriods = [...data.periods_attributes];
-
-    updatedPeriods.push({ start_at: '' });
-    setData('periods_attributes', updatedPeriods);
-  };
-
-  const removePeriod = (index) => {
-    const updatedPeriods = [...data.periods_attributes];
-
-    updatedPeriods.splice(index, 1);
-    setData('periods_attributes', updatedPeriods);
-  };
-
-  const updatePeriodPart = (index, part, value) => {
-    const updatedPeriods = [...data.periods_attributes];
-    const { date, time } = splitStartAt(updatedPeriods[index].start_at);
-
-    updatedPeriods[index].start_at =
-      part === 'date' ? combineStartAt(value, time) : combineStartAt(date, value);
-    setData('periods_attributes', updatedPeriods);
-  };
 
   const addTag = () => {
     const updatedTaggings = [...data.taggings_attributes];
@@ -135,64 +121,138 @@ export default function New({ tags }) {
           {errors.description && <div className="text-red font-bold mt-1 text-sm">{errors.description}</div>}
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="w-full mt-4">
+          <Label className="block mb-1">Mode</Label>
+          <div className="flex gap-2" role="radiogroup" aria-label="Mode">
+            <Button
+              type="button"
+              role="radio"
+              aria-checked={data.mode === 'scheduled'}
+              variant={data.mode === 'scheduled' ? 'default' : 'neutral'}
+              onClick={() => setData('mode', 'scheduled')}
+            >
+              Scheduled
+            </Button>
+            <Button
+              type="button"
+              role="radio"
+              aria-checked={data.mode === 'immediate'}
+              variant={data.mode === 'immediate' ? 'default' : 'neutral'}
+              onClick={() => setData('mode', 'immediate')}
+            >
+              Immediate
+            </Button>
+          </div>
+          {errors.mode && <div className="text-red font-bold mt-1 text-sm">{errors.mode}</div>}
+        </div>
+
+        {data.mode === 'immediate' && (
+          <div className="w-full mt-6 flex flex-col gap-4 rounded-xl border-2 border-black bg-white p-4">
+            <div className="flex flex-col gap-4 md:flex-row">
+              <div className="w-full md:w-1/2">
+                <Label className="block mb-1">Wait time</Label>
+                <Select value={String(data.wait_minutes)} onValueChange={(v) => setData('wait_minutes', Number(v))}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Wait time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {waitMinutesOptions.map((minutes) => (
+                      <SelectItem key={minutes} value={String(minutes)}>{minutes} minutes</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.wait_minutes && <div className="text-red font-bold mt-1 text-sm">{errors.wait_minutes}</div>}
+              </div>
+
+              <div className="w-full md:w-1/2">
+                <Label className="block mb-1">Requires approval</Label>
+                <div className="flex gap-2" role="radiogroup" aria-label="Requires approval">
+                  <Button
+                    type="button"
+                    role="radio"
+                    aria-checked={!data.requires_approval}
+                    variant={!data.requires_approval ? 'default' : 'neutral'}
+                    onClick={() => setData('requires_approval', false)}
+                  >
+                    No
+                  </Button>
+                  <Button
+                    type="button"
+                    role="radio"
+                    aria-checked={data.requires_approval}
+                    variant={data.requires_approval ? 'default' : 'neutral'}
+                    onClick={() => setData('requires_approval', true)}
+                  >
+                    Yes
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full">
+              <Label htmlFor="goal" className="block mb-1">Goal</Label>
+              <Textarea
+                id="goal"
+                value={data.goal}
+                onChange={e => setData('goal', e.target.value)}
+                rows="3"
+              />
+              {errors.goal && <div className="text-red font-bold mt-1 text-sm">{errors.goal}</div>}
+            </div>
+
+            <div className="flex flex-col gap-4 md:flex-row">
+              <div className="w-full md:w-1/2">
+                <Label className="block mb-1">Platform</Label>
+                <Select value={data.platform} onValueChange={(v) => setData('platform', v)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Platform" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {platformOptions.map((platform) => (
+                      <SelectItem key={platform} value={platform}>{humanize(platform)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.platform && <div className="text-red font-bold mt-1 text-sm">{errors.platform}</div>}
+              </div>
+
+              <div className="w-full md:w-1/2">
+                <Label htmlFor="pairing_tool" className="block mb-1">Pairing tool <span className="text-xs font-normal">(optional)</span></Label>
+                <Input
+                  id="pairing_tool"
+                  type="text"
+                  value={data.pairing_tool}
+                  onChange={e => setData('pairing_tool', e.target.value)}
+                />
+                {errors.pairing_tool && <div className="text-red font-bold mt-1 text-sm">{errors.pairing_tool}</div>}
+              </div>
+            </div>
+
+            <div className="w-full">
+              <Label htmlFor="plan" className="block mb-1">Plan <span className="text-xs font-normal">(optional)</span></Label>
+              <Textarea
+                id="plan"
+                value={data.plan}
+                onChange={e => setData('plan', e.target.value)}
+                rows="3"
+              />
+              {errors.plan && <div className="text-red font-bold mt-1 text-sm">{errors.plan}</div>}
+            </div>
+          </div>
+        )}
+
+        <div className={`mt-8 grid grid-cols-1 gap-6 ${data.mode === 'scheduled' ? 'md:grid-cols-2' : ''}`}>
+          {data.mode === 'scheduled' && (
           <div>
             <h4 className="mb-3 font-headline text-sm font-bold uppercase tracking-widest text-black/50">Periods</h4>
 
-            <div className="flex flex-col gap-3">
-              {data.periods_attributes.map((period, index) => {
-                const { date, time } = splitStartAt(period.start_at);
-
-                return (
-                  <div key={index} className="rounded-xl border-2 border-black bg-white p-3">
-                    <Label className="mb-1 block text-black/50">Start at</Label>
-                    <div className="flex flex-col gap-2 md:flex-row">
-                      <div className="md:flex-1">
-                        <DatePicker
-                          value={date}
-                          onChange={(v) => updatePeriodPart(index, 'date', v)}
-                          placeholder="Pick a date"
-                          disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Select value={time} onValueChange={(v) => updatePeriodPart(index, 'time', v)}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Time" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {TIME_SLOTS.map((slot) => (
-                                <SelectItem key={slot} value={slot}>{slot}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="neutral"
-                          onClick={() => removePeriod(index)}
-                          aria-label="Remove period"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    {errors["periods.start_at"] && !isValidStartAt(period.start_at) && (
-                      <div className="text-red font-bold mt-1 text-sm">
-                        {errors["periods.start_at"]}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            <Button type="button" size="sm" variant="neutral" onClick={addPeriod} className="mt-3">
-              + Add period
-            </Button>
+            <PeriodPicker
+              periods={data.periods_attributes}
+              onChange={(periods) => setData('periods_attributes', periods)}
+              error={errors["periods.start_at"]}
+            />
           </div>
+          )}
 
           <div>
             <h4 className="mb-3 font-headline text-sm font-bold uppercase tracking-widest text-black/50">Tags</h4>
@@ -205,18 +265,12 @@ export default function New({ tags }) {
                   </Label>
 
                   <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Input
-                        list={`tags-list-${index}`}
+                    <div className="flex-1">
+                      <TagCombobox
+                        tags={tags}
                         value={tagging.tag_attributes.name}
-                        onChange={(e) => updateTag(index, e.target.value)}
-                        placeholder="Search or create..."
+                        onChange={(name) => updateTag(index, name)}
                       />
-                      <datalist id={`tags-list-${index}`}>
-                        {tags.map((t) => (
-                          <option key={t.value} value={t.label} />
-                        ))}
-                      </datalist>
                     </div>
 
                     <Button

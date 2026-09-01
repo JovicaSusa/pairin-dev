@@ -83,6 +83,23 @@ RSpec.describe "generates expected activites", type: :system do
     end
   end
 
+  context "when session feedback submitted" do
+    let(:session) { create(:session, :past, with_holder: false) }
+    let!(:current_user_participation) { create(:participation, participable: session, participant: current_user) }
+    let(:other_participant) { session.other_participant(current_user) }
+
+    it "displays expected activity" do
+      perform_enqueued_jobs do
+        create(:session_feedback, session: session, participant: other_participant)
+      end
+
+      visit activities_path
+
+      expect(page).to have_one_of_the_texts(I18n.t("activities.session_feedback_received.titles"))
+      expect(page).to have_one_of_the_texts(I18n.t("activities.session_feedback_received.content"))
+    end
+  end
+
   context "when offer rejected" do
     let(:pair_request) { create(:pair_request) }
     let(:current_user_offer) { build(:offer, offerer: current_user, pair_request:) }

@@ -1,4 +1,6 @@
 class Period < ApplicationRecord
+  include FutureDateable
+
   belongs_to :periodable, polymorphic: true, inverse_of: :periods
 
   validates :start_at, :end_at, presence: true
@@ -20,10 +22,5 @@ class Period < ApplicationRecord
     return if start_at.nil?
 
     self.end_at = start_at.advance(minutes: self.periodable.duration || 0)
-  end
-
-  def dates_in_future
-    errors.add(:end_at, "must be in future") if end_at && end_at.past?
-    errors.add(:start_at, "must be in future") if start_at && start_at.past?
   end
 end

@@ -13,5 +13,18 @@ FactoryBot.define do
     after(:create) do |pair_request, evaluator|
       create(:period, periodable: pair_request) if pair_request.periods.blank? && evaluator.with_periods
     end
+
+    trait :immediate do
+      mode { "immediate" }
+      wait_minutes { 15 }
+    end
+
+    trait :requires_approval do
+      requires_approval { true }
+    end
+
+    trait :cancelled do
+      cancelled_at { Time.current }
+    end
   end
 end

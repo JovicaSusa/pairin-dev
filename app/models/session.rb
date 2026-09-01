@@ -1,7 +1,10 @@
 class Session < ApplicationRecord
+  include FutureDateable
+
   belongs_to :sessionable, polymorphic: true
   has_many :participations, as: :participable
   has_many :participants, through: :participations
+  has_many :session_feedbacks, dependent: :destroy
 
   validates :start_at, :end_at, presence: true
   validates :call_link, presence: true, on: :update
@@ -21,12 +24,15 @@ class Session < ApplicationRecord
     (participants - [participant]).first
   end
 
-  private
-
-  def dates_in_future
-    errors.add(:end_at, "must be in future") if end_at && end_at.past?
-    errors.add(:start_at, "must be in future") if start_at && start_at.past?
+  def feedback_from(participant)
+    session_feedbacks.find { |feedback| feedback.participant_id == participant.id }
   end
+
+  def feedback_complete?
+    participants.all? { |participant| feedback_from(participant).present? }
+  end
+
+  private
 
   def dates_in_order
     errors.add(:end_at, "must be after start date") if (end_at && start_at) && end_at < start_at
