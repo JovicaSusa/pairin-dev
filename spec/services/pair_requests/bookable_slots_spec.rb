@@ -36,6 +36,33 @@ RSpec.describe PairRequests::BookableSlots, type: :unit do
     expect(starts).to eq([Time.utc(2026, 10, 20, 16, 0), Time.utc(2026, 10, 27, 17, 0)])
   end
 
+  context "on the night clocks go back" do
+    # Sunday 25 Oct 2026: 03:00 CEST becomes 02:00 CET (01:00 UTC).
+    let(:now) { Time.utc(2026, 10, 20, 8, 0) }
+
+    it "drops the slot that would cross the change" do
+      window(weekday: 7, from: "01:00", to: "04:00")
+
+      # 00:30–01:15 UTC would read 02:30–02:15 on the clock.
+      expect(starts.select { |start| start < Time.utc(2026, 10, 25, 12) }).to eq([
+        Time.utc(2026, 10, 24, 23, 0), Time.utc(2026, 10, 24, 23, 45),
+        Time.utc(2026, 10, 25, 1, 15), Time.utc(2026, 10, 25, 2, 0)
+      ])
+    end
+  end
+
+  context "on the night clocks go forward" do
+    # Sunday 28 Mar 2027: 02:00 CET becomes 03:00 CEST (01:00 UTC).
+    let(:now) { Time.utc(2027, 3, 23, 8, 0) }
+
+    it "drops the slot that would cross the change" do
+      window(weekday: 7, from: "01:00", to: "04:00")
+
+      # 00:45–01:30 UTC would read 01:45–03:30 on the clock.
+      expect(starts.select { |start| start < Time.utc(2027, 3, 28, 12) }).to eq([Time.utc(2027, 3, 28, 0, 0)])
+    end
+  end
+
   it "only looks 14 days ahead" do
     window(weekday: 1, from: "18:00", to: "18:45")
 

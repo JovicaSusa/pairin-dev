@@ -52,7 +52,8 @@ module PairRequests
       slots = []
 
       while from + length <= to
-        slots << Slot.new(start_at: from, end_at: from + length)
+        # A slot spanning a DST change would read e.g. 02:30–02:15 on the clock; skip it.
+        slots << Slot.new(start_at: from, end_at: from + length) if from.utc_offset == (from + length).utc_offset
         from += length
       end
 
