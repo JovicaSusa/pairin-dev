@@ -14,7 +14,7 @@ RSpec.describe "create pair request offer", type: :system do
 
     click_button "Apply"
 
-    expect(page).to have_content("We have sent your offer, good luck!")
+    expect(page).to have_content("We've emailed the poster")
   end
 
   context "when details not provided" do

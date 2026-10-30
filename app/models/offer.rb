@@ -8,11 +8,23 @@ class Offer < ApplicationRecord
   validates :message, presence: true
   validates :pair_request_id, uniqueness: { scope: :offerer_id }
 
+  # Signed token for the poster's no-login confirmation link. What the link
+  # still allows (accept, already matched, slot passed) follows the offer's state.
+  generates_token_for :poster_confirmation, expires_in: 60.days
+
   scope :future, -> { joins(:period).merge(Period.future) }
   scope :accepted, -> { where.not(accepted_at: nil) }
 
   def accepted?
     accepted_at?
+  end
+
+  def pending?
+    status == "PENDING"
+  end
+
+  def offerer_display_name
+    offerer.name.presence || "A Pairin member"
   end
 
   def expired?

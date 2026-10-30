@@ -34,4 +34,8 @@ Rails.application.routes.draw do
   end
 
   resources :activities, only: [:index]
+
+  # No-login offer confirmation, reached from the offer-received email.
+  get "offers/confirm/:token", to: "offer_confirmations#show", as: :offer_confirmation
+  post "offers/confirm/:token", to: "offer_confirmations#create"
 end

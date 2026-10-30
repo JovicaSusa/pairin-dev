@@ -8,6 +8,8 @@ module Offers
 
     def call(offer)
       session = transaction do
+        # Serialize concurrent accepts on the same request (double clicks, two email links).
+        offer.pair_request.lock!
         step validate(offer)
         step accept_offer(offer)
         session = step schedule_session(offer)
