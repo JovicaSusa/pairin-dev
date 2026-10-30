@@ -9,6 +9,13 @@ class OfferMailer < ApplicationMailer
     mail(to: @poster.email, subject: "Reminder: #{@offerer_name} is waiting for your answer")
   end
 
+  def offer_expired_email
+    @poster_name = @poster.name.presence || "The poster"
+    @suggestions = PairRequests::Suggestions.call(@offer)
+
+    mail(to: @offer.offerer.email, subject: "No answer yet on #{@offer.pair_request.subject}")
+  end
+
   private
 
   def set_offer

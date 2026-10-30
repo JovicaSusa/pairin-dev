@@ -1,0 +1,64 @@
+<div style="display: none">
+  <%= @poster_name %> has gone quiet. Here are other people looking for a partner.
+</div>
+<div role="article" aria-roledescription="email" aria-label="Pairing offer expired" lang="en">
+  <div class="sm-px-4" style="background-color: #f8fafc; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+    <table align="center" cellpadding="0" cellspacing="0" role="none">
+      <tr>
+        <td style="width: 552px; max-width: 100%">
+          <div class="sm-my-8" style="margin-top: 48px; margin-bottom: 48px; text-align: center">
+            <a href="https://pairin.dev">
+              <img src="<%= image_url('logo.svg') %>" width="70" alt="Pairin" style="max-width: 100%; vertical-align: middle">
+            </a>
+          </div>
+          <table style="width: 100%;" cellpadding="0" cellspacing="0" role="none">
+            <tr>
+              <td class="sm-px-6" style="border-radius: 4px; background-color: #fffffe; padding: 48px; font-size: 16px; color: #334155; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05)">
+                <h1 class="sm-leading-8" style="margin: 0 0 24px; font-size: 24px; font-weight: 600; color: #000001">
+                  Sorry, no answer yet
+                </h1>
+                <p style="margin: 0; line-height: 24px">
+                  <%= @poster_name %> has gone quiet on
+                  "<strong><%= @offer.pair_request.subject %></strong>", so we've switched that request off for now.
+                  Your offer still stands, and we'll email you if they accept your offer. In the meantime, you don't have to wait.
+                </p>
+                <% if @suggestions.any? %>
+                  <p style="margin: 24px 0 8px; line-height: 24px; font-weight: 600">People looking for a partner right now:</p>
+                  <% @suggestions.each do |suggestion| %>
+                    <p style="margin: 0 0 12px; line-height: 24px">
+                      <a href="<%= new_pair_request_offer_url(suggestion) %>" style="color: #4338ca; font-weight: 600">
+                        <%= suggestion.subject %>
+                      </a>
+                    </p>
+                  <% end %>
+                <% else %>
+                  <p style="margin: 32px 0; text-align: center">
+                    <a href="<%= pair_requests_url %>" style="display: inline-block; border: 2px solid #000001; border-radius: 12px; background-color: #FF8B37; padding: 12px 24px; font-weight: 600; color: #000001; text-decoration: none">
+                      Browse open requests
+                    </a>
+                  </p>
+                <% end %>
+              </td>
+            </tr>
+            <tr role="separator">
+              <td style="line-height: 48px">&zwj;</td>
+            </tr>
+            <tr>
+              <td style="padding-left: 24px; padding-right: 24px; text-align: center; font-size: 12px; color: #475569">
+                <p style="margin: 0 0 16px">
+                  Pairin Team
+                </p>
+                <p style="margin: 0; font-style: italic">
+                  Find pair programming partner quick and easy
+                </p>
+                <p style="cursor: default">
+                  <a href="https://pairin.dev" class="hover-important-text-decoration-underline" style="color: #4338ca; text-decoration: none">Pairin</a>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

@@ -16,6 +16,20 @@ RSpec.describe OfferExpiryJob, type: :job do
       expect(pair_request.reload).to be_paused
     end
 
+    it "apologises to everyone with an offer on the request" do
+      later_offer = create(:offer, pair_request:, period: create(:period, periodable: pair_request, start_at: 2.days.from_now, end_at: 2.days.from_now + 1.hour))
+
+      expect { perform }
+        .to have_enqueued_mail(OfferMailer, :offer_expired_email).with(params: { offer: }, args: []).once
+        .and have_enqueued_mail(OfferMailer, :offer_expired_email).with(params: { offer: later_offer }, args: []).once
+    end
+
+    it "apologises to nobody when it doesn't switch the request off" do
+      pair_request.update!(paused_at: 1.day.ago)
+
+      expect { perform }.not_to have_enqueued_mail(OfferMailer, :offer_expired_email)
+    end
+
     it "leaves the request on when the poster accepted this offer" do
       offer.update!(accepted_at: 1.hour.ago)
 

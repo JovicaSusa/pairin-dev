@@ -16,6 +16,13 @@ class OfferExpiryJob < ApplicationJob
       pair_request.switch_off!
     end
 
-    PairRequestMailer.with(pair_request:).request_paused_email.deliver_later if paused_now
+    return unless paused_now
+
+    PairRequestMailer.with(pair_request:).request_paused_email.deliver_later
+
+    # Nothing on the request was accepted, so every offerer is left waiting.
+    pair_request.offers.each do |pending_offer|
+      OfferMailer.with(offer: pending_offer).offer_expired_email.deliver_later
+    end
   end
 end
