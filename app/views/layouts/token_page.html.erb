@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%# Pages reached by an emailed, signed link. The URL holds a bearer token, so this layout
+        deliberately has no analytics, no canonical/og:url and no third-party resources. %>
+    <title><%= content_for(:title) || "Pairin" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= vite_stylesheet_tag 'application', data: { 'turbo-track': 'reload' } %>
+    <%= favicon_link_tag asset_path('logo.svg') %>
+  </head>
+
+  <body>
+    <%= yield %>
+  </body>
+</html>

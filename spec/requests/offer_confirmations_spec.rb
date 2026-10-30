@@ -5,6 +5,15 @@ RSpec.describe "Offer confirmations", type: :request do
   let(:offer) { create(:offer, offerer:, message: "Happy to pair on this!") }
   let(:token) { offer.generate_token_for(:poster_confirmation) }
 
+  it "keeps the token away from analytics and link-preview metadata" do
+    get offer_confirmation_path(token:)
+
+    expect(response.body).not_to include("posthog")
+    expect(response.body).not_to include('rel="canonical"')
+    expect(response.body).not_to include("og:url")
+    expect(response.body).to include('<meta name="robots" content="noindex, nofollow">')
+  end
+
   describe "GET /offers/confirm/:token" do
     it "shows the offer without accepting it" do
       get offer_confirmation_path(token:)

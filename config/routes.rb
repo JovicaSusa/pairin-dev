@@ -40,4 +40,8 @@ Rails.application.routes.draw do
   # No-login offer confirmation, reached from the offer-received email.
   get "offers/confirm/:token", to: "offer_confirmations#show", as: :offer_confirmation
   post "offers/confirm/:token", to: "offer_confirmations#create"
+
+  # No-login "Turn it back on", reached from the request-paused email.
+  get "requests/resume/:token", to: "request_resumptions#show", as: :request_resumption
+  post "requests/resume/:token", to: "request_resumptions#create"
 end

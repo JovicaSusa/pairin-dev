@@ -26,6 +26,29 @@ RSpec.describe "PairRequests::Offers", type: :request do
       expect(flash[:notice]).to include("If they don't respond")
     end
 
+    context "with a period that doesn't belong to this request" do
+      let(:period) { create(:pair_request).periods.first }
+
+      it "rejects the offer and schedules nothing" do
+        expect { post_offer }
+          .to not_change(Offer, :count)
+          .and not_have_enqueued_job(OfferExpiryJob)
+      end
+    end
+
+    context "with a period that has already started" do
+      let(:pair_request) { create(:pair_request, with_periods: false) }
+      let(:period) do
+        create(:period, periodable: pair_request).tap { |p| p.update_columns(start_at: 1.hour.ago, end_at: 1.minute.ago) }
+      end
+
+      it "rejects the offer and schedules nothing" do
+        expect { post_offer }
+          .to not_change(Offer, :count)
+          .and not_have_enqueued_job(OfferExpiryJob)
+      end
+    end
+
     context "when the request is switched off" do
       before { pair_request.update!(paused_at: 1.hour.ago) }
 
@@ -43,6 +66,18 @@ RSpec.describe "PairRequests::Offers", type: :request do
 
         expect(response).to redirect_to(pair_requests_path)
         expect(flash[:alert]).to eq("This request is switched off and isn't taking offers right now.")
+      end
+    end
+
+    describe "scheduling the offer's expiry" do
+      let(:pair_request) { create(:pair_request, with_periods: false) }
+      let(:period) { create(:period, periodable: pair_request, start_at: 2.hours.from_now, end_at: 3.hours.from_now) }
+
+      around { |example| freeze_time { example.run } }
+
+      it "checks the offer when its slot starts, even when it's too close for a reminder" do
+        expect { post_offer }
+          .to have_enqueued_job(OfferExpiryJob).with(an_instance_of(Offer)).at(2.hours.from_now).exactly(:once)
       end
     end
 

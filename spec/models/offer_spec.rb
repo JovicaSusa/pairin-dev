@@ -9,8 +9,8 @@ RSpec.describe Offer, type: :model do
     describe ".future" do
       subject(:future) { described_class.future }
 
-      let!(:past_offer) { create(:offer, period: past_period) }
-      let!(:future_offer) { create(:offer, period: period) }
+      let!(:past_offer) { create(:offer, period: past_period, pair_request: past_period.periodable) }
+      let!(:future_offer) { create(:offer, period: period, pair_request: period.periodable) }
       let(:past_period) { create(:period, start_at: 1.minute.from_now) }
       let(:period) { create(:period, start_at: 3.minutes.from_now) }
 
