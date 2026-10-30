@@ -44,6 +44,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_30_211039) do
     t.datetime "updated_at", null: false
     t.bigint "period_id", null: false
     t.datetime "accepted_at"
+    t.datetime "expiry_notified_at"
     t.index ["offerer_id", "pair_request_id"], name: "index_offers_on_offerer_id_and_pair_request_id", unique: true
     t.index ["offerer_id"], name: "index_offers_on_offerer_id"
     t.index ["pair_request_id"], name: "index_offers_on_pair_request_id"
