@@ -1,5 +1,6 @@
-import { useForm, Link } from '@inertiajs/react';
-import { Inbox, CheckCircle2 } from "lucide-react";
+import { useState } from 'react';
+import { useForm, Link, router } from '@inertiajs/react';
+import { Inbox, CheckCircle2, Power, EyeOff } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
@@ -25,17 +26,40 @@ export default function UserPairRequestCard({ request }) {
     patch(`/users/pair_requests/${request.id}/add_call_link`);
   };
 
+  const [toggling, setToggling] = useState(false);
+
+  const toggleOnOff = () => {
+    router.patch(`/users/pair_requests/${request.id}/${request.paused ? 'resume' : 'pause'}`, {}, {
+      preserveScroll: true,
+      onStart: () => setToggling(true),
+      onFinish: () => setToggling(false),
+    });
+  };
+
   return (
-    <div className="mb-6 rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:p-6">
+    <div className={`mb-6 rounded-2xl border-2 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:p-6 ${request.paused ? 'bg-black/5' : 'bg-white'}`}>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <h3 className="text-xl">{request.subject}</h3>
-        <Button asChild variant="neutral" size="sm">
-          <Link href={`/pair_requests/${request.id}/offers`}>
-            <Inbox className="h-4 w-4" />
-            See applications
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="neutral" size="sm" onClick={toggleOnOff} disabled={toggling} aria-pressed={!request.paused}>
+            <Power className="h-4 w-4" />
+            {request.paused ? 'Switch on' : 'Switch off'}
+          </Button>
+          <Button asChild variant="neutral" size="sm">
+            <Link href={`/pair_requests/${request.id}/offers`}>
+              <Inbox className="h-4 w-4" />
+              See applications
+            </Link>
+          </Button>
+        </div>
       </div>
+
+      {request.paused && (
+        <Badge variant="neutral" className="mt-3 rounded-full">
+          <EyeOff className="h-3.5 w-3.5" />
+          Off: hidden from others
+        </Badge>
+      )}
 
       <ExpandableText className="mt-3 leading-relaxed text-black/60">{request.description}</ExpandableText>
 

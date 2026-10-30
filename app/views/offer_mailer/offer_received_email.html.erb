@@ -21,23 +21,7 @@
                   <strong><%= @offerer_name %></strong> offered to pair with you on your request
                   "<%= @offer.pair_request.subject %>".
                 </p>
-                <blockquote style="margin: 24px 0; padding-left: 16px; border-left: 4px solid #7B5FF1; line-height: 24px">
-                  <%= @offer.message %>
-                </blockquote>
-                <p style="margin: 0; line-height: 24px">
-                  <span style="font-weight: 600">Time:</span>
-                  <%= @offer.period.start_at.in_time_zone(@poster.timezone).to_fs(:short) %>
-                  – <%= @offer.period.end_at.in_time_zone(@poster.timezone).strftime("%H:%M") %>
-                  (<%= @poster.timezone %>)
-                </p>
-                <p style="margin: 32px 0; text-align: center">
-                  <a href="<%= @confirmation_url %>" style="display: inline-block; border: 2px solid #000001; border-radius: 12px; background-color: #FF8B37; padding: 12px 24px; font-weight: 600; color: #000001; text-decoration: none">
-                    See the offer
-                  </a>
-                </p>
-                <p style="margin: 0; font-size: 14px; line-height: 20px; color: #475569">
-                  You can accept from that page without logging in. Accept before the offered time starts.
-                </p>
+                <%= render "offer_mailer/offer_details", offer: @offer, poster: @poster, confirmation_url: @confirmation_url %>
               </td>
             </tr>
             <tr role="separator">

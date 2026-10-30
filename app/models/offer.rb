@@ -23,6 +23,14 @@ class Offer < ApplicationRecord
     status == "PENDING"
   end
 
+  # When to remind the poster: 24h after the offer, or 3h before the slot if
+  # that's sooner. Nil when the slot is too close for a reminder to help.
+  def reminder_at
+    at = [created_at + 24.hours, period.start_at - 3.hours].min
+
+    at if at > Time.current
+  end
+
   def offerer_display_name
     offerer.name.presence || "A Pairin member"
   end
