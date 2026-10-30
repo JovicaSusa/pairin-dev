@@ -1,6 +1,6 @@
 module PairRequests
   # Open requests to suggest to someone whose offer just expired: requests
-  # sharing the dead request's tags first, then the soonest upcoming slot.
+  # sharing the dead request's tags first, then the soonest bookable slot.
   class Suggestions
     LIMIT = 3
 
@@ -19,19 +19,24 @@ module PairRequests
         "0"
       end
 
-      PairRequest
+      candidates = PairRequest
         .switched_on
-        .joins(:periods).merge(Period.future)
+        .where(user_id: AvailabilityWindow.select(:user_id))
         .left_joins(:taggings)
         .where.not(id: @dead_request.id)
         .where.not(user_id: @offerer.id)
         .where.not(id: @offerer.offers.select(:pair_request_id))
         .where.not(id: Offer.accepted.select(:pair_request_id))
         .group(:id)
-        .select("pair_requests.*, #{shared_tags} AS shared_tags, MIN(periods.start_at) AS next_start_at")
-        .order(Arel.sql("shared_tags DESC, next_start_at ASC, pair_requests.id ASC"))
-        .limit(LIMIT)
-        .to_a
+        .select("pair_requests.*, #{shared_tags} AS shared_tags")
+        .preload(user: :availability_windows)
+
+      # The next slot comes from the poster's weekly hours, so rank in Ruby.
+      candidates
+        .filter_map { |request| (slot = request.bookable_slots.first) && [request, slot] }
+        .sort_by { |request, slot| [-request.shared_tags, slot.start_at, request.id] }
+        .first(LIMIT)
+        .map(&:first)
     end
   end
 end

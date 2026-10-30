@@ -5,7 +5,7 @@ RSpec.describe "update session call link", type: :system do
   let!(:current_user_participation) do
     create(:participation, participable: current_user_session, participant: current_user)
   end
-  let(:pair_request) { create(:pair_request, user: current_user, with_periods: false) }
+  let(:pair_request) { create(:pair_request, user: current_user) }
 
   before { sign_in(current_user) }
 

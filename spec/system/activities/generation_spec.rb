@@ -6,13 +6,14 @@ RSpec.describe "generates expected activites", type: :system do
   before { sign_in(current_user) }
 
   context "when pair request created" do
+    before { create(:availability_window, user: current_user) }
+
     it "displays expected activity" do
       visit new_users_pair_request_path
 
       fill_in "Subject", with: "AAA"
       fill_in "Description", with: "BBB"
       fill_in "Duration", with: 45
-      pick_future_period!
 
       perform_enqueued_jobs do
         click_button "Create Pair request"

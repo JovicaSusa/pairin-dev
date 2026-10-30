@@ -3,11 +3,18 @@ class Offer < ApplicationRecord
 
   belongs_to :offerer, class_name: "User"
   belongs_to :pair_request
-  belongs_to :period
+  # The slot this offer booked. Requests don't own slots; they're cut from the
+  # poster's weekly hours (PairRequests::BookableSlots).
+  has_one :period, as: :periodable, dependent: :destroy, inverse_of: :periodable, autosave: true
 
   validates :message, presence: true
   validates :pair_request_id, uniqueness: { scope: :offerer_id }
-  validate :period_is_an_upcoming_slot_of_the_request, on: :create
+  validates :period, presence: true
+  # Run when an offerer books (save(context: :booking)), not on every save:
+  # the open slots change as time passes and the poster gets sessions.
+  validate :period_is_a_bookable_slot, on: :booking
+
+  delegate :duration, to: :pair_request
 
   # Signed token for the poster's no-login confirmation link. What the link
   # still allows (accept, already matched, slot passed) follows the offer's state.
@@ -55,14 +62,11 @@ class Offer < ApplicationRecord
   private
 
   # The chosen period drives the session time and the expiry job, so it must be
-  # one of this request's own slots and still ahead.
-  def period_is_an_upcoming_slot_of_the_request
+  # a slot the request is actually offering right now.
+  def period_is_a_bookable_slot
     return if period.nil? || pair_request.nil?
 
-    if period.periodable != pair_request
-      errors.add(:period, "isn't one of this request's time slots")
-    elsif period.start_at <= Time.current
-      errors.add(:period, "has already started")
-    end
+    bookable = PairRequests::BookableSlots.call(pair_request).any? { |slot| slot.start_at == period.start_at }
+    errors.add(:period, "isn't one of this request's open slots") unless bookable
   end
 end

@@ -36,33 +36,6 @@
             <%= f.label :user_language_eq, "User language" %>
             <%= f.combobox :user_language_eq, I18nData.languages.map { |p, v| [v, p] } %>
           </div>
-          <div class="md:w-5/12">
-            <%= f.input :periods_start_at_gteq,
-              as: :string,
-              label: "Session starting from",
-              required: false,
-              input_html: {
-                data: {
-                  controller: "datepicker",
-                  class: "w-full rounded-md border-2  p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                }
-              }
-            %>
-          </div>
-          <div class="md:w-5/12">
-            <%= f.input :periods_end_at_lteq,
-              as: :string,
-              required: false,
-              label: "Session starting to",
-              input_html: {
-                data: {
-                  controller: "datepicker",
-                  class: "w-full rounded-md border-2  p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
-                }
-              }
-            %>
-          </div>
-
           <div class="md:w-full flex justify-center">
             <%= f.submit "Go",
               data: { turbo_frame: "pair-requests" },

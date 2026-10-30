@@ -40,6 +40,19 @@ RSpec.describe "Request resumptions", type: :request do
     end
   end
 
+  context "when the poster has no weekly hours" do
+    before { pair_request.user.availability_windows.destroy_all }
+
+    it "keeps the request off and points to weekly hours" do
+      post request_resumption_path(token:)
+
+      expect(pair_request.reload).to be_paused
+      follow_redirect!
+      expect(response.body).to include("Add your weekly hours")
+      expect(response.body).to include(availability_path)
+    end
+  end
+
   context "when the request is already on" do
     before { pair_request.update!(paused_at: nil) }
 

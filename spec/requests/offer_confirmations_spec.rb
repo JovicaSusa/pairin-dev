@@ -58,7 +58,7 @@ RSpec.describe "Offer confirmations", type: :request do
   end
 
   context "when another offer on the same request was already accepted" do
-    before { create(:offer, :accepted, pair_request: offer.pair_request, period: offer.period) }
+    before { create(:offer, :accepted, pair_request: offer.pair_request) }
 
     it "says the request is already matched" do
       get offer_confirmation_path(token:)
