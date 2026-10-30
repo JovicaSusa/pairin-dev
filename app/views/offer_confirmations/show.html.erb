@@ -1,0 +1,50 @@
+<% content_for :title, "Pairing offer - Pairin" %>
+
+<% offerer_name = @offer.offerer_display_name %>
+<% poster_timezone = @offer.pair_request.user.timezone %>
+
+<div class="px-6 md:px-16 lg:px-24 py-16 md:py-20 max-w-2xl mx-auto">
+  <a href="<%= root_path %>" class="text-sm font-bold text-purple hover:underline">&larr; Back to Pairin</a>
+
+  <% if flash[:alert] %>
+    <p class="mt-6 rounded-xl border-2 border-black bg-red/10 p-3 font-bold"><%= flash[:alert] %></p>
+  <% end %>
+
+  <h1 class="font-display font-extrabold text-4xl tracking-tight leading-none mt-6 mb-6">
+    <% case @offer.status %>
+    <% when "ACCEPTED" %>
+      You're pairing with <%= offerer_name %>
+    <% when "ACCEPTED OTHER" %>
+      This request is already matched
+    <% when "EXPIRED" %>
+      This time slot has passed
+    <% else %>
+      <%= offerer_name %> wants to pair with you
+    <% end %>
+  </h1>
+
+  <div class="rounded-xl border-2 border-black bg-white p-6">
+    <p class="text-sm text-gray-500 mb-1">On your request</p>
+    <p class="font-bold mb-4"><%= @offer.pair_request.subject %></p>
+
+    <blockquote class="border-l-4 border-purple pl-4 mb-4"><%= @offer.message %></blockquote>
+
+    <p>
+      <span class="font-bold">Time:</span>
+      <%= @offer.period.start_at.in_time_zone(poster_timezone).to_fs(:short) %>
+      &ndash; <%= @offer.period.end_at.in_time_zone(poster_timezone).strftime("%H:%M") %>
+      (<%= poster_timezone %>)
+    </p>
+  </div>
+
+  <% case @offer.status %>
+  <% when "PENDING" %>
+    <%= button_to "Accept", offer_confirmation_path(token: params[:token]),
+          class: "mt-8 rounded-xl border-2 border-black bg-orange px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none" %>
+    <p class="mt-3 text-sm text-gray-500">Accepting schedules the session and emails you both the details.</p>
+  <% when "ACCEPTED" %>
+    <p class="mt-8 text-gray-700">We've emailed you both the session details. Add a call link from your <a href="<%= sessions_path %>" class="text-purple font-bold">sessions</a> page.</p>
+  <% else %>
+    <p class="mt-8 text-gray-700">You can't accept this offer anymore. <a href="<%= users_pair_requests_path %>" class="text-purple font-bold">See your requests</a>.</p>
+  <% end %>
+</div>
