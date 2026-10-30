@@ -6,6 +6,7 @@ class OfferReminderJob < ApplicationJob
   # have been accepted, matched elsewhere or outlived its slot.
   def perform(offer)
     return unless offer.pending?
+    return if offer.pair_request.paused?
 
     OfferMailer.with(offer:).offer_reminder_email.deliver_later
   end

@@ -2,6 +2,8 @@ class Users::PairRequestsController < ApplicationController
   include Authenticated
   include Alba::Inertia::Controller
 
+  before_action :set_and_authorize_own_pair_request, only: [:pause, :resume]
+
   def index
     @pair_requests = current_user.pair_requests
       .includes(:tags, :sessions, accepted_offer: :offerer)
@@ -42,7 +44,23 @@ class Users::PairRequestsController < ApplicationController
     end
   end
 
+  def pause
+    @pair_request.update!(paused_at: Time.current)
+    redirect_to users_pair_requests_path, notice: "Request switched off. It's hidden from others until you switch it back on."
+  end
+
+  def resume
+    @pair_request.update!(paused_at: nil)
+    redirect_to users_pair_requests_path, notice: "Request switched on. Others can see it and send offers again."
+  end
+
   private
+
+  def set_and_authorize_own_pair_request
+    @pair_request = current_user.pair_requests.find(params[:id])
+
+    authorize @pair_request, policy_class: Users::PairRequestPolicy
+  end
 
   def add_call_link_params
     params.require(:pair_request).permit(sessions_attributes: [:call_link, :id])

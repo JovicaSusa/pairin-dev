@@ -26,6 +26,26 @@ RSpec.describe "PairRequests::Offers", type: :request do
       expect(flash[:notice]).to include("If they don't respond")
     end
 
+    context "when the request is switched off" do
+      before { pair_request.update!(paused_at: 1.hour.ago) }
+
+      it "rejects the offer with a clear message and emails nobody" do
+        expect { post_offer }
+          .to not_change(Offer, :count)
+          .and not_have_enqueued_mail(OfferMailer, :offer_received_email)
+
+        expect(response).to redirect_to(pair_requests_path)
+        expect(flash[:alert]).to eq("This request is switched off and isn't taking offers right now.")
+      end
+
+      it "doesn't show the offer form either" do
+        get new_pair_request_offer_path(pair_request)
+
+        expect(response).to redirect_to(pair_requests_path)
+        expect(flash[:alert]).to eq("This request is switched off and isn't taking offers right now.")
+      end
+    end
+
     describe "scheduling the poster's reminder" do
       let(:pair_request) { create(:pair_request, with_periods: false) }
       let(:period) { create(:period, periodable: pair_request, start_at: slot_start, end_at: slot_start + 1.hour) }
