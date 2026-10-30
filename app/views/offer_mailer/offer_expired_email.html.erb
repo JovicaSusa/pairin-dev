@@ -20,7 +20,11 @@
                 <p style="margin: 0; line-height: 24px">
                   <%= @poster_name %> has gone quiet on
                   "<strong><%= @offer.pair_request.subject %></strong>", so we've switched that request off for now.
-                  Your offer still stands, and we'll email you if they accept your offer. In the meantime, you don't have to wait.
+                  <% if @offer.pending? %>
+                    Your offer still stands, and we'll email you if they accept your offer. In the meantime, you don't have to wait.
+                  <% else %>
+                    The time you offered has passed without an answer, sorry. You don't have to wait for them, though.
+                  <% end %>
                 </p>
                 <% if @suggestions.any? %>
                   <p style="margin: 24px 0 8px; line-height: 24px; font-weight: 600">People looking for a partner right now:</p>

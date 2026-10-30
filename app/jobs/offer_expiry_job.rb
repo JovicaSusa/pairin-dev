@@ -19,10 +19,20 @@ class OfferExpiryJob < ApplicationJob
     return unless paused_now
 
     PairRequestMailer.with(pair_request:).request_paused_email.deliver_later
+    point_offerers_elsewhere(pair_request)
+  end
 
-    # Nothing on the request was accepted, so every offerer is left waiting.
-    pair_request.offers.each do |pending_offer|
-      OfferMailer.with(offer: pending_offer).offer_expired_email.deliver_later
+  private
+
+  # Each offerer hears about a quiet poster once, even if the request is
+  # resumed and paused again later.
+  def point_offerers_elsewhere(pair_request)
+    return unless Rails.configuration.x.send_suggestion_emails
+
+    not_yet_told = pair_request.offers.where(expiry_notified_at: nil).to_a
+    not_yet_told.each do |offer|
+      OfferMailer.with(offer:).offer_expired_email.deliver_later
     end
+    Offer.where(id: not_yet_told.map(&:id)).update_all(expiry_notified_at: Time.current)
   end
 end
