@@ -5,6 +5,7 @@ class PairRequestsController < ApplicationController
       .includes(:periods, :tags, :user, :offers)
       .left_joins(:periods, :tags, :user)
       .active
+      .switched_on
       .where.not(user_id: current_user.id)
 
     @q = base.ransack(params[:q]&.compact_blank)

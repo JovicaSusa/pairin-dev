@@ -1,6 +1,10 @@
 class PairRequestResource < ApplicationResource
   attributes :id, :subject, :description
 
+  attribute :paused do |pair_request|
+    pair_request.paused?
+  end
+
   many :tags, resource: TagResource
 
   many :sessions, resource: SessionResource
