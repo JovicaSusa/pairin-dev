@@ -1,7 +1,9 @@
 FactoryBot.define do
   factory(:pair_request) do
     transient do
-      with_periods { true }
+      # Requests are booked into the poster's weekly hours, so give a poster
+      # who has none every hour of the week unless the spec opts out.
+      weekly_hours { true }
     end
 
     user
@@ -11,7 +13,13 @@ FactoryBot.define do
     duration { Faker::Number.between(from: 1, to: 90) }
 
     after(:create) do |pair_request, evaluator|
-      create(:period, periodable: pair_request) if pair_request.periods.blank? && evaluator.with_periods
+      poster = pair_request.user
+
+      if evaluator.weekly_hours && poster.availability_windows.none?
+        AvailabilityWindow::WEEKDAYS.each_key do |weekday|
+          create(:availability_window, user: poster, weekday:, start_minute: 0, end_minute: AvailabilityWindow::MINUTES_IN_DAY)
+        end
+      end
     end
   end
 end

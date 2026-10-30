@@ -24,18 +24,20 @@ class PairRequests::OffersController < ApplicationController
 
     render inertia: 'PairRequests/Offers/New', props: {
       pairRequestId: @pair_request.id,
-      periods: @pair_request.periods.future.map { |p|
-        { id: p.id, start_at: p.start_at, end_at: p.end_at }
+      timezone: current_user.timezone,
+      slots: @pair_request.bookable_slots.map { |slot|
+        { start_at: slot.start_at.utc.iso8601, end_at: slot.end_at.utc.iso8601 }
       }
     }
   end
 
   def create
-    @offer = @pair_request.offers.build(offer_params.merge(offerer: current_user))
+    @offer = @pair_request.offers.build(message: offer_params[:message], offerer: current_user)
+    @offer.build_period(start_at: offer_params[:start_at].presence)
 
     authorize @offer, policy_class: PairRequests::OfferPolicy
 
-    if @offer.save
+    if @offer.save(context: :booking)
       OfferMailer.with(offer: @offer).offer_received_email.deliver_later
       OfferExpiryJob.set(wait_until: @offer.period.start_at).perform_later(@offer)
       if (remind_at = @offer.reminder_at)
@@ -71,5 +73,5 @@ class PairRequests::OffersController < ApplicationController
     end
   end
 
-  def offer_params = params.require(:offer).permit(:message, :period_id)
+  def offer_params = params.require(:offer).permit(:message, :start_at)
 end

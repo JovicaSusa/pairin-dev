@@ -8,16 +8,24 @@ RSpec.describe PairRequests::Suggestions, type: :unit do
   let(:dead_request) { request_starting_in(2.days, tags: [python]) }
   let(:expired_offer) { create(:offer, offerer:, pair_request: dead_request) }
 
+  # Monday 2 Nov 2026, 08:00 UTC.
+  around { |example| travel_to(Time.utc(2026, 11, 2, 8, 0)) { example.run } }
+
+  # A one-hour request whose poster is free for one hour a week, starting
+  # `time` from now; so its next bookable slot is then.
   def request_starting_in(time, tags: [], **attrs)
-    create(:pair_request, with_periods: false, **attrs).tap do |request|
-      # Periods can't be created in the past, so place them afterwards.
-      create(:period, periodable: request).update_columns(start_at: time.from_now, end_at: time.from_now + 1.hour)
+    start = time.from_now.utc
+    poster = attrs.delete(:user) || create(:user)
+    create(:availability_window, user: poster, weekday: start.to_date.cwday,
+      start_minute: start.hour * 60 + start.min, end_minute: start.hour * 60 + start.min + 60)
+
+    create(:pair_request, user: poster, duration: 60, **attrs).tap do |request|
       tags.each { |tag| create(:tagging, taggable: request, tag:) }
     end
   end
 
   it "ranks requests sharing the dead request's tags above sooner ones" do
-    sooner_untagged = request_starting_in(1.hour)
+    sooner_untagged = request_starting_in(4.hours)
     later_python = request_starting_in(3.days, tags: [python])
 
     expect(suggestions).to eq([later_python, sooner_untagged])
@@ -51,7 +59,7 @@ RSpec.describe PairRequests::Suggestions, type: :unit do
   it "skips requests that are already matched or have no upcoming slot" do
     matched = request_starting_in(1.day, tags: [python])
     create(:offer, :accepted, pair_request: matched)
-    request_starting_in(-1.day, tags: [python])
+    create(:pair_request, weekly_hours: false).tap { |request| create(:tagging, taggable: request, tag: python) }
     open_request = request_starting_in(2.days)
 
     expect(suggestions).to eq([open_request])

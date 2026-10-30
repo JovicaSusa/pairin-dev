@@ -9,7 +9,7 @@ class RequestResumptionsController < ApplicationController
   end
 
   def create
-    @pair_request.switch_on!
+    flash[:needs_weekly_hours] = true unless @pair_request.switch_on!
 
     redirect_to request_resumption_path(token: params[:token])
   end

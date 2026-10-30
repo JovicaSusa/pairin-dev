@@ -4,7 +4,7 @@ RSpec.describe OfferMailer, type: :mailer do
   describe "#offer_received_email" do
     let(:poster) { create(:user, email: "poster@example.com", timezone: "UTC") }
     let(:offerer) { create(:user, email: "offerer@example.com", name: "Ada") }
-    let(:pair_request) { create(:pair_request, user: poster, subject: "Learn Python together", with_periods: false) }
+    let(:pair_request) { create(:pair_request, user: poster, subject: "Learn Python together") }
     let(:period) { create(:period, periodable: pair_request, start_at: Time.utc(2030, 1, 15, 18, 0), end_at: Time.utc(2030, 1, 15, 19, 0)) }
     let(:offer) { create(:offer, pair_request:, period:, offerer:, message: "Happy to pair on this!") }
 

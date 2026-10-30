@@ -11,8 +11,8 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
     duration_eq: filters.duration_eq || "",
     user_level_eq: filters.user_level_eq || "",
     user_language_eq: filters.user_language_eq || "",
-    periods_start_at_gteq: filters.periods_start_at_gteq || "",
-    periods_start_at_lteq: filters.periods_start_at_lteq || "",
+    available_from: filters.available_from || "",
+    available_to: filters.available_to || "",
   });
 
   const handleChange = (e) => {
@@ -98,19 +98,19 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div>
-        <Label className="block mb-1">Session starts from</Label>
+        <Label className="block mb-1">Free from</Label>
         <DatePicker
-          value={form.periods_start_at_gteq}
-          onChange={(v) => setForm({ ...form, periods_start_at_gteq: v })}
+          value={form.available_from}
+          onChange={(v) => setForm({ ...form, available_from: v })}
           placeholder="Pick a start date"
         />
       </div>
 
       <div>
-        <Label className="block mb-1">Session starts before</Label>
+        <Label className="block mb-1">Free until</Label>
         <DatePicker
-          value={form.periods_start_at_lteq}
-          onChange={(v) => setForm({ ...form, periods_start_at_lteq: v })}
+          value={form.available_to}
+          onChange={(v) => setForm({ ...form, available_to: v })}
           placeholder="Pick an end date"
         />
       </div>

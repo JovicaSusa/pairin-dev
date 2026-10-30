@@ -1,7 +1,10 @@
 RSpec.describe "users pair requests", type: :system do
   let(:current_user) { create(:user) }
 
-  before { sign_in(current_user) }
+  before do
+    create(:availability_window, user: current_user)
+    sign_in(current_user)
+  end
 
   it "creates pair request for current user" do
     visit new_users_pair_request_path
@@ -9,7 +12,6 @@ RSpec.describe "users pair requests", type: :system do
     fill_in "Subject", with: "AAA"
     fill_in "Description", with: "BBB"
     fill_in "Duration", with: 45
-    pick_future_period!
 
     click_button "Create Pair request"
 
@@ -34,7 +36,7 @@ RSpec.describe "users pair requests", type: :system do
         expect(page).to have_content("can't be blank")
       end
       within(".pair_request_duration") do
-        expect(page).to have_content("must be greater than 0")
+        expect(page).to have_content("must be between 1 and 180 minutes")
       end
     end
   end

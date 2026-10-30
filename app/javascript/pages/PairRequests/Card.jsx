@@ -1,6 +1,5 @@
 import { Link } from "@inertiajs/react";
-import { ArrowRight } from "lucide-react";
-import { formatShort } from "@/helpers/date";
+import { slotParts } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
 
-export default function PairRequestCard({ pairRequest, currentUserId }) {
+export default function PairRequestCard({ pairRequest, currentUserId, timezone }) {
   const alreadyOffered = pairRequest.offers
     ?.map(o => o.offerer_id)
     .includes(currentUserId);
@@ -19,17 +18,18 @@ export default function PairRequestCard({ pairRequest, currentUserId }) {
         <h3 className="text-xl">{pairRequest.subject}</h3>
 
         <div className="flex flex-wrap gap-2 md:flex-col md:items-end">
-          {pairRequest.periods.map((period) => (
-            <div key={period.id} className="flex items-center gap-1.5">
-              <Badge variant="neutral" className="rounded-full text-xs">
-                {formatShort(period.start_at)}
+          {pairRequest.slots.map((slot) => {
+            const { day, time } = slotParts(slot.start_at, slot.end_at, timezone);
+
+            return (
+              <Badge key={slot.start_at} variant="neutral" className="rounded-full text-xs">
+                {day}, {time}
               </Badge>
-              <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
-              <Badge variant="neutral" className="rounded-full text-xs">
-                {formatShort(period.end_at)}
-              </Badge>
-            </div>
-          ))}
+            );
+          })}
+          {pairRequest.more_slots > 0 && (
+            <span className="text-xs text-black/50">+{pairRequest.more_slots} more times</span>
+          )}
         </div>
       </div>
 

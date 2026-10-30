@@ -1,67 +1,23 @@
-import { useForm, Head } from '@inertiajs/react';
+import { useForm, Head, Link } from '@inertiajs/react';
 import { X } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
-import { TIME_SLOTS } from "@/helpers/time-slots";
-
-const splitStartAt = (startAt) => {
-  if (!startAt) return { date: '', time: '' };
-  const [date = '', time = ''] = startAt.split('T');
-  return { date, time: time.slice(0, 5) };
-};
-
-const combineStartAt = (date, time) => (date || time ? `${date}T${time}` : '');
-
-const isValidStartAt = (s) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(s);
 
 export default function New({ tags }) {
-  const { data, setData, post, processing, errors, transform } = useForm({
+  const { data, setData, post, processing, errors } = useForm({
     subject: '',
     duration: 45,
     description: '',
-    periods_attributes: [{start_at: ''}],
     taggings_attributes: [{ tag_attributes: { name: '' } }]
   })
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    transform((formData) => ({
-      ...formData,
-      periods_attributes: formData.periods_attributes.map((p) => ({
-        ...p,
-        start_at: isValidStartAt(p.start_at) ? new Date(p.start_at).toISOString() : '',
-      })),
-    }));
     post('/users/pair_requests');
   }
-
-  const addPeriod = () => {
-    const updatedPeriods = [...data.periods_attributes];
-
-    updatedPeriods.push({ start_at: '' });
-    setData('periods_attributes', updatedPeriods);
-  };
-
-  const removePeriod = (index) => {
-    const updatedPeriods = [...data.periods_attributes];
-
-    updatedPeriods.splice(index, 1);
-    setData('periods_attributes', updatedPeriods);
-  };
-
-  const updatePeriodPart = (index, part, value) => {
-    const updatedPeriods = [...data.periods_attributes];
-    const { date, time } = splitStartAt(updatedPeriods[index].start_at);
-
-    updatedPeriods[index].start_at =
-      part === 'date' ? combineStartAt(value, time) : combineStartAt(date, value);
-    setData('periods_attributes', updatedPeriods);
-  };
 
   const addTag = () => {
     const updatedTaggings = [...data.taggings_attributes];
@@ -96,7 +52,7 @@ export default function New({ tags }) {
       <PageHeader
         eyebrow="Pair Requests"
         title="Create a request"
-        description="Share what you're working on, when you're free, and what stack you're looking for."
+        description="Share what you're working on and what stack you're looking for. Others book a time from your weekly hours."
       />
 
       <form onSubmit={handleSubmit} className="flex flex-col items-stretch">
@@ -120,7 +76,11 @@ export default function New({ tags }) {
               value={data.duration}
               onChange={e => setData('duration', e.target.value)}
             />
-            {errors.duration && <div className="text-red font-bold mt-1 text-sm">{errors.duration}</div>}
+            {errors.duration ? (
+              <div className="text-red font-bold mt-1 text-sm">{errors.duration}</div>
+            ) : (
+              <div className="mt-1 text-xs text-black/50">Up to 180</div>
+            )}
           </div>
         </div>
 
@@ -137,61 +97,11 @@ export default function New({ tags }) {
 
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <h4 className="mb-3 font-headline text-sm font-bold uppercase tracking-widest text-black/50">Periods</h4>
-
-            <div className="flex flex-col gap-3">
-              {data.periods_attributes.map((period, index) => {
-                const { date, time } = splitStartAt(period.start_at);
-
-                return (
-                  <div key={index} className="rounded-xl border-2 border-black bg-white p-3">
-                    <Label className="mb-1 block text-black/50">Start at</Label>
-                    <div className="flex flex-col gap-2 md:flex-row">
-                      <div className="md:flex-1">
-                        <DatePicker
-                          value={date}
-                          onChange={(v) => updatePeriodPart(index, 'date', v)}
-                          placeholder="Pick a date"
-                          disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="flex-1">
-                          <Select value={time} onValueChange={(v) => updatePeriodPart(index, 'time', v)}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Time" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {TIME_SLOTS.map((slot) => (
-                                <SelectItem key={slot} value={slot}>{slot}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="neutral"
-                          onClick={() => removePeriod(index)}
-                          aria-label="Remove period"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    {errors["periods.start_at"] && !isValidStartAt(period.start_at) && (
-                      <div className="text-red font-bold mt-1 text-sm">
-                        {errors["periods.start_at"]}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            <Button type="button" size="sm" variant="neutral" onClick={addPeriod} className="mt-3">
-              + Add period
-            </Button>
+            <h4 className="mb-3 font-headline text-sm font-bold uppercase tracking-widest text-black/50">When</h4>
+            <p className="rounded-xl border-2 border-black bg-white p-3 text-sm">
+              Others book a time from your weekly hours, cut into calls of this length.{" "}
+              <Link href="/availability" className="font-bold text-purple">Edit weekly hours</Link>
+            </p>
           </div>
 
           <div>

@@ -22,6 +22,42 @@ RSpec.describe Offer, type: :model do
     end
   end
 
+  describe "its period" do
+    it "is its own, not one of the request's" do
+      offer = create(:offer)
+
+      expect(offer.period.periodable).to eq(offer)
+      expect(offer.period.end_at - offer.period.start_at).to eq(offer.pair_request.duration.minutes)
+    end
+  end
+
+  describe "booking a slot" do
+    let(:pair_request) { create(:pair_request, duration: 60) }
+    let(:slot) { PairRequests::BookableSlots.call(pair_request).first }
+
+    def book(start_at)
+      build(:offer, pair_request:, with_period: false).tap { |offer| offer.build_period(start_at:) }
+    end
+
+    it "accepts one of the request's bookable slots" do
+      expect(book(slot.start_at).save(context: :booking)).to be(true)
+    end
+
+    it "rejects a time that isn't a bookable slot" do
+      offer = book(slot.start_at + 10.minutes)
+
+      expect(offer.save(context: :booking)).to be(false)
+      expect(offer.errors[:period]).to include("isn't one of this request's open slots")
+    end
+
+    it "needs a slot" do
+      offer = build(:offer, pair_request:, with_period: false)
+
+      expect(offer.save(context: :booking)).to be(false)
+      expect(offer.errors[:period]).to be_present
+    end
+  end
+
   describe ".accepted" do
     subject(:accepted) { described_class.accepted }
 

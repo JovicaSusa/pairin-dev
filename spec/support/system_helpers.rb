@@ -1,19 +1,4 @@
 module SystemHelpers
-  # Picks a date in the following month (always in the future) and a time
-  # slot, for the period DatePicker + Select combo on the pair request form.
-  def pick_future_period!(day: "15", time: "00:15")
-    click_button "Pick a date"
-    within(".rdp") do
-      click_button "Go to next month"
-      click_button day
-    end
-
-    click_button "Time"
-    find('[role="option"]', text: time, exact_text: true).click
-    expect(page).to have_button(time)
-    expect(page).not_to have_css('[role="listbox"]')
-  end
-
   # Opens the DatePicker popover behind `trigger_label` and clicks through to
   # `date`, navigating month-by-month (the calendar has no year/month jump).
   def select_calendar_date!(trigger_label, date)
