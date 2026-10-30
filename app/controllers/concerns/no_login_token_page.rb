@@ -4,7 +4,7 @@ module NoLoginTokenPage
   extend ActiveSupport::Concern
 
   included do
-    layout "marketing"
+    layout "token_page"
 
     before_action :protect_token
   end

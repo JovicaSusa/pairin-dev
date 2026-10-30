@@ -26,6 +26,29 @@ RSpec.describe "PairRequests::Offers", type: :request do
       expect(flash[:notice]).to include("If they don't respond")
     end
 
+    context "with a period that doesn't belong to this request" do
+      let(:period) { create(:pair_request).periods.first }
+
+      it "rejects the offer and schedules nothing" do
+        expect { post_offer }
+          .to not_change(Offer, :count)
+          .and not_have_enqueued_job(OfferExpiryJob)
+      end
+    end
+
+    context "with a period that has already started" do
+      let(:pair_request) { create(:pair_request, with_periods: false) }
+      let(:period) do
+        create(:period, periodable: pair_request).tap { |p| p.update_columns(start_at: 1.hour.ago, end_at: 1.minute.ago) }
+      end
+
+      it "rejects the offer and schedules nothing" do
+        expect { post_offer }
+          .to not_change(Offer, :count)
+          .and not_have_enqueued_job(OfferExpiryJob)
+      end
+    end
+
     context "when the request is switched off" do
       before { pair_request.update!(paused_at: 1.hour.ago) }
 

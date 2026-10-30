@@ -4,6 +4,15 @@ RSpec.describe "Request resumptions", type: :request do
   let(:pair_request) { create(:pair_request, subject: "Learn Rust together", paused_at: 1.hour.ago) }
   let(:token) { pair_request.generate_token_for(:resume) }
 
+  it "keeps the token away from analytics and link-preview metadata" do
+    get request_resumption_path(token:)
+
+    expect(response.body).not_to include("posthog")
+    expect(response.body).not_to include('rel="canonical"')
+    expect(response.body).not_to include("og:url")
+    expect(response.body).to include('<meta name="robots" content="noindex, nofollow">')
+  end
+
   describe "GET /requests/resume/:token" do
     it "shows the paused request without switching it on" do
       get request_resumption_path(token:)
