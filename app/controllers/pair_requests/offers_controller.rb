@@ -37,6 +37,7 @@ class PairRequests::OffersController < ApplicationController
 
     if @offer.save
       OfferMailer.with(offer: @offer).offer_received_email.deliver_later
+      OfferExpiryJob.set(wait_until: @offer.period.start_at).perform_later(@offer)
       if (remind_at = @offer.reminder_at)
         OfferReminderJob.set(wait_until: remind_at).perform_later(@offer)
       end

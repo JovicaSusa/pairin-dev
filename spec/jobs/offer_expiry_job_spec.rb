@@ -1,0 +1,39 @@
+require "rails_helper"
+
+RSpec.describe OfferExpiryJob, type: :job do
+  let(:offer) { create(:offer) }
+  let(:pair_request) { offer.pair_request }
+
+  def perform = described_class.perform_now(offer)
+
+  context "when the offer's slot started without an answer" do
+    before { travel_to(offer.period.start_at) }
+
+    it "switches the request off and tells the poster" do
+      expect { perform }
+        .to have_enqueued_mail(PairRequestMailer, :request_paused_email).with(params: { pair_request: }, args: [])
+
+      expect(pair_request.reload).to be_paused
+    end
+
+    it "leaves the request on when the poster accepted this offer" do
+      offer.update!(accepted_at: 1.hour.ago)
+
+      expect { perform }.not_to have_enqueued_mail(PairRequestMailer, :request_paused_email)
+      expect(pair_request.reload).not_to be_paused
+    end
+
+    it "leaves the request on when the poster accepted another offer" do
+      create(:offer, :accepted, pair_request:, period: offer.period)
+
+      expect { perform }.not_to have_enqueued_mail(PairRequestMailer, :request_paused_email)
+      expect(pair_request.reload).not_to be_paused
+    end
+
+    it "doesn't email the poster again when the request is already off" do
+      pair_request.update!(paused_at: 1.day.ago)
+
+      expect { perform }.not_to have_enqueued_mail(PairRequestMailer, :request_paused_email)
+    end
+  end
+end
