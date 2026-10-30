@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
 import { Progress } from "@/components/ui/progress";
 
 export default function Profile({ user, countries, languages, levels }) {
@@ -17,9 +16,6 @@ export default function Profile({ user, countries, languages, levels }) {
   const [level, setLevel] = useState(user.level || "");
   const [programmingSince, setProgrammingSince] = useState(
     user.programming_since ? String(user.programming_since) : ""
-  );
-  const [dateOfBirth, setDateOfBirth] = useState(
-    user.date_of_birth ? user.date_of_birth.split("T")[0] : ""
   );
 
   const currentYear = new Date().getFullYear();
@@ -93,20 +89,12 @@ export default function Profile({ user, countries, languages, levels }) {
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <Label className="block mb-1">Date of Birth</Label>
-                  <input type="hidden" name="date_of_birth" value={dateOfBirth} />
-                  <DatePicker
-                    value={dateOfBirth}
-                    onChange={setDateOfBirth}
-                    placeholder="Pick your birth date"
-                    captionLayout="dropdown-buttons"
-                    fromYear={currentYear - 100}
-                    toYear={currentYear}
-                    defaultMonth={new Date(1995, 0)}
-                    disabled={(date) => date > new Date()}
-                  />
-                </div>
+                {user.date_of_birth && (
+                  <div>
+                    <Label className="block mb-1">Date of Birth</Label>
+                    <p className="p-2 font-base">{user.date_of_birth}</p>
+                  </div>
+                )}
 
                 <div>
                   <Label className="block mb-1">Programming Since</Label>
