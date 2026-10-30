@@ -36,4 +36,25 @@ RSpec.describe OfferMailer, type: :mailer do
       end
     end
   end
+
+  describe "#offer_reminder_email" do
+    let(:poster) { create(:user, email: "poster@example.com") }
+    let(:pair_request) { create(:pair_request, user: poster, subject: "Learn Python together") }
+    let(:offer) { create(:offer, pair_request:, offerer: create(:user, name: "Ada")) }
+
+    let(:mail) { described_class.with(offer:).offer_reminder_email }
+
+    it "reminds the poster about the waiting offer" do
+      expect(mail.to).to eq(["poster@example.com"])
+      expect(mail.subject).to include("Reminder")
+      expect(mail.body.encoded).to include("Ada")
+      expect(mail.body.encoded).to include("Learn Python together")
+    end
+
+    it "links to the same no-login confirmation page" do
+      token = mail.body.encoded[%r{/offers/confirm/([^"\s]+)}, 1]
+
+      expect(Offer.find_by_token_for(:poster_confirmation, token)).to eq(offer)
+    end
+  end
 end

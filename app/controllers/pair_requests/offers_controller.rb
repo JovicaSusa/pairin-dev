@@ -37,6 +37,9 @@ class PairRequests::OffersController < ApplicationController
 
     if @offer.save
       OfferMailer.with(offer: @offer).offer_received_email.deliver_later
+      if (remind_at = @offer.reminder_at)
+        OfferReminderJob.set(wait_until: remind_at).perform_later(@offer)
+      end
 
       redirect_to pair_requests_path, notice: "Offer sent! We've emailed the poster, and you'll get an email when they accept. If they don't respond before your chosen time, the offer expires."
     else

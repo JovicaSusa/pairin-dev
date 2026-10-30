@@ -1,0 +1,48 @@
+<div style="display: none">
+  <%= @offerer_name %> is still waiting to hear back about "<%= @offer.pair_request.subject %>"
+</div>
+<div role="article" aria-roledescription="email" aria-label="Pairing offer reminder" lang="en">
+  <div class="sm-px-4" style="background-color: #f8fafc; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
+    <table align="center" cellpadding="0" cellspacing="0" role="none">
+      <tr>
+        <td style="width: 552px; max-width: 100%">
+          <div class="sm-my-8" style="margin-top: 48px; margin-bottom: 48px; text-align: center">
+            <a href="https://pairin.dev">
+              <img src="<%= image_url('logo.svg') %>" width="70" alt="Pairin" style="max-width: 100%; vertical-align: middle">
+            </a>
+          </div>
+          <table style="width: 100%;" cellpadding="0" cellspacing="0" role="none">
+            <tr>
+              <td class="sm-px-6" style="border-radius: 4px; background-color: #fffffe; padding: 48px; font-size: 16px; color: #334155; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05)">
+                <h1 class="sm-leading-8" style="margin: 0 0 24px; font-size: 24px; font-weight: 600; color: #000001">
+                  Still interested?
+                </h1>
+                <p style="margin: 0; line-height: 24px">
+                  <strong><%= @offerer_name %></strong> offered to pair with you on your request
+                  "<%= @offer.pair_request.subject %>" and is waiting for your answer.
+                </p>
+                <%= render "offer_mailer/offer_details", offer: @offer, poster: @poster, confirmation_url: @confirmation_url %>
+              </td>
+            </tr>
+            <tr role="separator">
+              <td style="line-height: 48px">&zwj;</td>
+            </tr>
+            <tr>
+              <td style="padding-left: 24px; padding-right: 24px; text-align: center; font-size: 12px; color: #475569">
+                <p style="margin: 0 0 16px">
+                  Pairin Team
+                </p>
+                <p style="margin: 0; font-style: italic">
+                  Find pair programming partner quick and easy
+                </p>
+                <p style="cursor: default">
+                  <a href="https://pairin.dev" class="hover-important-text-decoration-underline" style="color: #4338ca; text-decoration: none">Pairin</a>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

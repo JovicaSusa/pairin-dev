@@ -3,4 +3,8 @@ class OfferMailerPreview < ActionMailer::Preview
   def offer_received_email
     OfferMailer.with(offer: Offer.last).offer_received_email
   end
+
+  def offer_reminder_email
+    OfferMailer.with(offer: Offer.last).offer_reminder_email
+  end
 end
