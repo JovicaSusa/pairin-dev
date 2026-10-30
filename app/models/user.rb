@@ -21,6 +21,8 @@ class User < ApplicationRecord
   validates :level, inclusion: { in: LEVELS }, allow_nil: true
   validates :date_of_birth, presence: true, on: :create
   validates :date_of_birth, comparison: { less_than_or_equal_to: -> { Date.current }, message: "can't be in the future" }, allow_nil: true
+  # The age gate relies on it, so once given it stays put.
+  validate :date_of_birth_unchanged, on: :update, if: -> { date_of_birth_changed? && date_of_birth_was.present? }
   TIMEZONES = TZInfo::Timezone.all_identifiers.to_set.freeze
 
   validates :timezone, inclusion: { in: TIMEZONES, message: "isn't a known timezone" }, if: :timezone_changed?
@@ -29,6 +31,10 @@ class User < ApplicationRecord
 
   def level_titleized
     level&.titleize
+  end
+
+  private def date_of_birth_unchanged
+    errors.add(:date_of_birth, "can't be changed")
   end
 
   class << self

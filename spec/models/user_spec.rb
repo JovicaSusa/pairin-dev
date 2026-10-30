@@ -26,6 +26,14 @@ RSpec.describe User, type: :model do
       expect(build(:user, date_of_birth: Date.tomorrow).tap(&:validate).errors[:date_of_birth]).to include("can't be in the future")
     end
 
+    it "can't be changed once set" do
+      user = create(:user, date_of_birth: Date.new(1990, 6, 15))
+
+      expect(user.update(date_of_birth: Date.new(2015, 1, 1))).to be(false)
+      expect(user.errors[:date_of_birth]).to include("can't be changed")
+      expect(user.reload.date_of_birth).to eq(Date.new(1990, 6, 15))
+    end
+
     it "isn't required to keep using an existing account" do
       user = create(:user)
       user.update_column(:date_of_birth, nil)
