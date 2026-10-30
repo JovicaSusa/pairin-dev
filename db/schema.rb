@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_10_30_151239) do
+ActiveRecord::Schema[7.1].define(version: 2026_10_30_175928) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,16 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_30_151239) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["receiver_id"], name: "index_activities_on_receiver_id"
+  end
+
+  create_table "availability_windows", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "weekday", null: false
+    t.integer "start_minute", null: false
+    t.integer "end_minute", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_availability_windows_on_user_id"
   end
 
   create_table "offers", force: :cascade do |t|
@@ -126,6 +136,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_30_151239) do
   end
 
   add_foreign_key "activities", "users", column: "receiver_id"
+  add_foreign_key "availability_windows", "users"
   add_foreign_key "offers", "pair_requests"
   add_foreign_key "offers", "users", column: "offerer_id"
   add_foreign_key "pair_requests", "users"
