@@ -45,12 +45,12 @@ class Users::PairRequestsController < ApplicationController
   end
 
   def pause
-    @pair_request.update!(paused_at: Time.current)
+    @pair_request.switch_off!
     redirect_to users_pair_requests_path, notice: "Request switched off. It's hidden from others until you switch it back on."
   end
 
   def resume
-    @pair_request.update!(paused_at: nil)
+    @pair_request.switch_on!
     redirect_to users_pair_requests_path, notice: "Request switched on. Others can see it and send offers again."
   end
 
