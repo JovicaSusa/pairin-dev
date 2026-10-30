@@ -9,6 +9,11 @@ class Availabilities::WindowsController < ApplicationController
     else
       redirect_to availability_path, inertia: { errors: window.errors.to_hash(true) }
     end
+  rescue ActiveRecord::StatementInvalid => e
+    # A concurrent request saved an overlapping window after our validation ran.
+    raise unless e.cause.is_a?(PG::ExclusionViolation)
+
+    redirect_to availability_path, inertia: { errors: { start_minute: "overlaps hours you've already added" } }
   end
 
   def destroy

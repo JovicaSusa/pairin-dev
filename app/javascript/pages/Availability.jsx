@@ -32,6 +32,7 @@ export default function Availability({ timezone, windows, weekdays }) {
   const [weekday, setWeekday] = useState(weekdays[0].value);
   const [startMinute, setStartMinute] = useState(18 * 60);
   const [endMinute, setEndMinute] = useState(20 * 60);
+  const [adding, setAdding] = useState(false);
 
   const dayName = (number) => weekdays.find((d) => d.value === number)?.label;
   const describe = (w) => `${dayName(w.weekday)} ${formatMinute(w.start_minute)}–${formatMinute(w.end_minute)}`;
@@ -43,7 +44,12 @@ export default function Availability({ timezone, windows, weekdays }) {
 
   const addWindow = (e) => {
     e.preventDefault();
-    router.post("/availability/windows", { weekday, start_minute: startMinute, end_minute: endMinute }, { preserveScroll: true });
+    if (adding) return;
+    router.post("/availability/windows", { weekday, start_minute: startMinute, end_minute: endMinute }, {
+      preserveScroll: true,
+      onStart: () => setAdding(true),
+      onFinish: () => setAdding(false),
+    });
   };
 
   const removeWindow = (id) => {
@@ -110,7 +116,7 @@ export default function Availability({ timezone, windows, weekdays }) {
             {TIME_OPTIONS.slice(1).map((m) => <option key={m} value={m}>{formatMinute(m)}</option>)}
           </select>
         </div>
-        <Button type="submit">Add hours</Button>
+        <Button type="submit" disabled={adding}>Add hours</Button>
         {(errors?.start_minute || errors?.end_minute) && (
           <p className="text-sm font-bold text-red md:col-span-4">{errors.start_minute || errors.end_minute}</p>
         )}

@@ -30,6 +30,14 @@ RSpec.describe AvailabilityWindow, type: :model do
     expect(described_class.new(user: create(:user), weekday: 2, start_minute: 18 * 60, end_minute: 20 * 60)).to be_valid
   end
 
+  it "refuses an overlap at the database even when validation is skipped" do
+    window.save!
+
+    expect { window(start_minute: 19 * 60, end_minute: 21 * 60).save!(validate: false) }
+      .to raise_error(ActiveRecord::StatementInvalid) { |e| expect(e.cause).to be_a(PG::ExclusionViolation) }
+    expect { window(start_minute: 20 * 60, end_minute: 21 * 60).save!(validate: false) }.not_to raise_error
+  end
+
   it "only accepts Monday (1) to Sunday (7)" do
     expect(window(weekday: 0)).not_to be_valid
     expect(window(weekday: 8)).not_to be_valid

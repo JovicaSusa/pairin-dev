@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_10_30_175928) do
+ActiveRecord::Schema[7.1].define(version: 2026_10_30_211039) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "btree_gist"
   enable_extension "plpgsql"
 
   create_table "activities", force: :cascade do |t|
@@ -32,6 +33,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_30_175928) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_availability_windows_on_user_id"
+    t.exclusion_constraint "user_id WITH =, weekday WITH =, int4range(start_minute, end_minute) WITH &&", using: :gist, name: "availability_windows_no_overlap"
   end
 
   create_table "offers", force: :cascade do |t|

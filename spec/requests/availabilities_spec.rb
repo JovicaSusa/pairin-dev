@@ -35,6 +35,18 @@ RSpec.describe "Availability", type: :request do
 
       expect(session[:inertia_errors]).to include(:end_minute)
     end
+
+    it "turns a race past validation into the overlap error" do
+      create(:availability_window, user:, weekday: 2, start_minute: 18 * 60, end_minute: 20 * 60)
+      allow_any_instance_of(AvailabilityWindow).to receive(:doesnt_overlap_another_window)
+
+      expect {
+        post availability_windows_path, params: { weekday: 2, start_minute: 19 * 60, end_minute: 21 * 60 }
+      }.not_to change(AvailabilityWindow, :count)
+
+      expect(response).to redirect_to(availability_path)
+      expect(session[:inertia_errors]).to include(:start_minute)
+    end
   end
 
   describe "DELETE /availability/windows/:id" do
