@@ -2,6 +2,8 @@ class PairRequests::OffersController < ApplicationController
   include Authenticated
   include Alba::Inertia::Controller
 
+  before_action :reject_switched_off_request, only: [:new, :create]
+
   def index
     @pair_request = current_user.pair_requests.find_by(id: params[:pair_request_id])
 
@@ -16,7 +18,6 @@ class PairRequests::OffersController < ApplicationController
   end
 
   def new
-    @pair_request = PairRequest.find(params[:pair_request_id])
     @offer = @pair_request.offers.build(offerer: current_user)
 
     authorize @offer, :create?, policy_class: PairRequests::OfferPolicy
@@ -30,7 +31,6 @@ class PairRequests::OffersController < ApplicationController
   end
 
   def create
-    @pair_request = PairRequest.find(params[:pair_request_id])
     @offer = @pair_request.offers.build(offer_params.merge(offerer: current_user))
 
     authorize @offer, policy_class: PairRequests::OfferPolicy
@@ -61,6 +61,14 @@ class PairRequests::OffersController < ApplicationController
   end
 
   private
+
+  def reject_switched_off_request
+    @pair_request = PairRequest.find(params[:pair_request_id])
+
+    if @pair_request.paused?
+      redirect_to pair_requests_path, alert: "This request is switched off and isn't taking offers right now."
+    end
+  end
 
   def offer_params = params.require(:offer).permit(:message, :period_id)
 end

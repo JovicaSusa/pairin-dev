@@ -29,6 +29,8 @@ Rails.application.routes.draw do
   namespace :users do
     resources :pair_requests, except: [:edit, :update] do
       patch :add_call_link, on: :member
+      patch :pause, on: :member
+      patch :resume, on: :member
     end
     resources :offers, only: [:index]
   end

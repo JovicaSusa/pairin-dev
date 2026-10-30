@@ -13,6 +13,7 @@ class PairRequest < ApplicationRecord
   validates :duration, numericality: { greater_than: 0 }
 
   scope :active, -> { joins(:periods).merge(Period.future) }
+  scope :switched_on, -> { where(paused_at: nil) }
 
   accepts_nested_attributes_for :periods, allow_destroy: true
   accepts_nested_attributes_for :taggings,
@@ -28,6 +29,11 @@ class PairRequest < ApplicationRecord
     def ransackable_attributes(auth_object=nil)
       ["duration"]
     end
+  end
+
+  # Off requests are hidden from others and can't receive offers.
+  def paused?
+    paused_at?
   end
 
   def has_accepted_offer?

@@ -22,6 +22,12 @@ RSpec.describe OfferReminderJob, type: :job do
     expect { perform }.not_to have_enqueued_mail(OfferMailer, :offer_reminder_email)
   end
 
+  it "stays quiet when the request was switched off" do
+    offer.pair_request.update!(paused_at: 1.hour.ago)
+
+    expect { perform }.not_to have_enqueued_mail(OfferMailer, :offer_reminder_email)
+  end
+
   it "stays quiet when the offered slot has already started" do
     travel_to(offer.period.start_at + 1.minute)
 
