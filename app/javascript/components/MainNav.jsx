@@ -5,9 +5,8 @@ import {
   ClipboardList,
   FilePlus2,
   Inbox,
-  Send,
   Rss,
-  CalendarClock,
+  MessagesSquare,
   Clock,
   ChevronDown,
   LogOut,
@@ -20,15 +19,14 @@ import logoImg from "@/assets/images/logo.svg";
 
 const NAV_ITEMS = [
   { href: "/pair_requests", label: "Search", icon: Search },
+  { href: "/conversations", label: "Conversations", icon: MessagesSquare },
   { href: "/activities", label: "Feed", icon: Rss },
-  { href: "/sessions", label: "Sessions", icon: CalendarClock },
   { href: "/availability", label: "Availability", icon: Clock },
 ];
 
 const PAIR_REQUEST_SUBMENU = [
   { href: "/users/pair_requests/new", label: "New", icon: FilePlus2 },
   { href: "/users/pair_requests", label: "Opened", icon: Inbox },
-  { href: "/users/offers", label: "Applied", icon: Send },
 ];
 
 function NavLink({ href, label, icon: Icon, active, small = false, onClick }) {
@@ -52,7 +50,7 @@ function NavLink({ href, label, icon: Icon, active, small = false, onClick }) {
 
 function NavContent({ currentPath, currentUser, onNavigate }) {
   const cleanPath = currentPath.split("?")[0];
-  const isActive = (path) => cleanPath === path;
+  const isActive = (path) => cleanPath === path || cleanPath.startsWith(`${path}/`);
   const isPairRequestSubmenuActive = () => PAIR_REQUEST_SUBMENU.some((item) => item.href === cleanPath);
   const isProfileActive = () => cleanPath === `/profiles/${currentUser.id}`;
 

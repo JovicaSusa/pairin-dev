@@ -25,27 +25,6 @@ RSpec.describe "generates expected activites", type: :system do
     end
   end
 
-  context "when pair request offer accepted" do
-    let(:pair_request) { create(:pair_request, user: current_user) }
-    let!(:offer) { create(:offer, pair_request:) }
-
-    it "displays expected activity" do
-      visit users_pair_requests_path
-
-      within("#pair_requests") { click_link "See applications" }
-
-      perform_enqueued_jobs do
-        click_button "Accept"
-      end
-
-      expect(page).to have_content("Application accepted.")
-
-      visit activities_path
-
-      expect(page).not_to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
-    end
-  end
-
   context "when offer sent" do
     let!(:pair_request) { create(:pair_request) }
 
@@ -74,7 +53,7 @@ RSpec.describe "generates expected activites", type: :system do
     before do
       perform_enqueued_jobs do
         Activity.suppress { offer.save! }
-        Offers::Accept.call(offer)
+        offer.update!(accepted_at: Time.current)
       end
     end
 

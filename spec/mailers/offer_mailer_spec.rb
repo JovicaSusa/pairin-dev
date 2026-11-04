@@ -26,14 +26,15 @@ RSpec.describe OfferMailer, type: :mailer do
       expect(mail.to).to eq(["poster@example.com"])
     end
 
-    it "includes the offer details and a link to the no-login confirmation page" do
+    it "includes the offer details and a link to the thread" do
       body = mail.body.encoded
 
       expect(body).to include("Ada")
       expect(body).to include("Happy to pair on this!")
       expect(body).to include("Learn Python together")
       expect(body).not_to include("Time:")
-      expect(body).to match(%r{https?://[^/"]+/offers/confirm/[^"\s]+})
+      expect(body).to include("/conversations/#{offer.id}")
+      expect(body).not_to include("/offers/confirm")
     end
 
     it "still shows an old application's time" do
@@ -101,6 +102,31 @@ RSpec.describe OfferMailer, type: :mailer do
     end
   end
 
+  describe "#not_a_match_email" do
+    let(:poster) { create(:user, name: "Maya", email: "poster@example.com") }
+    let(:applicant) { create(:user, name: "Sam", email: "applicant@example.com") }
+    let(:offer) { create(:offer, pair_request: create(:pair_request, user: poster, subject: "Python buddy"), offerer: applicant) }
+
+    let(:mail) { described_class.with(offer:).not_a_match_email }
+
+    it "tells the applicant kindly when the poster ended it, without the reason" do
+      offer.not_a_match!(by: poster, reason: "Different goals")
+
+      expect(mail.to).to eq(["applicant@example.com"])
+      expect(mail.body.encoded).to include("Maya has ended your conversation")
+      expect(mail.body.encoded).to include("Python buddy")
+      expect(mail.body.encoded).not_to include("Different goals")
+      expect(mail.body.encoded).not_to include("poster@example.com")
+    end
+
+    it "tells the poster when the applicant ended it" do
+      offer.not_a_match!(by: applicant)
+
+      expect(mail.to).to eq(["poster@example.com"])
+      expect(mail.body.encoded).to include("Sam has ended your conversation")
+    end
+  end
+
   describe "#offer_reminder_email" do
     let(:poster) { create(:user, email: "poster@example.com") }
     let(:pair_request) { create(:pair_request, user: poster, subject: "Learn Python together") }
@@ -115,10 +141,8 @@ RSpec.describe OfferMailer, type: :mailer do
       expect(mail.body.encoded).to include("Learn Python together")
     end
 
-    it "links to the same no-login confirmation page" do
-      token = mail.body.encoded[%r{/offers/confirm/([^"\s]+)}, 1]
-
-      expect(Offer.find_by_token_for(:poster_confirmation, token)).to eq(offer)
+    it "links to the thread" do
+      expect(mail.body.encoded).to include("/conversations/#{offer.id}")
     end
   end
 end

@@ -22,7 +22,4 @@ class ReceivedOfferResource < ApplicationResource
     offer.pair_request.has_accepted_offer? && !offer.accepted?
   end
 
-  attribute :show_accept_button do |offer|
-    !offer.pair_request.has_accepted_offer? && !offer.expired?
-  end
 end

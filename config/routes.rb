@@ -23,9 +23,7 @@ Rails.application.routes.draw do
 
   resources :pair_requests, only: [:index] do
     scope module: 'pair_requests' do
-      resources :offers, only: [:index, :new, :create] do
-        post "accept", on: :member
-      end
+      resources :offers, only: [:index, :new, :create]
     end
 
     get :search, on: :collection
@@ -37,14 +35,17 @@ Rails.application.routes.draw do
       patch :pause, on: :member
       patch :resume, on: :member
     end
-    resources :offers, only: [:index]
+  end
+
+  resources :conversations, only: [:index, :show] do
+    post :not_a_match, on: :member
+    resources :messages, only: [:create], module: :conversations
   end
 
   resources :activities, only: [:index]
 
-  # No-login offer confirmation, reached from the offer-received email.
-  get "offers/confirm/:token", to: "offer_confirmations#show", as: :offer_confirmation
-  post "offers/confirm/:token", to: "offer_confirmations#create"
+  # Emails sent before replies needed sign-in linked here.
+  get "offers/confirm/:token", to: redirect("/conversations")
 
   # No-login "Turn it back on", reached from the request-paused email.
   get "requests/resume/:token", to: "request_resumptions#show", as: :request_resumption

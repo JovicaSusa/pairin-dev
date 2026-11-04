@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
@@ -6,11 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-export default function OfferCard({ offer, pairRequestId }) {
-  const handleAccept = () => {
-    router.post(`/pair_requests/${pairRequestId}/offers/${offer.id}/accept`);
-  };
-
+export default function OfferCard({ offer }) {
   return (
     <div
       className={`relative mb-6 rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:p-6 ${
@@ -69,9 +65,9 @@ export default function OfferCard({ offer, pairRequestId }) {
           </div>
         ) : <span />}
 
-        {offer.show_accept_button && (
-          <Button onClick={handleAccept}>Accept</Button>
-        )}
+        <Button asChild>
+          <Link href={`/conversations/${offer.id}`}>Open conversation</Link>
+        </Button>
       </div>
     </div>
   );
