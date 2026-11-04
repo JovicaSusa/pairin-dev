@@ -108,6 +108,9 @@ class User < ApplicationRecord
     name.presence || "A Pairin member"
   end
 
+  # The profile form sends "" for anything not chosen yet, which isn't a valid value.
+  normalizes :language, :country, :level, with: ->(value) { value.presence }
+
   validates :language, inclusion: { in: I18nData.languages.keys }, allow_nil: true
   validates :country, inclusion: { in: I18nData.countries.keys }, allow_nil: true
   validates :level, inclusion: { in: LEVELS }, allow_nil: true

@@ -1,6 +1,15 @@
 Rails.application.routes.draw do
   mount MissionControl::Jobs::Engine, at: "/jobs"
-  devise_for :users, controllers: { registrations: "users/registrations" }
+  # Registrations without destroy: deleting an account is by request, as the privacy policy says.
+  devise_for :users, skip: [:registrations]
+  devise_scope :user do
+    get "users/cancel", to: "users/registrations#cancel", as: :cancel_user_registration
+    get "users/sign_up", to: "users/registrations#new", as: :new_user_registration
+    get "users/edit", to: "users/registrations#edit", as: :edit_user_registration
+    patch "users", to: "users/registrations#update", as: :user_registration
+    put "users", to: "users/registrations#update"
+    post "users", to: "users/registrations#create"
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

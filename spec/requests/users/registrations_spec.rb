@@ -105,4 +105,41 @@ RSpec.describe "Signing up", type: :request do
       expect { sign_up(date_of_birth: "1990-01-01") }.to change(User, :count).by(1)
     end
   end
+
+  describe "deleting an account" do
+    let(:user) { create(:user) }
+
+    before { sign_in(user) }
+
+    it "can't be done from the app: there's no route" do
+      delete "/users"
+
+      expect(response).to have_http_status(:not_found)
+      expect(User.exists?(user.id)).to be(true)
+    end
+
+    it "has no button on the account page" do
+      get "/users/edit"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include("Cancel my account")
+    end
+  end
+
+  describe "the rest of the account routes" do
+    it "still shows signup" do
+      get "/users/sign_up"
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "still lets someone change their password" do
+      user = create(:user, password: "Password33*")
+      sign_in(user)
+
+      put "/users", params: { user: { password: "Different44*", password_confirmation: "Different44*", current_password: "Password33*" } }
+
+      expect(user.reload).to be_valid_password("Different44*")
+    end
+  end
 end

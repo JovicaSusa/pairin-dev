@@ -16,6 +16,8 @@ RSpec.configure do |config|
       slowmo: ENV["SLOWMO"]&.to_f,
       process_timeout: 60,
       timeout: 30,
+      # PostHog loads from the internet, and a page waiting on it fails with a timeout.
+      url_blacklist: [/posthog\.com/],
       browser_options: ENV["DOCKER"] ? { "no-sandbox" => nil } : {}
     })
   end

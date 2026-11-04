@@ -63,6 +63,23 @@ RSpec.describe "apply to a partner search", type: :system do
     expect(current_user.reload.level).to eq("competent")
   end
 
+  it "closes only an open dropdown on Escape, keeping what was typed" do
+    visit pair_requests_path
+    click_button "Apply"
+    fill_in "What do you want to get out of this?", with: "Finish the course"
+
+    click_button "How often can you pair?"
+    expect(page).to have_css('[role="listbox"]')
+    find("body").send_keys(:escape)
+
+    expect(page).not_to have_css('[role="listbox"]')
+    expect(page).to have_css('[role="dialog"]')
+    expect(page).to have_field("What do you want to get out of this?", with: "Finish the course")
+
+    find("body").send_keys(:escape)
+    expect(page).not_to have_css('[role="dialog"]')
+  end
+
   it "closes the drawer without applying" do
     visit pair_requests_path
 
