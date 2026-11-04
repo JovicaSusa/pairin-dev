@@ -128,9 +128,11 @@ function WeeklyHours({ weekdays, windows, onChange, timezone, onTimezone }) {
     return [...new Set([timezone, "UTC", ...all].filter(Boolean))].sort();
   }, [timezone]);
 
+  const overlaps = windows.some((w) => w.weekday === weekday && w.start_minute < end && start < w.end_minute);
+  const canAdd = start < end && !overlaps;
+
   const add = () => {
-    const overlaps = windows.some((w) => w.weekday === weekday && w.start_minute < end && start < w.end_minute);
-    if (start < end && !overlaps) onChange([...windows, { weekday, start_minute: start, end_minute: end }]);
+    if (canAdd) onChange([...windows, { weekday, start_minute: start, end_minute: end }]);
   };
 
   return (
@@ -146,7 +148,7 @@ function WeeklyHours({ weekdays, windows, onChange, timezone, onTimezone }) {
         <select aria-label="To" className={SELECT_CLASS} value={end} onChange={(e) => setEnd(Number(e.target.value))}>
           {TIME_OPTIONS.slice(1).map((m) => <option key={m} value={m}>{formatMinute(m)}</option>)}
         </select>
-        <Button type="button" variant="neutral" onClick={add}>Add</Button>
+        <Button type="button" variant="neutral" disabled={!canAdd} onClick={add}>Add</Button>
       </div>
 
       {windows.length > 0 && (
