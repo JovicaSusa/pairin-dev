@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_04_230000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_240000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -114,6 +114,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_230000) do
     t.text "goal"
     t.datetime "ended_at"
     t.bigint "ended_by_id"
+    t.text "end_reason"
     t.index ["ended_by_id"], name: "index_partnerships_on_ended_by_id"
     t.index ["offer_id"], name: "index_partnerships_on_offer_id", unique: true
     t.index ["pair_request_id"], name: "index_partnerships_on_pair_request_id", unique: true

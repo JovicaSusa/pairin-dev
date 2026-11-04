@@ -16,6 +16,15 @@ class OfferMailer < ApplicationMailer
     mail(to: @offer.offerer.email, subject: "No answer yet on #{@offer.pair_request.subject}")
   end
 
+  # To the other partner. It says the partnership ended, never why, or whether
+  # they were blocked.
+  def partnership_ended_email
+    @ended_by = params[:ended_by]
+    @recipient = @offer.other_person(@ended_by)
+
+    mail(to: @recipient.email, subject: "Your partnership with #{@ended_by.display_name} has ended")
+  end
+
   def search_filled_email
     @suggestions = PairRequests::Suggestions.call(@offer)
 

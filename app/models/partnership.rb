@@ -26,16 +26,20 @@ class Partnership < ApplicationRecord
     ended_at? || offer.ended?
   end
 
-  # Ending it ends the chat too, and the search stays Off. Returns false if it
-  # had already ended.
-  def end!(by:)
-    offer.with_lock do
+  # Ending it ends the chat too, and the search stays Off. The record stays for
+  # metrics. The other person hears only that it ended, even after a block, and
+  # the reason stays private. Returns false if it had already ended.
+  def end!(by:, reason: nil)
+    ended = offer.with_lock do
       next false if ended_at?
 
-      update_columns(ended_at: Time.current, ended_by_id: by.id)
+      update_columns(ended_at: Time.current, ended_by_id: by.id, end_reason: reason.presence)
       offer.not_a_match!(by:)
       true
     end
+
+    OfferMailer.with(offer:, ended_by: by).partnership_ended_email.deliver_later if ended
+    ended
   end
 
   # What each person said they'd commit to: the search's commitment for the

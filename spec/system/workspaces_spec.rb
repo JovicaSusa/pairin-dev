@@ -70,9 +70,27 @@ RSpec.describe "workspaces", type: :system do
       click_button "Block"
       within('[aria-label="Confirm block"]') { click_button "Block" }
 
-      expect(page).to have_content("This partnership has ended.")
+      expect(page).to have_content("You ended this partnership.")
       expect(page).not_to have_field("Write a message")
       expect(page).not_to have_button("Edit")
+    end
+
+    it "ends after asking, and reads as ended" do
+      visit partner_path(Partnership.last)
+
+      click_button "End partnership"
+      expect(page).to have_content("We'll tell Sam kindly.")
+      click_button "Keep going"
+      expect(Partnership.last).not_to be_ended
+
+      click_button "End partnership"
+      fill_in "Why? (optional, only we see this)", with: "Different goals"
+      within("form", text: "End this partnership?") { click_button "End partnership" }
+
+      expect(page).to have_content("You ended this partnership.")
+      expect(page).not_to have_field("Write a message")
+      expect(page).not_to have_button("End partnership")
+      expect(Partnership.last.end_reason).to eq("Different goals")
     end
 
     it "links to the Workspace from the conversation" do

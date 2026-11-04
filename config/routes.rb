@@ -41,7 +41,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :partners, only: [:index, :show, :update], controller: "partnerships"
+  resources :partners, only: [:index, :show, :update], controller: "partnerships" do
+    post :end_partnership, on: :member
+  end
 
   resources :conversations, only: [:index, :show] do
     post :not_a_match, on: :member
