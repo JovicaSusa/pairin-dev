@@ -26,6 +26,22 @@ RSpec.describe "Offer confirmations", type: :request do
     end
   end
 
+  describe "the applicant's GitHub link" do
+    it "is shown when they've added one" do
+      offerer.update!(github_url: "https://github.com/ada")
+
+      get offer_confirmation_path(token:)
+
+      expect(response.body).to include('href="https://github.com/ada"')
+    end
+
+    it "is left out when they haven't" do
+      get offer_confirmation_path(token:)
+
+      expect(response.body).not_to include("GitHub:")
+    end
+  end
+
   describe "POST /offers/confirm/:token" do
     it "accepts the offer, schedules the session and emails both participants" do
       expect { post offer_confirmation_path(token:) }

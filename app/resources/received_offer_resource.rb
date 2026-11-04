@@ -4,7 +4,8 @@ class ReceivedOfferResource < ApplicationResource
   attribute :offerer do |offer|
     {
       name: offer.offerer.name,
-      image_url: offer.offerer.image_url
+      image_url: offer.offerer.image_url,
+      github_url: offer.offerer.github_url
     }
   end
 

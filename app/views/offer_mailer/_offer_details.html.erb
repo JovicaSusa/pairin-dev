@@ -7,6 +7,12 @@
                   – <%= offer.period.end_at.in_time_zone(poster.timezone).strftime("%H:%M") %>
                   (<%= poster.timezone %>)
                 </p>
+                <% if offer.offerer.github_url.present? %>
+                  <p style="margin: 8px 0 0; line-height: 24px">
+                    <span style="font-weight: 600">GitHub:</span>
+                    <a href="<%= offer.offerer.github_url %>" style="color: #4338ca"><%= offer.offerer.github_url %></a>
+                  </p>
+                <% end %>
                 <p style="margin: 32px 0; text-align: center">
                   <a href="<%= confirmation_url %>" style="display: inline-block; border: 2px solid #000001; border-radius: 12px; background-color: #FF8B37; padding: 12px 24px; font-weight: 600; color: #000001; text-decoration: none">
                     See the offer

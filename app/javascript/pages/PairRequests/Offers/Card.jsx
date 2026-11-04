@@ -22,7 +22,14 @@ export default function OfferCard({ offer, pairRequestId }) {
           <AvatarImage src={offer.offerer.image_url} alt={offer.offerer.name} />
           <AvatarFallback className="bg-orange text-white font-bold">{offer.offerer.name?.[0]}</AvatarFallback>
         </Avatar>
-        <p className="font-bold">{offer.offerer.name}</p>
+        <div>
+          <p className="font-bold">{offer.offerer.name}</p>
+          {offer.offerer.github_url && (
+            <a href={offer.offerer.github_url} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-purple underline">
+              GitHub
+            </a>
+          )}
+        </div>
         {offer.status === "ACCEPTED" && (
           <Badge className="ml-auto rounded-full border-black bg-green text-black">
             <CheckCircle2 className="h-3.5 w-3.5" />
