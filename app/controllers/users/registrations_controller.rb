@@ -29,7 +29,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
 
     super
-    session.delete(:shared_search_token) if resource.persisted?
+    return unless resource.persisted?
+
+    # Someone who can't apply to it, such as a 17-year-old, isn't sent back to its form.
+    session.delete("user_return_to") if session.delete(:shared_search_token) && resource.signup_pair_request.nil?
   end
 
   # GET /resource/edit
@@ -63,7 +66,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
   def build_resource(hash = {})
     super
     token = session[:shared_search_token]
-    resource.signup_pair_request = PairRequest.find_by(share_token: token) if action_name == "create" && token.present?
+    return unless action_name == "create" && token.present?
+
+    search = PairRequest.find_by(share_token: token)
+    resource.signup_pair_request = search if search && resource.same_age_group?(search.user)
   end
 
   def configure_sign_up_params

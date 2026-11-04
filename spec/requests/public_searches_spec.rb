@@ -113,6 +113,51 @@ RSpec.describe "Shareable partner search links", type: :request do
     end
   end
 
+  describe "a poster with no date of birth" do
+    it "has no page, and no link" do
+      poster.update_columns(date_of_birth: nil)
+
+      get public_search_path(token:)
+
+      expect(response).to have_http_status(:not_found)
+      expect(search.reload).not_to be_shareable
+    end
+  end
+
+  describe "a signed-in viewer who can't see this search" do
+    it "shows an under-18 the same page as a bad link, with nothing about the adult" do
+      sign_in(create(:user, date_of_birth: 17.years.ago.to_date))
+
+      get public_search_path(token:)
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).not_to include("Python buddy", "Maya")
+
+      get public_search_apply_path(token:)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "does the same when blocked, whichever of them did it" do
+      viewer = create(:user)
+      viewer.block!(poster)
+      sign_in(viewer)
+
+      get public_search_path(token:)
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).not_to include("Python buddy")
+    end
+
+    it "does the same for someone whose age isn't known" do
+      viewer = create(:user).tap { |u| u.update_columns(date_of_birth: nil) }
+      sign_in(viewer)
+
+      get public_search_path(token:)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
   describe "the poster's own view" do
     before do
       search
@@ -150,23 +195,21 @@ RSpec.describe "Shareable partner search links", type: :request do
       expect(response).to redirect_to(new_pair_request_offer_path(search, via: "share"))
     end
 
-    it "keeps the age-group rule" do
+    it "keeps the form closed to another age group" do
       sign_in(create(:user, date_of_birth: 17.years.ago.to_date))
 
-      get public_search_apply_path(token:)
-      follow_redirect!
+      get new_pair_request_offer_path(search, via: "share")
 
       expect(response).to redirect_to(pair_requests_path)
       expect(flash[:alert]).to include("switched off")
     end
 
-    it "keeps the block rule" do
+    it "keeps the form closed when blocked" do
       user = create(:user)
       poster.block!(user)
       sign_in(user)
 
-      get public_search_apply_path(token:)
-      follow_redirect!
+      get new_pair_request_offer_path(search, via: "share")
 
       expect(response).to redirect_to(pair_requests_path)
       expect(flash[:alert]).to include("switched off")
@@ -234,6 +277,18 @@ RSpec.describe "Shareable partner search links", type: :request do
       User.find_by!(email: "new@example.com").confirm
       search.switch_off!
       reset!
+
+      sign_in_as_new_person
+
+      expect(response).to redirect_to(onboarding_path)
+    end
+
+    it "doesn't send a 17-year-old back to an adult's search, or count them" do
+      post user_registration_path, params: { user: signup[:user].merge(date_of_birth: 17.years.ago.to_date.iso8601) }
+      user = User.find_by!(email: "new@example.com")
+      user.confirm
+
+      expect(user.signup_pair_request).to be_nil
 
       sign_in_as_new_person
 

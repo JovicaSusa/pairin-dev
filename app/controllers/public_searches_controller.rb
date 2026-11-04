@@ -24,6 +24,6 @@ class PublicSearchesController < ApplicationController
   def set_search
     @search = PairRequest.find_by(share_token: params[:token])
 
-    render :invalid, status: :not_found unless @search&.shareable?
+    render :invalid, status: :not_found unless @search&.shareable? && @search.visible_through_link_to?(current_user)
   end
 end
