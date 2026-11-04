@@ -16,6 +16,11 @@ class OfferMailer < ApplicationMailer
     mail(to: @offer.offerer.email, subject: "No answer yet on #{@offer.pair_request.subject}")
   end
 
+  # The applicant was told the poster had gone quiet, so this one's good news.
+  def late_reply_email
+    mail(to: @offer.offerer.email, subject: "#{@poster.display_name} came back and replied")
+  end
+
   # To whoever didn't end it. The reason they gave stays private.
   def not_a_match_email
     @ended_by = @offer.ended_by

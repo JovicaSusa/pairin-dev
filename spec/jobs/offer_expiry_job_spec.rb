@@ -32,6 +32,17 @@ RSpec.describe OfferExpiryJob, type: :job do
           .and have_enqueued_mail(OfferMailer, :offer_expired_email).with(params: { offer: later_offer }, args: []).once
       end
 
+      it "doesn't apologise to someone already talking to the poster" do
+        talking = create(:offer, pair_request:)
+        talking.post_message(pair_request.user, "Great to meet you")
+
+        expect { perform }
+          .to have_enqueued_mail(OfferMailer, :offer_expired_email).with(params: { offer: }, args: []).once
+
+        expect(offer.reload.expiry_notified_at).to be_present
+        expect(talking.reload.expiry_notified_at).to be_nil
+      end
+
       it "apologises to nobody when it doesn't switch the request off" do
         pair_request.update!(paused_at: 1.day.ago)
 
@@ -47,6 +58,24 @@ RSpec.describe OfferExpiryJob, type: :job do
         expect { described_class.perform_now(later_offer) }
           .to have_enqueued_mail(PairRequestMailer, :request_paused_email)
           .and not_have_enqueued_mail(OfferMailer, :offer_expired_email)
+      end
+    end
+
+    context "when the poster replied in time" do
+      before { offer.post_message(offer.poster, "Great to meet you") }
+
+      it "leaves the search on and tells nobody" do
+        expect { perform }.not_to have_enqueued_mail(PairRequestMailer, :request_paused_email)
+        expect(pair_request.reload).not_to be_paused
+      end
+    end
+
+    context "when the conversation was ended" do
+      before { offer.not_a_match!(by: offer.poster) }
+
+      it "leaves the search on and tells nobody" do
+        expect { perform }.not_to have_enqueued_mail(PairRequestMailer, :request_paused_email)
+        expect(pair_request.reload).not_to be_paused
       end
     end
 

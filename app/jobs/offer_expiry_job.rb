@@ -1,11 +1,13 @@
-# Runs when an offer's slot starts. An offer nobody answered means the poster
-# isn't around, so the request is switched off and the poster is asked if
-# they're still looking.
+# Runs 72 hours after someone applies. An application nobody answered means the
+# poster isn't around, so the search is switched off and the poster is asked if
+# they're still looking. A reply or a "Not a match" stops this clock.
 class OfferExpiryJob < ApplicationJob
   queue_as :default
   discard_on ActiveJob::DeserializationError
 
   def perform(offer)
+    return unless offer.unanswered?
+
     pair_request = offer.pair_request
 
     # Checked under a row lock on the request.
@@ -23,12 +25,12 @@ class OfferExpiryJob < ApplicationJob
 
   private
 
-  # Each offerer hears about a quiet poster once, even if the request is
-  # resumed and paused again later.
+  # Each applicant still waiting hears about a quiet poster once, even if the
+  # search is resumed and paused again later. People already talking don't.
   def point_offerers_elsewhere(pair_request)
     return unless Rails.configuration.x.send_suggestion_emails
 
-    not_yet_told = pair_request.offers.where(expiry_notified_at: nil).to_a
+    not_yet_told = pair_request.offers.where(expiry_notified_at: nil, replied_at: nil, ended_at: nil).to_a
     not_yet_told.each do |offer|
       OfferMailer.with(offer:).offer_expired_email.deliver_later
     end

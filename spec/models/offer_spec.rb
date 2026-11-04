@@ -71,18 +71,34 @@ RSpec.describe Offer, type: :model do
       expect(offer.reminder_at).to eq(offer.created_at + 24.hours)
     end
 
-    it "expires after 72 hours" do
-      travel_to(offer.created_at + 72.hours - 1.minute) { expect(offer).not_to be_expired }
-      travel_to(offer.created_at + 72.hours + 1.second) do
-        expect(offer).to be_expired
-        expect(offer.status).to eq("EXPIRED")
-      end
+    it "is overdue after 72 hours with no answer" do
+      expect(offer.expires_at).to eq(offer.created_at + 72.hours)
+
+      travel_to(offer.created_at + 72.hours - 1.minute) { expect(offer).not_to be_overdue }
+      travel_to(offer.created_at + 72.hours + 1.second) { expect(offer).to be_overdue }
+    end
+
+    it "stops when the poster replies" do
+      offer.post_message(offer.poster, "Hi")
+
+      expect(offer).not_to be_unanswered
+      travel_to(offer.expires_at + 1.day) { expect(offer).not_to be_overdue }
+    end
+
+    it "stops when either person ends it" do
+      offer.not_a_match!(by: offer.offerer)
+
+      expect(offer).not_to be_unanswered
+    end
+
+    it "treats an application accepted the old way as answered" do
+      expect(create(:offer, :accepted)).not_to be_unanswered
     end
 
     it "ignores an old application's time" do
       old = create(:offer, with_old_period: true)
 
-      travel_to(old.period.start_at + 1.hour) { expect(old).not_to be_expired }
+      travel_to(old.period.start_at + 1.hour) { expect(old).not_to be_overdue }
     end
   end
 

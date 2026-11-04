@@ -19,7 +19,7 @@
   <% if @pair_request.paused? %>
     <%= button_to "Turn it back on", request_resumption_path(token: params[:token]),
           class: "mt-8 rounded-xl border-2 border-black bg-orange px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none" %>
-    <p class="mt-3 text-sm text-gray-500">Others will see it again and can apply. Applications that already expired stay expired.</p>
+    <p class="mt-3 text-sm text-gray-500">Others will see it again and can apply. You can still reply to anyone who already applied.</p>
   <% else %>
     <p class="mt-8 text-gray-700">Others can see it and apply again. <a href="<%= users_pair_requests_path %>" class="text-purple font-bold">See your partner searches</a>.</p>
   <% end %>

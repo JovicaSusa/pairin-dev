@@ -36,8 +36,15 @@ class Offer < ApplicationRecord
     accepted_at?
   end
 
-  def pending?
-    status == "PENDING"
+  # The clock on an application runs until the poster replies or either person
+  # ends it. Old applications accepted the old way count as answered too.
+  def unanswered?
+    !replied_at? && !ended? && !accepted?
+  end
+
+  # The poster has gone past the deadline, so a reply now is a late one.
+  def overdue?
+    unanswered? && expires_at <= Time.current
   end
 
   def poster
@@ -125,17 +132,11 @@ class Offer < ApplicationRecord
     offerer.display_name
   end
 
-  def expired?
-    expires_at <= Time.current
-  end
-
   def status
     if accepted?
       "ACCEPTED"
     elsif pair_request.has_accepted_offer?
       "ACCEPTED OTHER"
-    elsif expired?
-      "EXPIRED"
     else
       "PENDING"
     end
