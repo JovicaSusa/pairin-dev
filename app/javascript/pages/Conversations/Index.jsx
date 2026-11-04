@@ -76,7 +76,7 @@ function ApplicationAnswers({ conversation }) {
     ["How long", application.how_long_label],
     [isPoster ? "You're looking for" : `${other.name} is looking for`, search.commitment_label],
   ];
-  if (isPoster) rows.push(["Level", other.level ?? "Not added"]);
+  if (isPoster && other.level) rows.push(["Level", other.level]);
 
   return (
     <div className="rounded-2xl border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">

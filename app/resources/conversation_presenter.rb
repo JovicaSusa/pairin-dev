@@ -16,7 +16,7 @@ class ConversationPresenter
       status: status,
       line: line,
       unread: @unread,
-      other: { name: @other.display_name, image_url: @other.image_url }
+      other: other_profile.slice(:name, :image_url)
     }
   end
 
@@ -31,12 +31,7 @@ class ConversationPresenter
       can_send: @offer.can_message?(@viewer),
       search: { subject: @offer.pair_request.subject, commitment_label: @offer.pair_request.commitment_label },
       application: application,
-      other: {
-        name: @other.display_name,
-        image_url: @other.image_url,
-        level: @other.level_titleized,
-        github_url: @other.github_url
-      },
+      other: other_profile.slice(:name, :image_url, :level, :github_url),
       messages: @offer.messages.order(:created_at, :id).map { |message|
         { id: message.id, mine: message.sender_id == @viewer.id, body: message.body, at: message.created_at.utc.iso8601 }
       }
@@ -44,6 +39,10 @@ class ConversationPresenter
   end
 
   private
+
+  def other_profile
+    @other_profile ||= @other.profile_for_others
+  end
 
   def status
     @offer.conversation_status_for(@viewer)

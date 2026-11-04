@@ -41,7 +41,7 @@ export default function OfferCard({ offer }) {
             ["How often", offer.how_often_label],
             ["How long", offer.how_long_label],
             ["Level", offer.offerer.level],
-          ].map(([label, value]) => (
+          ].filter(([, value]) => value).map(([label, value]) => (
             <div key={label}>
               <dt className="text-xs font-bold uppercase tracking-wide text-black/50">{label}</dt>
               <dd className="font-medium">{value}</dd>

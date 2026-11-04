@@ -4,6 +4,7 @@ class User < ApplicationRecord
   LEVELS = %w(expert proficient competent advanced_beginner novice).freeze
   # Not legal advice: see the "Minimum-age requirements for Pairin" research.
   MINIMUM_AGE = 16
+  ADULT_AGE = 18
   # Starting points for rate limits, meant to be changed as we learn.
   NEW_ACCOUNT_AGE = 7.days
   NEW_ACCOUNT_APPLICATIONS_PER_DAY = 5
@@ -93,6 +94,41 @@ class User < ApplicationRecord
   validates :timezone, inclusion: { in: TIMEZONES, message: "isn't a known timezone" }, if: :timezone_changed?
   # Signup sends whatever the browser reports; an unknown zone shouldn't block the account.
   before_validation(on: :create) { self.timezone = "UTC" unless TIMEZONES.include?(timezone) }
+
+  # Someone whose age we don't know yet is in neither group, so they can't see
+  # or be seen by anyone until they've answered.
+  scope :minors, -> { where(date_of_birth: (ADULT_AGE.years.ago.to_date + 1)..) }
+  scope :adults, -> { where(date_of_birth: ..ADULT_AGE.years.ago.to_date) }
+
+  def minor?
+    date_of_birth.present? && date_of_birth > ADULT_AGE.years.ago.to_date
+  end
+
+  def adult?
+    date_of_birth.present? && !minor?
+  end
+
+  def age_group
+    return :minor if minor?
+
+    :adult if adult?
+  end
+
+  def same_age_group?(other)
+    age_group.present? && age_group == other.age_group
+  end
+
+  def same_age_group
+    minor? ? User.minors : User.adults
+  end
+
+  # What other people may see of this person. Under-18s show only their name;
+  # their learning topic is the partner search itself.
+  def profile_for_others
+    return { name: display_name, image_url: nil, profession: nil, level: nil, github_url: nil } if minor?
+
+    { name: display_name, image_url:, profession:, level: level_titleized, github_url: }
+  end
 
   def level_titleized
     level&.titleize

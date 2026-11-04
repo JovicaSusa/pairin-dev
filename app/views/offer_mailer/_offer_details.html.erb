@@ -5,7 +5,9 @@
                   <p style="margin: 0 0 8px; line-height: 24px"><span style="font-weight: 600">Their goal:</span> <%= offer.goal %></p>
                   <p style="margin: 0 0 8px; line-height: 24px"><span style="font-weight: 600">How often:</span> <%= offer.how_often_label %></p>
                   <p style="margin: 0 0 8px; line-height: 24px"><span style="font-weight: 600">How long:</span> <%= offer.how_long_label %> (you're looking for: <%= offer.pair_request.commitment_label %>)</p>
-                  <p style="margin: 0 0 8px; line-height: 24px"><span style="font-weight: 600">Level:</span> <%= offer.offerer.level_titleized %></p>
+                  <% if offer.offerer.profile_for_others[:level] %>
+                    <p style="margin: 0 0 8px; line-height: 24px"><span style="font-weight: 600">Level:</span> <%= offer.offerer.profile_for_others[:level] %></p>
+                  <% end %>
                 <% end %>
                 <% if offer.period %>
                 <p style="margin: 0; line-height: 24px">
@@ -15,7 +17,7 @@
                   (<%= poster.timezone %>)
                 </p>
                 <% end %>
-                <% if offer.offerer.github_url.present? %>
+                <% if offer.offerer.profile_for_others[:github_url].present? %>
                   <p style="margin: 8px 0 0; line-height: 24px">
                     <span style="font-weight: 600">GitHub:</span>
                     <a href="<%= offer.offerer.github_url %>" style="color: #4338ca"><%= offer.offerer.github_url %></a>
