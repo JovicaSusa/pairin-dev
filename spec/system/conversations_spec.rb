@@ -63,10 +63,15 @@ RSpec.describe "conversations", type: :system do
     expect(page).not_to have_button("Become partners")
     click_button "Accept"
 
-    expect(page).to have_content("You and Sam are partners.")
+    expect(page).to have_content("You and Sam")
+    expect(page).to have_content(/workspace/i)
     expect(page).to have_field("Write a message")
-    expect(page).not_to have_button("Not a match")
     expect(offer.reload).to be_partners
+
+    visit conversation_path(offer)
+
+    expect(page).to have_content("You and Sam are partners.")
+    expect(page).not_to have_button("Not a match")
   end
 
   it "proposes from the header and can be told not yet" do
@@ -124,9 +129,9 @@ RSpec.describe "conversations", type: :system do
     visit conversation_path(offer)
 
     click_button "Block"
-    expect(page).to have_content("Sam won't be told.")
+    expect(page).to have_content("Sam won't be told you blocked them.")
     click_button "Cancel"
-    expect(page).not_to have_content("Sam won't be told.")
+    expect(page).not_to have_content("Sam won't be told you blocked them.")
     expect(Block.count).to eq(0)
 
     click_button "Block"
@@ -142,6 +147,7 @@ RSpec.describe "conversations", type: :system do
     visit conversations_path
 
     expect(page).to have_link("Conversations")
+    expect(page).to have_link("Partners")
     expect(page).not_to have_link("Sessions")
     click_button "Partner searches"
     expect(page).to have_link("Opened")

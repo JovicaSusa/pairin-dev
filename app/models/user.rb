@@ -60,7 +60,10 @@ class User < ApplicationRecord
     transaction do
       blocks_made.find_or_create_by!(blocked: other)
 
-      Offer.between(self, other).to_a.each { |offer| offer.not_a_match!(by: self) }
+      Offer.between(self, other).includes(:partnership).to_a.each do |offer|
+        offer.partnership&.end!(by: self)
+        offer.not_a_match!(by: self)
+      end
     end
   end
 

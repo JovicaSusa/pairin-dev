@@ -8,10 +8,13 @@ const consumer = createConsumer();
 // fresh props through the normal, permission-checked request, so nothing is
 // ever trusted from the socket and missed signals are simply caught up on.
 function refresh() {
-  const onConversations = window.location.pathname.startsWith("/conversations");
+  const path = window.location.pathname;
+  const only = ["unreadMessages"];
+  if (path.startsWith("/conversations")) only.push("conversations", "conversation");
+  if (path.startsWith("/partners")) only.push("partnership", "partnerships");
 
   router.reload({
-    only: onConversations ? ["conversations", "conversation", "unreadMessages"] : ["unreadMessages"],
+    only,
     async: true,
   });
 }
