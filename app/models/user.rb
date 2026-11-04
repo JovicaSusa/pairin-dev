@@ -9,6 +9,8 @@ class User < ApplicationRecord
   NEW_ACCOUNT_AGE = 7.days
   NEW_ACCOUNT_APPLICATIONS_PER_DAY = 5
   MESSAGES_PER_HOUR = 60
+  # How long a suspended account can be put right before it's deleted.
+  SUSPENSION_GRACE_PERIOD = 14.days
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -130,6 +132,30 @@ class User < ApplicationRecord
     return { name: display_name, image_url: nil, profession: nil, level: nil, github_url: nil } if minor?
 
     { name: display_name, image_url:, profession:, level: level_titleized, github_url: }
+  end
+
+  scope :suspended_past_grace_period, -> { where(suspended_at: ..SUSPENSION_GRACE_PERIOD.ago) }
+
+  # Their searches go Off straight away, so nobody sees them during the grace
+  # period. The date they gave isn't kept.
+  def suspend!
+    transaction do
+      update_columns(suspended_at: Time.current)
+      pair_requests.switched_on.find_each(&:switch_off!)
+    end
+  end
+
+  def suspended?
+    suspended_at?
+  end
+
+  # Devise checks these on every request, so this also ends any other open session.
+  def active_for_authentication?
+    super && !suspended?
+  end
+
+  def inactive_message
+    suspended? ? :suspended : super
   end
 
   def level_titleized

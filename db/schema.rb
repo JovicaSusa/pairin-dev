@@ -175,6 +175,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_210000) do
     t.string "profession"
     t.string "timezone", default: "UTC", null: false
     t.string "github_url"
+    t.datetime "suspended_at"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["country"], name: "index_users_on_country"
     t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
@@ -182,6 +183,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_210000) do
     t.index ["language"], name: "index_users_on_language"
     t.index ["programming_since"], name: "index_users_on_programming_since"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["suspended_at"], name: "index_users_on_suspended_at"
   end
 
   add_foreign_key "activities", "users", column: "receiver_id"
