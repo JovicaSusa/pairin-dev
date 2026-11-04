@@ -14,9 +14,12 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :confirmable
 
-  has_many :pair_requests, dependent: :destroy # TODO: Reconsider dependent option
-  has_many :offers, foreign_key: :offerer_id, dependent: nil # TODO: Reconsider dependent option
-  has_many :participations, foreign_key: :participant_id, dependent: nil # TODO: Reconsider dependent option
+  # Deleting an account deletes every conversation the person was in, on either
+  # side, including the other person's messages. The privacy policy promises this.
+  has_many :pair_requests, dependent: :destroy
+  has_many :offers, foreign_key: :offerer_id, dependent: :destroy
+  has_many :participations, foreign_key: :participant_id, dependent: :destroy
+  has_many :activities, foreign_key: :receiver_id, dependent: :destroy, inverse_of: :receiver
   has_many :sessions, through: :participations, source: :participable, source_type: Session.name
   has_many :availability_windows, dependent: :destroy
   has_many :blocks_made, class_name: "Block", foreign_key: :blocker_id, dependent: :destroy, inverse_of: :blocker

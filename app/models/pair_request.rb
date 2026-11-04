@@ -2,12 +2,12 @@ class PairRequest < ApplicationRecord
   include ActivityGeneratable
 
   belongs_to :user
-  has_many :offers, dependent: nil # TODO: Reconsider
+  has_many :offers, dependent: :destroy
   has_one :accepted_offer, -> { accepted }, class_name: "Offer"
   # History only: requests used to own their time slots.
   has_many :periods, as: :periodable, dependent: :destroy, inverse_of: :periodable
   has_many :sessions, as: :sessionable
-  has_many :taggings, as: :taggable
+  has_many :taggings, as: :taggable, dependent: :destroy
   has_many :tags, through: :taggings
 
   COMMITMENTS = {
