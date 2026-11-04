@@ -49,6 +49,8 @@ class PairRequests::OffersController < ApplicationController
       OfferReminderJob.set(wait_until: @offer.reminder_at).perform_later(@offer)
 
       after_applying notice: "Application sent! We've emailed the poster."
+    elsif @offer.errors.of_kind?(:pair_request_id, :taken)
+      redirect_to pair_requests_path, alert: "You've already applied to this partner search."
     else
       redirect_back_or_to new_pair_request_offer_path(@pair_request), inertia: { errors: @offer.errors.to_hash(true) }
     end
@@ -72,11 +74,17 @@ class PairRequests::OffersController < ApplicationController
   # From the list's drawer they go back to the same filtered list; from the
   # full form page they go to the list.
   def after_applying(notice:)
-    if URI(request.referer.to_s).path == pair_requests_path
+    if came_from_the_list?
       redirect_back_or_to pair_requests_path, notice:
     else
       redirect_to pair_requests_path, notice:
     end
+  end
+
+  def came_from_the_list?
+    URI.parse(request.referer.to_s).path == pair_requests_path
+  rescue URI::InvalidURIError
+    false
   end
 
   def reject_switched_off_request

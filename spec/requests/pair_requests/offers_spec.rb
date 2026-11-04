@@ -143,6 +143,23 @@ RSpec.describe "PairRequests::Offers", type: :request do
       expect(response).to redirect_to(list)
     end
 
+    it "goes to the list when the referer can't be read, and still saves" do
+      expect {
+        post pair_request_offers_path(pair_request), params: { offer: answers }, headers: { "HTTP_REFERER" => "not a url" }
+      }.to change(Offer, :count).by(1)
+
+      expect(response).to redirect_to(pair_requests_path)
+    end
+
+    it "says so when they've already applied" do
+      post_offer
+
+      expect { post_offer }.not_to change(Offer, :count)
+
+      expect(response).to redirect_to(pair_requests_path)
+      expect(flash[:alert]).to eq("You've already applied to this partner search.")
+    end
+
     it "goes to the list from the full form page" do
       post pair_request_offers_path(pair_request), params: { offer: answers }, headers: { "HTTP_REFERER" => new_pair_request_offer_url(pair_request) }
 
