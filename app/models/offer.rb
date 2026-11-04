@@ -4,6 +4,8 @@ class Offer < ApplicationRecord
   belongs_to :offerer, class_name: "User"
   belongs_to :pair_request
   belongs_to :ended_by, class_name: "User", optional: true
+  belongs_to :proposed_by, class_name: "User", optional: true
+  has_one :partnership, dependent: :destroy
   has_many :messages, dependent: :destroy
   # History only: applications used to book a time. New ones have no period.
   has_one :period, as: :periodable, dependent: :destroy, inverse_of: :periodable, autosave: true
@@ -25,6 +27,7 @@ class Offer < ApplicationRecord
   validates :pair_request_id, uniqueness: { scope: :offerer_id }
 
   UNREAD_EMAIL_AFTER = 15.minutes
+  PROPOSAL_REMINDER_AFTER = 3.days
   REMIND_AFTER = 24.hours
   ANSWER_WITHIN = 72.hours
 
@@ -109,8 +112,48 @@ class Offer < ApplicationRecord
     end
   end
 
+  def partners?
+    partnership.present?
+  end
+
+  def proposal_pending?
+    proposed_at?
+  end
+
+  def can_propose?
+    chat_open? && !partners? && !proposal_pending? && !pair_request.partnership
+  end
+
+  # Returns :proposed or :accepted, or nil if it can't happen. If the other
+  # person proposed at the same moment, they both want this, so it's accepted.
+  def propose_partnership!(by:)
+    with_lock do
+      next accept_proposal(by:) && :accepted if proposal_pending? && proposed_by_id != by.id
+      next unless can_propose?
+
+      update_columns(proposed_at: Time.current, proposed_by_id: by.id, proposal_declined_at: nil)
+      :proposed
+    end
+  end
+
+  # Returns the partnership, or nil if it can't happen.
+  def accept_proposal!(by:)
+    with_lock { accept_proposal(by:) }
+  end
+
+  # The chat stays open, and either person can propose again.
+  def decline_proposal!(by:)
+    with_lock do
+      next false unless proposal_pending? && proposed_by_id != by.id
+
+      update_columns(proposed_at: nil, proposal_declined_at: Time.current)
+      true
+    end
+  end
+
   def conversation_status_for(user)
     return "Ended" if ended?
+    return "Partners" if partners?
     return "Talking" if replied_at?
 
     user == poster ? "Reply" : "Sent"
@@ -186,6 +229,18 @@ class Offer < ApplicationRecord
   end
 
   private
+
+  # Locks the search too: only one of its chats can become the partnership.
+  def accept_proposal(by:)
+    return unless chat_open? && proposal_pending? && proposed_by_id != by.id
+
+    pair_request.with_lock do
+      next if pair_request.partnership
+
+      update_columns(proposed_at: nil)
+      create_partnership!(pair_request:)
+    end
+  end
 
   def read_column_for(user)
     user == offerer ? :offerer_read_at : :poster_read_at

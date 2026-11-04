@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_04_190000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -75,10 +75,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_190000) do
     t.datetime "offerer_read_at"
     t.datetime "poster_emailed_at"
     t.datetime "offerer_emailed_at"
+    t.datetime "proposed_at"
+    t.bigint "proposed_by_id"
+    t.datetime "proposal_declined_at"
     t.index ["ended_by_id"], name: "index_offers_on_ended_by_id"
     t.index ["last_message_at"], name: "index_offers_on_last_message_at"
     t.index ["offerer_id", "pair_request_id"], name: "index_offers_on_offerer_id_and_pair_request_id", unique: true
     t.index ["offerer_id"], name: "index_offers_on_offerer_id"
+    t.index ["proposed_by_id"], name: "index_offers_on_proposed_by_id"
     t.index ["pair_request_id"], name: "index_offers_on_pair_request_id"
   end
 
@@ -100,6 +104,15 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_190000) do
     t.string "role", null: false
     t.index ["participable_type", "participable_id"], name: "index_participations_on_participable"
     t.index ["participant_id"], name: "index_participations_on_participant_id"
+  end
+
+  create_table "partnerships", force: :cascade do |t|
+    t.bigint "offer_id", null: false
+    t.bigint "pair_request_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["offer_id"], name: "index_partnerships_on_offer_id", unique: true
+    t.index ["pair_request_id"], name: "index_partnerships_on_pair_request_id", unique: true
   end
 
   create_table "periods", force: :cascade do |t|
@@ -177,6 +190,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_190000) do
   add_foreign_key "messages", "offers"
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "offers", "users", column: "ended_by_id"
+  add_foreign_key "offers", "users", column: "proposed_by_id"
+  add_foreign_key "partnerships", "offers"
+  add_foreign_key "partnerships", "pair_requests"
   add_foreign_key "availability_windows", "users"
   add_foreign_key "offers", "pair_requests"
   add_foreign_key "offers", "users", column: "offerer_id"

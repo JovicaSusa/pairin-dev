@@ -3,6 +3,7 @@ class PairRequest < ApplicationRecord
 
   belongs_to :user
   has_many :offers, dependent: :destroy
+  has_one :partnership, dependent: :destroy
   has_one :accepted_offer, -> { accepted }, class_name: "Offer"
   # History only: requests used to own their time slots.
   has_many :periods, as: :periodable, dependent: :destroy, inverse_of: :periodable

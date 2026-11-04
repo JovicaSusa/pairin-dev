@@ -41,6 +41,9 @@ Rails.application.routes.draw do
     post :not_a_match, on: :member
     post :block, on: :member
     post :report, on: :member
+    post :propose, on: :member
+    post :accept_proposal, on: :member
+    post :decline_proposal, on: :member
     resources :messages, only: [:create], module: :conversations
   end
 
