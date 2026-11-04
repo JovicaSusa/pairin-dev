@@ -12,7 +12,7 @@ if Rails.env.development?
   timezones = ["Europe/Berlin", "Europe/London", "America/New_York", "Asia/Tokyo", "UTC"]
 
   posters = Array.new(20) { Faker::Internet.email }.map do |email|
-    user = User.create!(email: email, confirmed_at: Time.zone.now, password: "Password33*", timezone: timezones.sample)
+    user = User.create!(email: email, confirmed_at: Time.zone.now, password: "Password33*", timezone: timezones.sample, date_of_birth: Faker::Date.birthday(min_age: 18, max_age: 60))
 
     # Weekly hours: three evenings a week, long enough for the longest seeded call.
     [1, 2, 3, 4, 5, 6, 7].sample(3).each do |weekday|

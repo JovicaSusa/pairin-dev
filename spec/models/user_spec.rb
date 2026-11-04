@@ -26,6 +26,10 @@ RSpec.describe User, type: :model do
       expect(build(:user, date_of_birth: Date.tomorrow).tap(&:validate).errors[:date_of_birth]).to include("can't be in the future")
     end
 
+    it "can't make a new account under the minimum age, however it's created" do
+      expect(build(:user, date_of_birth: 15.years.ago.to_date)).not_to be_valid
+    end
+
     it "can't be changed once set" do
       user = create(:user, date_of_birth: Date.new(1990, 6, 15))
 

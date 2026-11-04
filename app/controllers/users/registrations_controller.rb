@@ -21,8 +21,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
 
     # Under the minimum age: no account, nothing stored, and no retrying
-    # with a different date for about a day.
-    if (date_of_birth = submitted_date_of_birth) && !User.old_enough?(date_of_birth)
+    # with a different date for about a day. Checks the date the model would
+    # store, so every format it accepts is covered.
+    if User.new(sign_up_params).under_age?
       cookies.signed[AGE_RESTRICTION_COOKIE] = { value: true, expires: 24.hours, httponly: true }
       return redirect_to new_user_registration_path
     end
@@ -67,15 +68,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   def show_age_restriction
     request.post? ? redirect_to(new_user_registration_path) : render(:age_restricted)
-  end
-
-  # A real date that isn't in the future; anything else is left to the
-  # model's validation errors.
-  def submitted_date_of_birth
-    date = Date.iso8601(params.dig(:user, :date_of_birth).to_s)
-    date if date <= Date.current
-  rescue Date::Error
-    nil
   end
 
   # If you have extra params to permit, append them to the sanitizer.

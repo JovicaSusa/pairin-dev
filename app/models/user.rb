@@ -21,6 +21,7 @@ class User < ApplicationRecord
   validates :level, inclusion: { in: LEVELS }, allow_nil: true
   validates :date_of_birth, presence: true, on: :create
   validates :date_of_birth, comparison: { less_than_or_equal_to: -> { Date.current }, message: "can't be in the future" }, allow_nil: true
+  validate :old_enough_for_an_account, on: :create, if: :under_age?
   # The age gate relies on it, so once given it stays put.
   validate :date_of_birth_unchanged, on: :update, if: -> { date_of_birth_changed? && date_of_birth_was.present? }
   TIMEZONES = TZInfo::Timezone.all_identifiers.to_set.freeze
@@ -33,8 +34,22 @@ class User < ApplicationRecord
     level&.titleize
   end
 
+  # Judged on today's date where the person is, so a birthday counts from its
+  # local start. A future date isn't under age; it's a typo the form reports.
+  def under_age?
+    return false if date_of_birth.blank?
+
+    today = Time.find_zone(timezone)&.today || Date.current
+
+    date_of_birth <= today && !self.class.old_enough?(date_of_birth, today:)
+  end
+
   private def date_of_birth_unchanged
     errors.add(:date_of_birth, "can't be changed")
+  end
+
+  private def old_enough_for_an_account
+    errors.add(:date_of_birth, "can't be used")
   end
 
   class << self

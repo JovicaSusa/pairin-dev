@@ -7,9 +7,9 @@ RSpec.describe "Signing up", type: :request do
     Nokogiri::HTML(response.body).at("main").text.squish
   end
 
-  def sign_up(date_of_birth:, email: "new@example.com")
+  def sign_up(date_of_birth: nil, email: "new@example.com", **attributes)
     post user_registration_path, params: {
-      user: { email:, password: "secret-password-123", password_confirmation: "secret-password-123", date_of_birth: }
+      user: { email:, password: "secret-password-123", password_confirmation: "secret-password-123", date_of_birth:, **attributes }.compact
     }
   end
 
@@ -38,9 +38,50 @@ RSpec.describe "Signing up", type: :request do
     expect(Nokogiri::HTML(response.body).at("form").text.squish).to include("Date of birthcan't be blank")
   end
 
+  it "shows a form error, not the refusal, for a date in the future" do
+    expect { sign_up(date_of_birth: "2030-01-01") }.not_to change(User, :count)
+
+    expect(Nokogiri::HTML(response.body).at("form").text.squish).to include("can't be in the future")
+    get new_user_registration_path
+    expect(response.body).not_to include("due to an age restriction")
+  end
+
+  context "when the date is in the signer-up's timezone" do
+    it "lets someone in on their birthday when it's already that day for them" do
+      # 12:00 UTC on 2 Nov is 01:00 on 3 Nov in Auckland.
+      expect { sign_up(date_of_birth: "2010-11-03", timezone: "Pacific/Auckland") }.to change(User, :count).by(1)
+    end
+
+    it "refuses someone whose birthday hasn't started for them yet" do
+      travel_to Time.utc(2026, 11, 3, 2, 0) # Still 2 Nov in Honolulu.
+
+      expect { sign_up(date_of_birth: "2010-11-03", timezone: "Pacific/Honolulu") }.not_to change(User, :count)
+    end
+
+    it "falls back to UTC for an unknown timezone" do
+      expect { sign_up(date_of_birth: "2010-11-03", timezone: "Not/AZone") }.not_to change(User, :count)
+    end
+  end
+
   context "when under 16" do
     it "creates no account and stores nothing" do
       expect { sign_up(date_of_birth: "2010-11-03") }.not_to change(User, :count)
+    end
+
+    it "refuses a date written in another format" do
+      expect { sign_up(date_of_birth: "3 Nov 2010") }.not_to change(User, :count)
+
+      get new_user_registration_path
+      expect(response.body).to include("due to an age restriction")
+    end
+
+    it "refuses a date sent as separate year, month and day fields" do
+      expect {
+        sign_up("date_of_birth(1i)": "2010", "date_of_birth(2i)": "11", "date_of_birth(3i)": "3")
+      }.not_to change(User, :count)
+
+      get new_user_registration_path
+      expect(response.body).to include("due to an age restriction")
     end
 
     it "says why without naming the age" do
