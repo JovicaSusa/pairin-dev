@@ -2,7 +2,8 @@ class Message < ApplicationRecord
   MAX_LENGTH = 5000
 
   belongs_to :offer
-  belongs_to :sender, class_name: "User"
+  # Nobody for a message from Pairin itself, like a chat's closing message.
+  belongs_to :sender, class_name: "User", optional: true
 
   validates :body, presence: true, length: { maximum: MAX_LENGTH }
 

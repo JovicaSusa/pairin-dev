@@ -28,6 +28,7 @@ class ConversationPresenter
       chat_open: @offer.chat_open?,
       ended: @offer.ended?,
       ended_by_viewer: @offer.ended_by_id == @viewer.id,
+      search_filled: @offer.ended? && !@offer.partners? && @offer.pair_request.partnership.present?,
       can_send: @offer.can_message?(@viewer),
       partners: @offer.partners?,
       can_propose: @offer.can_propose?,
@@ -36,7 +37,7 @@ class ConversationPresenter
       application: application,
       other: other_profile.slice(:name, :image_url, :level, :github_url),
       messages: @offer.messages.order(:created_at, :id).map { |message|
-        { id: message.id, mine: message.sender_id == @viewer.id, body: message.body, at: message.created_at.utc.iso8601 }
+        { id: message.id, mine: message.sender_id == @viewer.id, from_pairin: message.sender_id.nil?, body: message.body, at: message.created_at.utc.iso8601 }
       }
     }
   end

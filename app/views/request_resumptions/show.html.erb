@@ -16,7 +16,9 @@
     <p class="font-bold"><%= @pair_request.subject %></p>
   </div>
 
-  <% if @pair_request.paused? %>
+  <% if @pair_request.partnership %>
+    <p class="mt-8 text-gray-700">This partner search has found its partner, so it stays off.</p>
+  <% elsif @pair_request.paused? %>
     <%= button_to "Turn it back on", request_resumption_path(token: params[:token]),
           class: "mt-8 rounded-xl border-2 border-black bg-orange px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none" %>
     <p class="mt-3 text-sm text-gray-500">Others will see it again and can apply. You can still reply to anyone who already applied.</p>

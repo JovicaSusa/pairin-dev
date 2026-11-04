@@ -87,6 +87,23 @@ RSpec.describe "conversations", type: :system do
     expect(page).to have_button("Become partners")
   end
 
+  it "closes another chat on the search when a partnership forms" do
+    other = create(:offer, pair_request: search, offerer: create(:user, name: "Lena"))
+    other.post_message(poster, "Hi Lena")
+    offer.post_message(poster, "Great to meet you")
+    offer.propose_partnership!(by: applicant)
+    offer.accept_proposal!(by: poster)
+
+    sign_in(other.offerer)
+    visit conversation_path(other)
+
+    expect(page).to have_content(Partnership::CLOSING_MESSAGE)
+    expect(page).to have_content("This search has found its partner, so this chat has ended.")
+    expect(page).not_to have_field("Write a message")
+    expect(page).not_to have_button("Become partners")
+    expect(page).to have_content("Hi Lena")
+  end
+
   it "reports someone from the thread" do
     sign_in(poster)
     visit conversation_path(offer)

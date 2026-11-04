@@ -16,6 +16,12 @@ class OfferMailer < ApplicationMailer
     mail(to: @offer.offerer.email, subject: "No answer yet on #{@offer.pair_request.subject}")
   end
 
+  def search_filled_email
+    @suggestions = PairRequests::Suggestions.call(@offer)
+
+    mail(to: @offer.offerer.email, subject: "An update on #{@offer.pair_request.subject}")
+  end
+
   def proposal_email
     @proposer = @offer.proposed_by
     mail(to: @offer.other_person(@proposer).email, subject: "#{@proposer.display_name} wants to become partners")
