@@ -1,6 +1,6 @@
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, router, useForm } from "@inertiajs/react";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Lock, MessagesSquare, Send } from "lucide-react";
+import { ArrowLeft, Lock, MessagesSquare, Send, ShieldBan } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -180,9 +180,35 @@ function NotAMatch({ conversation }) {
   );
 }
 
+function BlockConfirmation({ conversation, onCancel }) {
+  const [processing, setProcessing] = useState(false);
+
+  const block = () => {
+    router.post(`/conversations/${conversation.id}/block`, {}, {
+      preserveScroll: true,
+      onStart: () => setProcessing(true),
+      onFinish: () => setProcessing(false),
+    });
+  };
+
+  return (
+    <div role="group" aria-label="Confirm block" className="border-b-2 border-black bg-yellow-50 p-3">
+      <p className="text-sm font-bold">Block {conversation.other.name}?</p>
+      <p className="mb-2 text-xs text-black/60">
+        This ends your conversations, and neither of you will see or apply to the other's partner searches. {conversation.other.name} won't be told.
+      </p>
+      <div className="flex gap-2">
+        <Button type="button" size="sm" disabled={processing} onClick={block}>Block</Button>
+        <Button type="button" size="sm" variant="neutral" onClick={onCancel}>Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
 function Thread({ conversation }) {
   const { other, search, chat_open: chatOpen, ended, can_send: canSend, application } = conversation;
   const [showApplication, setShowApplication] = useState(false);
+  const [confirmingBlock, setConfirmingBlock] = useState(false);
   const scroller = useRef(null);
 
   useEffect(() => {
@@ -204,8 +230,16 @@ function Thread({ conversation }) {
             <p className="truncate text-xs text-black/50">{search.subject}</p>
           </div>
         </div>
-        <StatusBadge status={conversation.status} />
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => setConfirmingBlock(true)} className="flex items-center gap-1 text-xs font-bold text-black/50 hover:text-black">
+            <ShieldBan className="h-3.5 w-3.5" />
+            Block
+          </button>
+          <StatusBadge status={conversation.status} />
+        </div>
       </header>
+
+      {confirmingBlock && <BlockConfirmation conversation={conversation} onCancel={() => setConfirmingBlock(false)} />}
 
       <div ref={scroller} className={`flex-1 overflow-y-auto p-4 ${ended ? "opacity-70" : ""}`}>
         {application && !pinned && (

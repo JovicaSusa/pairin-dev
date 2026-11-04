@@ -53,6 +53,24 @@ RSpec.describe "conversations", type: :system do
     expect(page).to have_content("Hi Maya!")
   end
 
+  it "blocks after asking first" do
+    sign_in(poster)
+    visit conversation_path(offer)
+
+    click_button "Block"
+    expect(page).to have_content("Sam won't be told.")
+    click_button "Cancel"
+    expect(page).not_to have_content("Sam won't be told.")
+    expect(Block.count).to eq(0)
+
+    click_button "Block"
+    within('[aria-label="Confirm block"]') { click_button "Block" }
+
+    expect(page).to have_content("You've blocked Sam")
+    expect(page).to have_content("You ended this conversation.")
+    expect(Block.find_by(blocker: poster, blocked: applicant)).to be_present
+  end
+
   it "shows the new navigation" do
     sign_in(poster)
     visit conversations_path

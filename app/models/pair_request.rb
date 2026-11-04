@@ -21,6 +21,7 @@ class PairRequest < ApplicationRecord
   validates :description, :subject, presence: true
 
   scope :switched_on, -> { where(paused_at: nil) }
+  scope :visible_to, ->(user) { where.not(user_id: user.blocked_user_ids) }
 
   # Signed token for the no-login "Turn it back on" link in the paused email.
   generates_token_for :resume, expires_in: 30.days

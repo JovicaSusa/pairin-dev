@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_04_180000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -34,6 +34,15 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_180000) do
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_availability_windows_on_user_id"
     t.exclusion_constraint "user_id WITH =, weekday WITH =, int4range(start_minute, end_minute) WITH &&", using: :gist, name: "availability_windows_no_overlap"
+  end
+
+  create_table "blocks", force: :cascade do |t|
+    t.bigint "blocker_id", null: false
+    t.bigint "blocked_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blocked_id"], name: "index_blocks_on_blocked_id"
+    t.index ["blocker_id", "blocked_id"], name: "index_blocks_on_blocker_id_and_blocked_id", unique: true
   end
 
   create_table "messages", force: :cascade do |t|
@@ -163,6 +172,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_180000) do
   end
 
   add_foreign_key "activities", "users", column: "receiver_id"
+  add_foreign_key "blocks", "users", column: "blocked_id"
+  add_foreign_key "blocks", "users", column: "blocker_id"
   add_foreign_key "messages", "offers"
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "offers", "users", column: "ended_by_id"

@@ -39,6 +39,7 @@ Rails.application.routes.draw do
 
   resources :conversations, only: [:index, :show] do
     post :not_a_match, on: :member
+    post :block, on: :member
     resources :messages, only: [:create], module: :conversations
   end
 

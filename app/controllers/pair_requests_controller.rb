@@ -5,6 +5,7 @@ class PairRequestsController < ApplicationController
     base = PairRequest
       .includes(:tags, :offers, :user)
       .switched_on
+      .visible_to(current_user)
       .where.not(user_id: current_user.id)
 
     @q = base.ransack(params[:q]&.compact_blank)

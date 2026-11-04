@@ -24,6 +24,15 @@ class ConversationsController < ApplicationController
     redirect_to conversation_path(offer)
   end
 
+  def block
+    offer = conversations.find(params[:id])
+    other = offer.other_person(current_user)
+
+    current_user.block!(other).each { |ended| ConversationsChannel.notify(ended) }
+
+    redirect_to conversation_path(offer), notice: "You've blocked #{other.display_name}. You won't see each other's partner searches."
+  end
+
   private
 
   def conversations

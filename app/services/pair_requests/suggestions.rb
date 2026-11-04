@@ -14,6 +14,7 @@ module PairRequests
     def call
       candidates = PairRequest
         .switched_on
+        .visible_to(@offerer)
         .left_joins(:taggings)
         .where.not(id: @dead_request.id)
         .where.not(user_id: @offerer.id)
