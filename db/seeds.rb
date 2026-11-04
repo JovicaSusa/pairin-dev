@@ -12,7 +12,7 @@ if Rails.env.development?
   timezones = ["Europe/Berlin", "Europe/London", "America/New_York", "Asia/Tokyo", "UTC"]
 
   posters = Array.new(20) { Faker::Internet.email }.map do |email|
-    user = User.create!(email: email, confirmed_at: Time.zone.now, password: "Password33*", timezone: timezones.sample, date_of_birth: Faker::Date.birthday(min_age: 18, max_age: 60))
+    user = User.create!(email: email, confirmed_at: Time.zone.now, password: "Password33*", timezone: timezones.sample, level: User::LEVELS.sample, date_of_birth: Faker::Date.birthday(min_age: 18, max_age: 60))
 
     # Weekly hours: three evenings a week.
     [1, 2, 3, 4, 5, 6, 7].sample(3).each do |weekday|
@@ -36,7 +36,13 @@ if Rails.env.development?
 
     { pr1 => offerers.first(5), pr2 => offerers.last(5) }.each do |pair_request, request_offerers|
       request_offerers.each do |offerer|
-        pair_request.offers.create!(offerer:, message: Faker::Hacker.say_something_smart)
+        pair_request.offers.create!(
+          offerer:,
+          message: Faker::Hacker.say_something_smart,
+          goal: Faker::Hacker.say_something_smart,
+          how_often: Offer::HOW_OFTEN.keys.sample,
+          how_long: PairRequest::COMMITMENTS.keys.sample
+        )
       end
     end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_04_140000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -44,6 +44,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_140000) do
     t.datetime "updated_at", null: false
     t.datetime "accepted_at"
     t.datetime "expiry_notified_at"
+    t.text "goal"
+    t.string "how_often"
+    t.string "how_long"
     t.index ["offerer_id", "pair_request_id"], name: "index_offers_on_offerer_id_and_pair_request_id", unique: true
     t.index ["offerer_id"], name: "index_offers_on_offerer_id"
     t.index ["pair_request_id"], name: "index_offers_on_pair_request_id"

@@ -38,6 +38,22 @@ export default function OfferCard({ offer, pairRequestId }) {
         )}
       </div>
 
+      {offer.goal && (
+        <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          {[
+            ["Their goal", offer.goal],
+            ["How often", offer.how_often_label],
+            ["How long", offer.how_long_label],
+            ["Level", offer.offerer.level],
+          ].map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-xs font-bold uppercase tracking-wide text-black/50">{label}</dt>
+              <dd className="font-medium">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
       <ExpandableText className="mt-4 whitespace-pre-wrap leading-relaxed text-black/60">{offer.message}</ExpandableText>
 
       <div className="mt-4 flex flex-col gap-4 border-t-2 border-black/10 pt-4 md:flex-row md:items-center md:justify-between">

@@ -9,6 +9,19 @@ RSpec.describe OfferMailer, type: :mailer do
 
     let(:mail) { described_class.with(offer:).offer_received_email }
 
+    it "shows the answers and level, next to the search's commitment" do
+      pair_request.update!(commitment: "open_ended")
+      offer.update!(goal: "Finish a course", how_often: "twice_a_week", how_long: "few_weeks")
+      offerer.update!(level: "competent")
+      body = mail.body.encoded
+
+      expect(body).to include("Finish a course")
+      expect(body).to include("Twice a week")
+      expect(body).to include("A few weeks")
+      expect(body).to include("Open-ended")
+      expect(body).to include("Competent")
+    end
+
     it "is sent to the request's poster" do
       expect(mail.to).to eq(["poster@example.com"])
     end

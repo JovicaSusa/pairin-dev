@@ -7,6 +7,9 @@ FactoryBot.define do
     offerer factory: :user
 
     message { Faker::Lorem.sentence(word_count: 5) }
+    goal { Faker::Lorem.sentence(word_count: 5) }
+    how_often { "once_a_week" }
+    how_long { "one_to_three_months" }
 
     trait :accepted do
       accepted_at { Time.current }

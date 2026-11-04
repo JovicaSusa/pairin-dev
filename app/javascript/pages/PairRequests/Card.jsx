@@ -1,4 +1,3 @@
-import { Link } from "@inertiajs/react";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
 
-export default function PairRequestCard({ pairRequest, currentUserId }) {
+export default function PairRequestCard({ pairRequest, currentUserId, onApply }) {
   const alreadyOffered = pairRequest.offers
     ?.map(o => o.offerer_id)
     .includes(currentUserId);
@@ -48,9 +47,7 @@ export default function PairRequestCard({ pairRequest, currentUserId }) {
         {alreadyOffered ? (
           <span className="text-sm font-bold italic text-black/40">You've already applied</span>
         ) : (
-          <Button asChild>
-            <Link href={`/pair_requests/${pairRequest.id}/offers/new`}>Apply</Link>
-          </Button>
+          <Button onClick={() => onApply(pairRequest)}>Apply</Button>
         )}
       </div>
     </div>

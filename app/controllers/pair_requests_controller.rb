@@ -25,6 +25,8 @@ class PairRequestsController < ApplicationController
           )
         }
       },
+      applicationOptions: InertiaRails.once { Offer.form_options },
+      needsLevel: current_user.level.blank?,
       filterOptions: InertiaRails.once {
         {
           tags: Tag.all.as_json(only: [:id, :name]),

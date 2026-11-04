@@ -22,6 +22,22 @@ RSpec.describe "PairRequests::Offers", type: :request do
     end
   end
 
+  describe "what the poster sees" do
+    it "sends each applicant's answers and level, next to the search's commitment" do
+      search = create(:pair_request, commitment: "open_ended")
+      applicant = create(:user, level: "competent")
+      create(:offer, pair_request: search, offerer: applicant, goal: "Ship a project", how_often: "twice_a_week", how_long: "few_weeks")
+      sign_in(search.user)
+
+      get pair_request_offers_path(search)
+
+      props = JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]
+      expect(props["commitmentLabel"]).to eq("Open-ended")
+      expect(props["offers"].first).to include("goal" => "Ship a project", "how_often_label" => "Twice a week", "how_long_label" => "A few weeks")
+      expect(props["offers"].first.dig("offerer", "level")).to eq("Competent")
+    end
+  end
+
   describe "GET /users/offers" do
     it "lists the applicant's applications, with an old one's time and without a time on a new one" do
       old = create(:offer, offerer:, with_old_period: true)
@@ -38,17 +54,116 @@ RSpec.describe "PairRequests::Offers", type: :request do
   end
 
   describe "GET /pair_requests/:pair_request_id/offers/new" do
+    def props
+      JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]
+    end
+
     it "asks for no time" do
       get new_pair_request_offer_path(pair_request)
 
-      props = JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]
       expect(props).not_to include("slots")
+      expect(props.dig("pairRequest", "commitment_label")).to eq("1–3 months")
+    end
+
+    it "asks for a level only when the profile has none" do
+      get new_pair_request_offer_path(pair_request)
+      expect(props["needsLevel"]).to be(false)
+
+      offerer.update!(level: nil)
+      get new_pair_request_offer_path(pair_request)
+      expect(props["needsLevel"]).to be(true)
     end
   end
 
   describe "POST /pair_requests/:pair_request_id/offers" do
-    def post_offer
-      post pair_request_offers_path(pair_request), params: { offer: { message: "Let's pair!" } }
+    let(:answers) { { message: "Let's pair!", goal: "Finish a course", how_often: "twice_a_week", how_long: "few_weeks" } }
+
+    def post_offer(extra = {})
+      post pair_request_offers_path(pair_request), params: { offer: answers.merge(extra) }
+    end
+
+    it "saves the answers" do
+      post_offer
+
+      expect(Offer.last).to have_attributes(goal: "Finish a course", how_often: "twice_a_week", how_long: "few_weeks")
+    end
+
+    shared_examples "a refused application" do |field|
+      it "saves nothing and reports #{field}" do
+        expect { post_offer(field => "") }.not_to change(Offer, :count)
+
+        expect(session[:inertia_errors]).to include(field)
+      end
+    end
+
+    it_behaves_like "a refused application", :goal
+    it_behaves_like "a refused application", :how_often
+    it_behaves_like "a refused application", :how_long
+    it_behaves_like "a refused application", :message
+
+    it "refuses an unknown option instead of raising" do
+      expect { post_offer(how_often: "daily") }.not_to change(Offer, :count)
+
+      expect(session[:inertia_errors]).to include(:how_often)
+    end
+
+    context "when the applicant's profile has no level" do
+      before { offerer.update!(level: nil) }
+
+      it "refuses without one" do
+        expect { post_offer }.not_to change(Offer, :count)
+
+        expect(session[:inertia_errors]).to include(:level)
+      end
+
+      it "saves the level given on the form to their profile" do
+        expect { post_offer(level: "competent") }.to change(Offer, :count).by(1)
+
+        expect(offerer.reload.level).to eq("competent")
+      end
+
+      it "refuses an unknown level and doesn't save it" do
+        expect { post_offer(level: "wizard") }.not_to change(Offer, :count)
+
+        expect(offerer.reload.level).to be_nil
+      end
+    end
+
+    it "ignores a level sent by someone who already has one" do
+      post_offer(level: "expert")
+
+      expect(offerer.reload.level).to eq("novice")
+    end
+
+    it "goes back to the filtered list from the drawer" do
+      list = pair_requests_url(q: { commitment_eq: "open_ended" })
+
+      post pair_request_offers_path(pair_request), params: { offer: answers }, headers: { "HTTP_REFERER" => list }
+
+      expect(response).to redirect_to(list)
+    end
+
+    it "goes to the list when the referer can't be read, and still saves" do
+      expect {
+        post pair_request_offers_path(pair_request), params: { offer: answers }, headers: { "HTTP_REFERER" => "not a url" }
+      }.to change(Offer, :count).by(1)
+
+      expect(response).to redirect_to(pair_requests_path)
+    end
+
+    it "says so when they've already applied" do
+      post_offer
+
+      expect { post_offer }.not_to change(Offer, :count)
+
+      expect(response).to redirect_to(pair_requests_path)
+      expect(flash[:alert]).to eq("You've already applied to this partner search.")
+    end
+
+    it "goes to the list from the full form page" do
+      post pair_request_offers_path(pair_request), params: { offer: answers }, headers: { "HTTP_REFERER" => new_pair_request_offer_url(pair_request) }
+
+      expect(response).to redirect_to(pair_requests_path)
     end
 
     it "saves the application with no time, and schedules no session" do
@@ -61,7 +176,7 @@ RSpec.describe "PairRequests::Offers", type: :request do
     end
 
     it "ignores a time sent anyway" do
-      post pair_request_offers_path(pair_request), params: { offer: { message: "Let's pair!", start_at: 1.day.from_now.iso8601 } }
+      post pair_request_offers_path(pair_request), params: { offer: answers.merge(start_at: 1.day.from_now.iso8601) }
 
       expect(Offer.last.period).to be_nil
     end
@@ -80,7 +195,7 @@ RSpec.describe "PairRequests::Offers", type: :request do
     end
 
     it "needs a message" do
-      expect { post pair_request_offers_path(pair_request), params: { offer: { message: "" } } }
+      expect { post_offer(message: "") }
         .to not_change(Offer, :count)
         .and not_have_enqueued_job(OfferExpiryJob)
 

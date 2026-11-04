@@ -1,11 +1,12 @@
 class ReceivedOfferResource < ApplicationResource
-  attributes :id, :message, :status
+  attributes :id, :message, :status, :goal, :how_often_label, :how_long_label
 
   attribute :offerer do |offer|
     {
       name: offer.offerer.name,
       image_url: offer.offerer.image_url,
-      github_url: offer.offerer.github_url
+      github_url: offer.offerer.github_url,
+      level: offer.offerer.level_titleized
     }
   end
 

@@ -4,12 +4,12 @@ import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import Card from './Card';
 
-export default function Index({ offers, pairRequestId }) {
+export default function Index({ offers, pairRequestId, commitmentLabel }) {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
       <Head title="Applications" />
 
-      <PageHeader eyebrow="Partner searches" title="Applications" description="Who's applied to this partner search." />
+      <PageHeader eyebrow="Partner searches" title="Applications" description={`Who's applied to this partner search. You're looking for: ${commitmentLabel}.`} />
 
       {offers.length > 0 ? (
         offers.map((offer) => (
