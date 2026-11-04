@@ -16,6 +16,16 @@
                       autocomplete: "email",
                       class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
                     } %>
+        <%= f.input :date_of_birth,
+                    as: :date,
+                    html5: true,
+                    required: true,
+                    label_html: {
+                      class: "block mt-4"
+                    },
+                    input_html: {
+                      class: "w-full rounded-md border-2 border-black p-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] outline-none transition-all focus:translate-x-[3px] focus:translate-y-[3px] focus:shadow-none"
+                    } %>
         <%= f.input :password,
                     required: true,
                     label_html: {
