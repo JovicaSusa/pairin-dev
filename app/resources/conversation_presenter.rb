@@ -31,6 +31,7 @@ class ConversationPresenter
       search_filled: @offer.ended? && !@offer.partners? && @offer.pair_request.partnership.present?,
       can_send: @offer.can_message?(@viewer),
       partners: @offer.partners?,
+      partnership_id: @offer.partnership&.id,
       can_propose: @offer.can_propose?,
       proposal: proposal,
       search: { subject: @offer.pair_request.subject, commitment_label: @offer.pair_request.commitment_label },

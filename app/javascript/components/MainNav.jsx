@@ -7,6 +7,7 @@ import {
   Inbox,
   Rss,
   MessagesSquare,
+  Users,
   Clock,
   ChevronDown,
   LogOut,
@@ -20,6 +21,7 @@ import logoImg from "@/assets/images/logo.svg";
 const NAV_ITEMS = [
   { href: "/pair_requests", label: "Search", icon: Search },
   { href: "/conversations", label: "Conversations", icon: MessagesSquare },
+  { href: "/partners", label: "Partners", icon: Users },
   { href: "/activities", label: "Feed", icon: Rss },
   { href: "/availability", label: "Availability", icon: Clock },
 ];
@@ -98,6 +100,7 @@ function NavContent({ currentPath, currentUser, onNavigate }) {
           <NavLink {...NAV_ITEMS[1]} active={isActive(NAV_ITEMS[1].href)} onClick={onNavigate} count={unreadMessages} />
           <NavLink {...NAV_ITEMS[2]} active={isActive(NAV_ITEMS[2].href)} onClick={onNavigate} />
           <NavLink {...NAV_ITEMS[3]} active={isActive(NAV_ITEMS[3].href)} onClick={onNavigate} />
+          <NavLink {...NAV_ITEMS[4]} active={isActive(NAV_ITEMS[4].href)} onClick={onNavigate} />
         </div>
       </nav>
 

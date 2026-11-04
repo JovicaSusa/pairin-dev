@@ -16,6 +16,8 @@ class ConversationsController < ApplicationController
   def not_a_match
     offer = conversations.find(params[:id])
 
+    return redirect_to conversation_path(offer), alert: "You're partners now, so this can't be undone from here." if offer.partners?
+
     if offer.not_a_match!(by: current_user, reason: params[:reason].to_s.first(Message::MAX_LENGTH))
       OfferMailer.with(offer:).not_a_match_email.deliver_later
       ConversationsChannel.notify(offer)
@@ -30,7 +32,7 @@ class ConversationsController < ApplicationController
 
     current_user.block!(other).each { |ended| ConversationsChannel.notify(ended) }
 
-    redirect_to conversation_path(offer), notice: "You've blocked #{other.display_name}. You won't see each other's partner searches."
+    back_to_thread(offer, notice: "You've blocked #{other.display_name}. You won't see each other's partner searches.")
   end
 
   def report
@@ -38,10 +40,10 @@ class ConversationsController < ApplicationController
     reason = params[:reason].to_s.strip.first(Message::MAX_LENGTH)
 
     if reason.empty?
-      redirect_to conversation_path(offer), inertia: { errors: { reason: "Please say what happened" } }
+      back_to_thread(offer, inertia: { errors: { reason: "Please say what happened" } })
     else
       ReportMailer.with(offer:, reporter: current_user, reason:).chat_report.deliver_later
-      redirect_to conversation_path(offer), notice: "Thanks for telling us. We'll look into it."
+      back_to_thread(offer, notice: "Thanks for telling us. We'll look into it.")
     end
   end
 
@@ -54,6 +56,8 @@ class ConversationsController < ApplicationController
       ProposalReminderJob.set(wait: Offer::PROPOSAL_REMINDER_AFTER).perform_later(offer, offer.proposed_at)
     when :accepted
       announce_partnership(offer)
+      ConversationsChannel.notify(offer)
+      return redirect_to partner_path(offer.partnership)
     end
 
     ConversationsChannel.notify(offer)
@@ -64,14 +68,13 @@ class ConversationsController < ApplicationController
     offer = conversations.find(params[:id])
     proposer = offer.proposed_by
 
-    if offer.accept_proposal!(by: current_user)
-      announce_partnership(offer, proposer)
-    else
-      flash[:alert] = "This proposal isn't open any more."
+    unless offer.accept_proposal!(by: current_user)
+      return redirect_to conversation_path(offer), alert: "This proposal isn't open any more."
     end
 
+    announce_partnership(offer, proposer)
     ConversationsChannel.notify(offer)
-    redirect_to conversation_path(offer)
+    redirect_to partner_path(offer.reload.partnership)
   end
 
   def decline_proposal
@@ -83,6 +86,10 @@ class ConversationsController < ApplicationController
   end
 
   private
+
+  def back_to_thread(offer, **options)
+    redirect_back_or_to conversation_path(offer), allow_other_host: false, **options
+  end
 
   # Whoever accepted is here to see it. The proposer may not be.
   def announce_partnership(offer, proposer = offer.other_person(current_user))

@@ -5,13 +5,50 @@ class Partnership < ApplicationRecord
 
   belongs_to :offer
   belongs_to :pair_request
+  belongs_to :ended_by, class_name: "User", optional: true
+
+  GOAL_MAX_LENGTH = 500
 
   validates :offer_id, :pair_request_id, uniqueness: true
+  validates :goal, length: { maximum: GOAL_MAX_LENGTH }
 
+  normalizes :goal, with: ->(goal) { goal.strip.presence }
+
+  scope :involving, ->(user) {
+    joins(:offer, :pair_request).where("offers.offerer_id = :id OR pair_requests.user_id = :id", id: user.id)
+  }
+
+  before_create :prefill_goal
   after_create :close_the_rest_of_the_search
   after_create_commit :tell_the_other_applicants
 
+  def ended?
+    ended_at? || offer.ended?
+  end
+
+  # Ending it ends the chat too, and the search stays Off. Returns false if it
+  # had already ended.
+  def end!(by:)
+    offer.with_lock do
+      next false if ended_at?
+
+      update_columns(ended_at: Time.current, ended_by_id: by.id)
+      offer.not_a_match!(by:)
+      true
+    end
+  end
+
+  # What each person said they'd commit to: the search's commitment for the
+  # poster, and the answer on the application for the applicant.
+  def commitment_of(user)
+    user == offer.poster ? pair_request.commitment_label : offer.how_long_label
+  end
+
   private
+
+  def prefill_goal
+    self.goal = offer.goal.presence&.first(GOAL_MAX_LENGTH) || pair_request.subject.first(GOAL_MAX_LENGTH) if goal.blank?
+  end
 
   # Each offer is re-read under its lock, so a first reply or "Not a match" that
   # lands at the same moment is seen, not overwritten.

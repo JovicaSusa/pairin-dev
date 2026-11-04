@@ -34,6 +34,7 @@ class OfferMailer < ApplicationMailer
 
   def proposal_accepted_email
     @accepter = @offer.other_person(params[:recipient])
+    @conversation_url = partner_url(@offer.partnership)
     mail(to: params[:recipient].email, subject: "You and #{@accepter.display_name} are partners")
   end
 
