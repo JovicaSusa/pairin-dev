@@ -42,6 +42,17 @@ RSpec.describe Offer, type: :model do
     end
   end
 
+  it "starts its thread with the application's message" do
+    offer = create(:offer, message: "Hello there")
+
+    expect(offer.messages.map { |m| [m.sender, m.body] }).to eq([[offer.offerer, "Hello there"]])
+    expect(offer.reload.last_message_at).to be_present
+  end
+
+  it "refuses an application message too long for a thread" do
+    expect(build(:offer, message: "x" * (Message::MAX_LENGTH + 1))).not_to be_valid
+  end
+
   it "doesn't need a time" do
     expect(build(:offer)).to be_valid
     expect(create(:offer).period).to be_nil

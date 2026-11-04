@@ -4,7 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import Card from './Card';
 
-export default function Index({ offers, pairRequestId, commitmentLabel }) {
+export default function Index({ offers, commitmentLabel }) {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
       <Head title="Applications" />
@@ -13,7 +13,7 @@ export default function Index({ offers, pairRequestId, commitmentLabel }) {
 
       {offers.length > 0 ? (
         offers.map((offer) => (
-          <Card key={offer.id} offer={offer} pairRequestId={pairRequestId} />
+          <Card key={offer.id} offer={offer} />
         ))
       ) : (
         <EmptyState icon={Inbox} title="No applications yet" description="Share your partner search or hang tight. New applicants show up here." />

@@ -21,7 +21,7 @@
                   <strong><%= @offerer_name %></strong> applied to your partner search
                   "<%= @offer.pair_request.subject %>" and is waiting for your answer.
                 </p>
-                <%= render "offer_mailer/offer_details", offer: @offer, poster: @poster, confirmation_url: @confirmation_url %>
+                <%= render "offer_mailer/offer_details", offer: @offer, poster: @poster, conversation_url: @conversation_url %>
               </td>
             </tr>
             <tr role="separator">

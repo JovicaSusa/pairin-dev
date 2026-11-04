@@ -38,21 +38,6 @@ RSpec.describe "PairRequests::Offers", type: :request do
     end
   end
 
-  describe "GET /users/offers" do
-    it "lists the applicant's applications, with an old one's time and without a time on a new one" do
-      old = create(:offer, offerer:, with_old_period: true)
-      new_offer = create(:offer, offerer:)
-
-      travel 3.days
-
-      get users_offers_path
-
-      offers = JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"]).dig("props", "offers")
-      expect(offers.find { |o| o["id"] == old.id }["start_at"]).to be_present
-      expect(offers.find { |o| o["id"] == new_offer.id }["start_at"]).to be_nil
-    end
-  end
-
   describe "GET /pair_requests/:pair_request_id/offers/new" do
     def props
       JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]

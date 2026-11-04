@@ -16,12 +16,20 @@ class OfferMailer < ApplicationMailer
     mail(to: @offer.offerer.email, subject: "No answer yet on #{@offer.pair_request.subject}")
   end
 
+  # To whoever didn't end it. The reason they gave stays private.
+  def not_a_match_email
+    @ended_by = @offer.ended_by
+    @recipient = @offer.other_person(@ended_by)
+
+    mail(to: @recipient.email, subject: "#{@ended_by.display_name} has ended your conversation")
+  end
+
   private
 
   def set_offer
     @offer = params[:offer]
     @poster = @offer.pair_request.user
     @offerer_name = @offer.offerer_display_name
-    @confirmation_url = offer_confirmation_url(token: @offer.generate_token_for(:poster_confirmation))
+    @conversation_url = conversation_url(@offer)
   end
 end

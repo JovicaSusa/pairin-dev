@@ -46,6 +46,7 @@ if Rails.env.development?
       end
     end
 
-    Offers::Accept.call(pr1.offers.first) if pr1.offers.any?
+    # One conversation already under way on each poster's first search.
+    pr1.offers.first&.post_message(poster, Faker::Hacker.say_something_smart)
   end
 end

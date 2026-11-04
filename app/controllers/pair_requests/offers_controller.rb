@@ -56,19 +56,6 @@ class PairRequests::OffersController < ApplicationController
     end
   end
 
-  def accept
-    offer = Offer.find(params[:id])
-
-    authorize offer, policy_class: PairRequests::OfferPolicy
-
-    Offers::Accept
-      .call(offer)
-      .either(
-        -> (success) { redirect_to pair_request_offers_path(offer.pair_request_id), notice: "Application accepted. Happy pairin!" },
-        -> (failure) { redirect_to pair_request_offers_path(offer.pair_request_id), alert: "Could not accept this application." }
-      )
-  end
-
   private
 
   # From the list's drawer they go back to the same filtered list; from the

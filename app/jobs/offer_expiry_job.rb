@@ -8,8 +8,7 @@ class OfferExpiryJob < ApplicationJob
   def perform(offer)
     pair_request = offer.pair_request
 
-    # Checked under the same row lock Offers::Accept takes, so an accept that
-    # commits just before this can't be followed by a pause.
+    # Checked under a row lock on the request.
     paused_now = pair_request.with_lock do
       next false if pair_request.paused? || pair_request.has_accepted_offer?
 

@@ -16,6 +16,10 @@ class User < ApplicationRecord
   has_many :sessions, through: :participations, source: :participable, source_type: Session.name
   has_many :availability_windows, dependent: :destroy
 
+  def display_name
+    name.presence || "A Pairin member"
+  end
+
   validates :language, inclusion: { in: I18nData.languages.keys }, allow_nil: true
   validates :country, inclusion: { in: I18nData.countries.keys }, allow_nil: true
   validates :level, inclusion: { in: LEVELS }, allow_nil: true

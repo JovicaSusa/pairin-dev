@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_04_150000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -36,6 +36,16 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_150000) do
     t.exclusion_constraint "user_id WITH =, weekday WITH =, int4range(start_minute, end_minute) WITH &&", using: :gist, name: "availability_windows_no_overlap"
   end
 
+  create_table "messages", force: :cascade do |t|
+    t.bigint "offer_id", null: false
+    t.bigint "sender_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["offer_id", "created_at"], name: "index_messages_on_offer_id_and_created_at"
+    t.index ["sender_id"], name: "index_messages_on_sender_id"
+  end
+
   create_table "offers", force: :cascade do |t|
     t.bigint "offerer_id", null: false
     t.bigint "pair_request_id", null: false
@@ -47,6 +57,13 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_150000) do
     t.text "goal"
     t.string "how_often"
     t.string "how_long"
+    t.datetime "replied_at"
+    t.datetime "last_message_at"
+    t.datetime "ended_at"
+    t.bigint "ended_by_id"
+    t.text "end_reason"
+    t.index ["ended_by_id"], name: "index_offers_on_ended_by_id"
+    t.index ["last_message_at"], name: "index_offers_on_last_message_at"
     t.index ["offerer_id", "pair_request_id"], name: "index_offers_on_offerer_id_and_pair_request_id", unique: true
     t.index ["offerer_id"], name: "index_offers_on_offerer_id"
     t.index ["pair_request_id"], name: "index_offers_on_pair_request_id"
@@ -142,6 +159,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_150000) do
   end
 
   add_foreign_key "activities", "users", column: "receiver_id"
+  add_foreign_key "messages", "offers"
+  add_foreign_key "messages", "users", column: "sender_id"
+  add_foreign_key "offers", "users", column: "ended_by_id"
   add_foreign_key "availability_windows", "users"
   add_foreign_key "offers", "pair_requests"
   add_foreign_key "offers", "users", column: "offerer_id"
