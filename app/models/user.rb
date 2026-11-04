@@ -15,6 +15,8 @@ class User < ApplicationRecord
   has_many :participations, foreign_key: :participant_id, dependent: nil # TODO: Reconsider dependent option
   has_many :sessions, through: :participations, source: :participable, source_type: Session.name
   has_many :availability_windows, dependent: :destroy
+  has_many :blocks_made, class_name: "Block", foreign_key: :blocker_id, dependent: :destroy, inverse_of: :blocker
+  has_many :blocks_received, class_name: "Block", foreign_key: :blocked_id, dependent: :destroy, inverse_of: :blocked
 
   # Messages from the other person since this user last opened each conversation,
   # as { offer_id => count }.
@@ -31,6 +33,25 @@ class User < ApplicationRecord
       SQL
       .group(:offer_id)
       .count
+  end
+
+  # Everyone this user can't see or apply to, whichever of them did the blocking.
+  def blocked_user_ids
+    blocks_made.pluck(:blocked_id) + blocks_received.pluck(:blocker_id)
+  end
+
+  def blocked_with?(other)
+    blocked_user_ids.include?(other.id)
+  end
+
+  # Ends every conversation between them, and tells the other person nothing.
+  # Returns those conversations.
+  def block!(other)
+    transaction do
+      blocks_made.find_or_create_by!(blocked: other)
+
+      Offer.between(self, other).to_a.each { |offer| offer.not_a_match!(by: self) }
+    end
   end
 
   def display_name

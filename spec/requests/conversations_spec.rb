@@ -265,6 +265,109 @@ RSpec.describe "Conversations", type: :request do
     end
   end
 
+  describe "blocking" do
+    def listed(viewer)
+      sign_in(viewer)
+      get pair_requests_path
+      props["pairRequests"].map { |request| request["id"] }
+    end
+
+    before do
+      sign_in(applicant)
+    end
+
+    it "ends the chat for both, and tells the blocked person nothing" do
+      offer.post_message(poster, "Hello")
+
+      expect { post block_conversation_path(offer) }
+        .to have_broadcasted_to(poster).from_channel(ConversationsChannel)
+        .and not_have_enqueued_mail(OfferMailer, :not_a_match_email)
+
+      expect(offer.reload).to be_ended
+      expect(Block.find_by(blocker: applicant, blocked: poster)).to be_present
+
+      follow_redirect! # Uses up the blocker's own confirmation, which this one session would otherwise carry over.
+      sign_in(poster)
+      get conversation_path(offer)
+      expect(props["conversation"]).to include("status" => "Ended", "ended_by_viewer" => false, "can_send" => false)
+      expect(response.body).not_to match(/blocked/i)
+    end
+
+    it "ends every other conversation between them" do
+      other = create(:offer, pair_request: create(:pair_request, user: applicant), offerer: poster)
+
+      post block_conversation_path(offer)
+
+      expect(other.reload).to be_ended
+    end
+
+    it "leaves their conversations with other people alone" do
+      unrelated = create(:offer, pair_request: search)
+
+      post block_conversation_path(offer)
+
+      expect(unrelated.reload).not_to be_ended
+    end
+
+    it "hides each person's searches from the other, and no one else's" do
+      theirs = search
+      mine = create(:pair_request, user: applicant)
+      someone_elses = create(:pair_request)
+
+      post block_conversation_path(offer)
+
+      expect(listed(applicant)).to contain_exactly(someone_elses.id)
+      expect(listed(poster)).not_to include(mine.id)
+      expect(listed(create(:user))).to include(theirs.id, mine.id)
+    end
+
+    it "stops either person applying, with the same answer as a switched-off search" do
+      mine = create(:pair_request, user: applicant)
+      post block_conversation_path(offer)
+
+      sign_in(poster)
+      answers = { message: "Hi", goal: "A goal", how_often: "once_a_week", how_long: "few_weeks" }
+
+      expect { post pair_request_offers_path(mine), params: { offer: answers } }.not_to change(Offer, :count)
+      expect(flash[:alert]).to eq("This partner search is switched off and isn't taking applications right now.")
+
+      get new_pair_request_offer_path(mine)
+      expect(response).to redirect_to(pair_requests_path)
+    end
+
+    it "leaves them out of suggestions" do
+      blocker_search = create(:pair_request, user: applicant)
+      dead = create(:offer, offerer: poster)
+      post block_conversation_path(offer)
+
+      expect(PairRequests::Suggestions.call(dead)).not_to include(blocker_search)
+    end
+
+    it "stops the unread email" do
+      offer.post_message(poster, "Hello")
+      post block_conversation_path(offer)
+      travel 20.minutes
+
+      expect { UnreadMessagesEmailJob.perform_now(offer, applicant) }
+        .not_to have_enqueued_mail(OfferMailer, :unread_messages_email)
+    end
+
+    it "can be done twice without trouble" do
+      post block_conversation_path(offer)
+
+      expect { post block_conversation_path(offer) }.not_to change(Block, :count)
+    end
+
+    it "can't be used on someone else's conversation" do
+      sign_in(create(:user))
+
+      post block_conversation_path(offer)
+
+      expect(response).to have_http_status(:not_found)
+      expect(Block.count).to eq(0)
+    end
+  end
+
   describe "the list" do
     it "shows each person the other, a status and the newest first" do
       older = create(:offer, pair_request: create(:pair_request, user: create(:user, name: "Tom")), offerer: applicant)

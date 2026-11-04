@@ -31,6 +31,12 @@ class Offer < ApplicationRecord
   after_create { messages.create!(sender: offerer, body: message) }
 
   scope :accepted, -> { where.not(accepted_at: nil) }
+  scope :between, ->(a, b) {
+    joins(:pair_request).where(
+      "(offers.offerer_id = :a AND pair_requests.user_id = :b) OR (offers.offerer_id = :b AND pair_requests.user_id = :a)",
+      a: a.id, b: b.id
+    )
+  }
   scope :involving, ->(user) { joins(:pair_request).where("offers.offerer_id = :id OR pair_requests.user_id = :id", id: user.id) }
 
   def accepted?
