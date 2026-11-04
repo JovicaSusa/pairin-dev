@@ -1,7 +1,42 @@
-# Two people who agreed to work together on a partner search.
+# Two people who agreed to work together on a partner search. Forming one closes
+# the rest of the search: it goes Off, and every other application on it ends.
 class Partnership < ApplicationRecord
+  CLOSING_MESSAGE = "This partner search has found its partner, so this conversation has ended."
+
   belongs_to :offer
   belongs_to :pair_request
 
   validates :offer_id, :pair_request_id, uniqueness: true
+
+  after_create :close_the_rest_of_the_search
+  after_create_commit :tell_the_other_applicants
+
+  private
+
+  # Each offer is re-read under its lock, so a first reply or "Not a match" that
+  # lands at the same moment is seen, not overwritten.
+  def close_the_rest_of_the_search
+    pair_request.switch_off!
+
+    @closed = []
+    pair_request.offers.where.not(id: offer_id).where(ended_at: nil).find_each do |other|
+      other.with_lock do
+        next if other.ended_at?
+
+        other.messages.create!(sender: nil, body: CLOSING_MESSAGE) if other.replied_at?
+        other.update_columns(ended_at: Time.current, proposed_at: nil)
+        @closed << other
+      end
+    end
+  end
+
+  # Anyone already told their application went quiet doesn't hear again.
+  def tell_the_other_applicants
+    return unless Rails.configuration.x.send_suggestion_emails
+
+    @closed.reject(&:expiry_notified_at?).each do |closed|
+      OfferMailer.with(offer: closed).search_filled_email.deliver_later
+      closed.update_columns(expiry_notified_at: Time.current)
+    end
+  end
 end

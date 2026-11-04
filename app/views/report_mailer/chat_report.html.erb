@@ -10,7 +10,7 @@
 <h2>Most recent messages (up to <%= ReportMailer::RECENT_MESSAGES %>)</h2>
 <% @messages.each do |message| %>
   <p>
-    <strong><%= message.sender.display_name %></strong>, <%= message.created_at.utc.to_fs(:long) %> UTC<br>
+    <strong><%= message.sender&.display_name || "Pairin" %></strong>, <%= message.created_at.utc.to_fs(:long) %> UTC<br>
     <span style="white-space: pre-wrap"><%= message.body %></span>
   </p>
 <% end %>

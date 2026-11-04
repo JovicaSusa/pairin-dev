@@ -107,7 +107,9 @@ function ApplicationAnswers({ conversation }) {
 function Messages({ messages }) {
   return (
     <div className="flex flex-col gap-3">
-      {messages.map((m) => (
+      {messages.map((m) => m.from_pairin ? (
+        <p key={m.id} className="mx-auto max-w-[85%] text-center text-xs font-bold text-black/50">{m.body}</p>
+      ) : (
         <div key={m.id} className={`flex flex-col ${m.mine ? "items-end" : "items-start"}`}>
           <p className={`max-w-[85%] whitespace-pre-wrap break-words rounded-2xl border-2 border-black px-3 py-2 text-sm ${m.mine ? "bg-purple text-white" : "bg-white"}`}>
             {m.body}
@@ -337,7 +339,7 @@ function Thread({ conversation }) {
           <div className="flex items-start gap-2 rounded-xl border-2 border-black bg-black/5 p-3 text-sm">
             <Lock className="mt-0.5 h-4 w-4 shrink-0" />
             <span>
-              <b>{conversation.ended_by_viewer ? "You ended this conversation." : "This conversation has ended."}</b> You can still read it.{" "}
+              <b>{conversation.search_filled ? "This search has found its partner, so this chat has ended." : conversation.ended_by_viewer ? "You ended this conversation." : "This conversation has ended."}</b> You can still read it.{" "}
               <Link href="/pair_requests" className="font-bold text-purple underline">See open partner searches</Link>
             </span>
           </div>

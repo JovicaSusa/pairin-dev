@@ -2,6 +2,8 @@ class PairRequests::OffersController < ApplicationController
   include Authenticated
   include Alba::Inertia::Controller
 
+  SWITCHED_OFF = "This partner search is switched off and isn't taking applications right now."
+
   before_action :reject_switched_off_request, only: [:new, :create]
   before_action :enforce_application_limit, only: :create
 
@@ -44,7 +46,16 @@ class PairRequests::OffersController < ApplicationController
     # the profile's other rules: a half-filled profile mustn't block applying.
     current_user.level = params.dig(:offer, :level).presence if current_user.level.blank?
 
-    if Offer.transaction { @offer.save && current_user.save!(validate: false) }
+    # Under the search's lock, so it can't slip in while a partnership closes the search.
+    saved = @pair_request.with_lock do
+      next :closed if @pair_request.paused?
+
+      @offer.save && current_user.save!(validate: false)
+    end
+
+    if saved == :closed
+      redirect_to pair_requests_path, alert: SWITCHED_OFF
+    elsif saved
       OfferMailer.with(offer: @offer).offer_received_email.deliver_later
       OfferExpiryJob.set(wait_until: @offer.expires_at).perform_later(@offer)
       OfferReminderJob.set(wait_until: @offer.reminder_at).perform_later(@offer)
@@ -86,7 +97,7 @@ class PairRequests::OffersController < ApplicationController
 
     # A block or a different age group gets the same answer, so neither gives itself away.
     if @pair_request.paused? || current_user.blocked_with?(@pair_request.user) || !current_user.same_age_group?(@pair_request.user)
-      redirect_to pair_requests_path, alert: "This partner search is switched off and isn't taking applications right now."
+      redirect_to pair_requests_path, alert: SWITCHED_OFF
     end
   end
 

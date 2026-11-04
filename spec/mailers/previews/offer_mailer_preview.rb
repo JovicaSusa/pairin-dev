@@ -9,6 +9,10 @@ class OfferMailerPreview < ActionMailer::Preview
     OfferMailer.with(offer:, recipient: offer.poster).unread_messages_email
   end
 
+  def search_filled_email
+    OfferMailer.with(offer: Offer.last).search_filled_email
+  end
+
   def proposal_email
     OfferMailer.with(offer: Offer.where.not(proposed_at: nil).last).proposal_email
   end

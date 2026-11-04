@@ -58,7 +58,10 @@ class PairRequest < ApplicationRecord
     update_columns(paused_at: Time.current, updated_at: Time.current)
   end
 
+  # A search that has found its partner stays Off. Returns whether it's On.
   def switch_on!
+    return false if partnership
+
     update_columns(paused_at: nil, updated_at: Time.current)
   end
 

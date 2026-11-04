@@ -127,7 +127,7 @@ class Offer < ApplicationRecord
   # Returns :proposed or :accepted, or nil if it can't happen. If the other
   # person proposed at the same moment, they both want this, so it's accepted.
   def propose_partnership!(by:)
-    with_lock do
+    with_search_locked do
       next accept_proposal(by:) && :accepted if proposal_pending? && proposed_by_id != by.id
       next unless can_propose?
 
@@ -138,7 +138,7 @@ class Offer < ApplicationRecord
 
   # Returns the partnership, or nil if it can't happen.
   def accept_proposal!(by:)
-    with_lock { accept_proposal(by:) }
+    with_search_locked { accept_proposal(by:) }
   end
 
   # The chat stays open, and either person can propose again.
@@ -230,16 +230,23 @@ class Offer < ApplicationRecord
 
   private
 
-  # Locks the search too: only one of its chats can become the partnership.
+  # The search first, then the offer. Forming a partnership goes on to lock the
+  # search's other offers, so any other order could deadlock with a second accept.
+  def with_search_locked
+    transaction do
+      pair_request.lock!
+      lock!
+      yield
+    end
+  end
+
+  # Only one of a search's chats can become the partnership.
   def accept_proposal(by:)
     return unless chat_open? && proposal_pending? && proposed_by_id != by.id
+    return if pair_request.partnership
 
-    pair_request.with_lock do
-      next if pair_request.partnership
-
-      update_columns(proposed_at: nil)
-      create_partnership!(pair_request:)
-    end
+    update_columns(proposed_at: nil)
+    create_partnership!(pair_request:)
   end
 
   def read_column_for(user)

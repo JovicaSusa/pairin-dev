@@ -51,8 +51,11 @@ class Users::PairRequestsController < ApplicationController
   end
 
   def resume
-    @pair_request.switch_on!
-    redirect_to users_pair_requests_path, notice: "Partner search switched on. Others can see it and apply again."
+    if @pair_request.switch_on!
+      redirect_to users_pair_requests_path, notice: "Partner search switched on. Others can see it and apply again."
+    else
+      redirect_to users_pair_requests_path, alert: "This partner search has found its partner, so it stays off."
+    end
   end
 
   private
