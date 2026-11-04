@@ -10,11 +10,13 @@ export default function ApplyDrawer({ pairRequest, options, needsLevel, onClose 
     };
     const overflow = document.body.style.overflow;
 
-    document.addEventListener("keydown", onKey);
+    // In the capture phase, to run before the dropdown closes itself: by the
+    // time a normal listener runs, it's gone and this would close the drawer too.
+    document.addEventListener("keydown", onKey, true);
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("keydown", onKey, true);
       document.body.style.overflow = overflow;
     };
   }, [onClose]);
