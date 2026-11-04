@@ -17,7 +17,11 @@ module Onboarding
       errors = required_answers_missing
       return Result.new(pair_request: nil, errors:) if errors.any?
 
-      pair_request = User.transaction do
+      # The lock means a double click can't post two searches: the second one
+      # waits, then finds the first and stops there.
+      pair_request = @user.with_lock do
+        next @user.pair_requests.first if @user.pair_requests.exists?
+
         save_profile
         save_weekly_hours
         post_search
@@ -26,6 +30,12 @@ module Onboarding
       Result.new(pair_request:, errors: {})
     rescue ActiveRecord::RecordInvalid => e
       Result.new(pair_request: nil, errors: { base: e.record.errors.full_messages.first })
+    rescue ActiveRecord::RecordNotUnique
+      # Someone else created the same new topic at this moment. It exists now, so try once more.
+      raise if @retried
+
+      @retried = true
+      retry
     rescue ActiveRecord::StatementInvalid => e
       raise unless e.cause.is_a?(PG::ExclusionViolation)
 
@@ -56,8 +66,22 @@ module Onboarding
       @user.update_columns(changes)
     end
 
+    # Hours saved earlier stay as they are, and anything that overlaps them is
+    # already covered, so it shouldn't stop them finishing.
     def save_weekly_hours
-      Array(@params[:windows]).each { |window| @user.availability_windows.create!(window) }
+      saved = @user.availability_windows.to_a
+
+      Array(@params[:windows]).each do |window|
+        next if saved.any? { |existing| overlaps?(existing, window) }
+
+        @user.availability_windows.create!(window)
+      end
+    end
+
+    def overlaps?(existing, window)
+      existing.weekday == window[:weekday].to_i &&
+        existing.start_minute < window[:end_minute].to_i &&
+        window[:start_minute].to_i < existing.end_minute
     end
 
     def post_search

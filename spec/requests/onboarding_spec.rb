@@ -130,6 +130,44 @@ RSpec.describe "Onboarding", type: :request do
       expect(user.reload.level).to be_nil
     end
 
+    it "isn't blocked by hours they saved earlier" do
+      create(:availability_window, user:, weekday: 2, start_minute: 1080, end_minute: 1200)
+
+      finish(answers.merge(windows: [
+        { weekday: 2, start_minute: 1140, end_minute: 1260 },
+        { weekday: 3, start_minute: 600, end_minute: 660 }
+      ]))
+
+      expect(user.pair_requests.count).to eq(1)
+      expect(user.availability_windows.chronological.pluck(:weekday, :start_minute, :end_minute)).to eq([[2, 1080, 1200], [3, 600, 660]])
+    end
+
+    it "posts one search when submitted twice at once" do
+      params = ActionController::Parameters.new(answers).permit(:level, :goal, :commitment, :timezone, topics: [], windows: [:weekday, :start_minute, :end_minute])
+
+      first = Onboarding::Finish.call(user, params)
+      second = Onboarding::Finish.call(user, params)
+
+      expect(second).to be_success
+      expect(second.pair_request).to eq(first.pair_request)
+      expect(user.pair_requests.count).to eq(1)
+    end
+
+    it "tries again when someone else creates the same new topic at that moment" do
+      calls = 0
+      allow(Tag).to receive(:find_or_create_by!).and_wrap_original do |original, **args|
+        calls += 1
+        raise ActiveRecord::RecordNotUnique, "duplicate" if calls == 1
+
+        original.call(**args)
+      end
+
+      finish(answers.merge(topics: ["Brand new"]))
+
+      expect(response).to redirect_to(users_pair_requests_path)
+      expect(user.pair_requests.sole.tags.pluck(:name)).to eq(["brand new"])
+    end
+
     it "saves nothing at all when something's wrong" do
       finish(answers.merge(windows: [{ weekday: 2, start_minute: 1200, end_minute: 1080 }]))
 
