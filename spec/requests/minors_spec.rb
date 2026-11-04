@@ -54,6 +54,55 @@ RSpec.describe "Protections for under-18s", type: :request do
     end
   end
 
+  describe "someone with no date of birth" do
+    it "sees nobody's searches" do
+      unknown = create(:user)
+      unknown.update_columns(date_of_birth: nil)
+      sign_in(unknown)
+
+      expect(listed_subjects).to be_empty
+    end
+  end
+
+  describe "turning 18 in the middle of a chat" do
+    let(:turning) { create(:user, name: "Tess", date_of_birth: 18.years.ago.to_date + 2) }
+    let!(:offer) { create(:offer, pair_request: minor_search, offerer: turning, message: "Hi Ben") }
+
+    before do
+      offer.post_message(other_minor, "Hello")
+      travel 3.days
+    end
+
+    it "ends the chat for both, so neither can write" do
+      expect(turning.reload).to be_adult
+      expect(other_minor.reload).to be_minor
+      expect(offer.reload).to be_ended
+
+      sign_in(other_minor)
+      expect { post conversation_messages_path(offer), params: { message: { body: "Still there?" } } }.not_to change(Message, :count)
+
+      sign_in(turning)
+      expect { post conversation_messages_path(offer), params: { message: { body: "Yes" } } }.not_to change(Message, :count)
+    end
+
+    it "shows it as ended, keeps it readable and sends no unread email" do
+      sign_in(other_minor)
+      get conversation_path(offer)
+
+      expect(props["conversation"]).to include("status" => "Ended", "can_send" => false, "ended_by_viewer" => false)
+      expect(props.dig("conversation", "messages").size).to eq(2)
+
+      expect { UnreadMessagesEmailJob.perform_now(offer, turning) }
+        .not_to have_enqueued_mail(OfferMailer, :unread_messages_email)
+    end
+
+    it "leaves a chat between two adults alone" do
+      adults = create(:offer, pair_request: adult_search)
+
+      expect(adults).not_to be_ended
+    end
+  end
+
   describe "applying" do
     it "stops an under-18 applying to an adult, with the same answer as a switched-off search" do
       sign_in(minor)
@@ -126,13 +175,51 @@ RSpec.describe "Protections for under-18s", type: :request do
       expect(body).not_to include("Novice")
     end
 
-    it "ignores filters that would reveal a hidden profile field" do
+    [
+      { user_level_eq: "expert" },
+      { user_level_cont: "exp" },
+      { user_level_start: "exp" },
+      { user_level_not_eq: "novice" },
+      { user_language_cont: "EN" },
+      { user_level_or_user_language_cont: "exp" },
+      { c: { "0" => { a: { "0" => { name: "user_level" } }, p: "eq", v: { "0" => { value: "expert" } } } } },
+      { g: { "0" => { user_level_eq: "expert" } } }
+    ].each do |filter|
+      it "ignores #{filter.keys.first}, which would reveal a hidden profile field" do
+        sign_in(minor)
+        create(:pair_request, subject: "Expert minor", user: create(:user, date_of_birth: 17.years.ago.to_date, level: "expert"))
+
+        get pair_requests_path, params: { q: filter }
+
+        expect(props["pairRequests"].map { |r| r["subject"] }).to include("Minor search", "Expert minor")
+      end
+    end
+
+    it "ignores a sort on the poster, which would order by a hidden field" do
       sign_in(minor)
-      create(:pair_request, subject: "Expert minor", user: create(:user, date_of_birth: 17.years.ago.to_date, level: "expert"))
+      expert = create(:pair_request, subject: "Expert minor", user: create(:user, date_of_birth: 17.years.ago.to_date, level: "expert"), created_at: 1.year.ago)
+
+      get pair_requests_path, params: { q: { s: "user_level asc" } }
+
+      expect(props["pairRequests"].last["id"]).to eq(expert.id)
+    end
+
+    it "still lets them filter by tag and commitment" do
+      sign_in(minor)
+      create(:pair_request, subject: "Long minor", commitment: "open_ended", user: create(:user, date_of_birth: 17.years.ago.to_date))
+
+      get pair_requests_path, params: { q: { commitment_eq: "open_ended" } }
+
+      expect(props["pairRequests"].map { |r| r["subject"] }).to eq(["Long minor"])
+    end
+
+    it "still lets an adult filter by level" do
+      sign_in(create(:user))
+      create(:pair_request, subject: "Novice adult", user: create(:user, level: "novice"))
 
       get pair_requests_path, params: { q: { user_level_eq: "expert" } }
 
-      expect(props["pairRequests"].map { |r| r["subject"] }).to include("Minor search", "Expert minor")
+      expect(props["pairRequests"].map { |r| r["subject"] }).to eq(["Adult search"])
     end
 
     it "still shows them their own profile in full" do

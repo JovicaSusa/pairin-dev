@@ -40,9 +40,13 @@ class PairRequestsController < ApplicationController
 
   private
 
-  # Filtering under-18s by level or language would reveal what their profiles hide.
+  # Under-18s only get filters on the search itself. Any filter or sort on the
+  # poster would reveal what an under-18's profile hides, and adults can't reach
+  # under-18 searches at all.
+  MINOR_FILTERS = %w[tags_name_eq commitment_eq].freeze
+
   def searchable_filters
     filters = params[:q]&.compact_blank
-    current_user.minor? ? filters&.except(:user_level_eq, :user_language_eq) : filters
+    current_user.minor? ? filters&.slice(*MINOR_FILTERS) : filters
   end
 end

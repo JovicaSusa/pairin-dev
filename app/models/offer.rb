@@ -68,8 +68,15 @@ class Offer < ApplicationRecord
     replied_at? && !ended?
   end
 
+  # A chat also ends the day one of two under-18s turns 18, because a chat can't
+  # exist between an under-18 and an adult. Someone whose age isn't known yet
+  # doesn't trigger this.
   def ended?
-    ended_at?
+    ended_at? || across_age_groups?
+  end
+
+  def across_age_groups?
+    offerer.age_group.present? && poster.age_group.present? && offerer.age_group != poster.age_group
   end
 
   # The applicant has said their piece until the poster replies.
@@ -95,7 +102,7 @@ class Offer < ApplicationRecord
   # Returns false if it had already ended.
   def not_a_match!(by:, reason: nil)
     with_lock do
-      next false if ended?
+      next false if ended_at?
 
       update_columns(ended_at: Time.current, ended_by_id: by.id, end_reason: reason.presence)
       true

@@ -119,7 +119,9 @@ class User < ApplicationRecord
   end
 
   def same_age_group
-    minor? ? User.minors : User.adults
+    return User.minors if minor?
+
+    adult? ? User.adults : User.none
   end
 
   # What other people may see of this person. Under-18s show only their name;
