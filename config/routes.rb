@@ -42,6 +42,9 @@ Rails.application.routes.draw do
 
   resources :activities, only: [:index]
 
+  # PROTOTYPE ONLY: chat-first UI variants, never routed in production.
+  get "prototype/chat_first", to: "prototypes#chat_first" if Rails.env.local?
+
   # No-login offer confirmation, reached from the offer-received email.
   get "offers/confirm/:token", to: "offer_confirmations#show", as: :offer_confirmation
   post "offers/confirm/:token", to: "offer_confirmations#create"
