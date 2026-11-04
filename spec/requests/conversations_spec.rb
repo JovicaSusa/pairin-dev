@@ -115,6 +115,45 @@ RSpec.describe "Conversations", type: :request do
     end
   end
 
+  describe "the message limit" do
+    before do
+      sign_in(poster)
+      stub_const("User::MESSAGES_PER_HOUR", 2)
+      offer.post_message(poster, "One")
+      offer.post_message(poster, "Two")
+    end
+
+    it "stops the next message, with a clear message and no email scheduled" do
+      expect { reply("Three") }
+        .to not_change(Message, :count)
+        .and not_have_enqueued_job(UnreadMessagesEmailJob)
+
+      expect(flash[:alert]).to include("2 messages in the last hour")
+    end
+
+    it "allows more once the hour has passed" do
+      travel 1.hour + 1.minute
+
+      expect { reply("Three") }.to change(Message, :count).by(1)
+    end
+
+    it "counts messages across every conversation" do
+      other = create(:offer, pair_request: create(:pair_request, user: poster))
+
+      expect { post conversation_messages_path(other), params: { message: { body: "Hi" } } }.not_to change(Message, :count)
+    end
+
+    it "doesn't limit the other person" do
+      sign_in(applicant)
+
+      expect { reply("Hi") }.to change(Message, :count).by(1)
+    end
+  end
+
+  it "starts the message limit at 60 an hour" do
+    expect(User::MESSAGES_PER_HOUR).to eq(60)
+  end
+
   describe "the poster's first reply" do
     before do
       sign_in(poster)

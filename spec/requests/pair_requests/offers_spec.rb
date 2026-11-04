@@ -67,6 +67,45 @@ RSpec.describe "PairRequests::Offers", type: :request do
       post pair_request_offers_path(pair_request), params: { offer: answers.merge(extra) }
     end
 
+    describe "the limit for new accounts" do
+      let(:offerer) { create(:user, created_at: 6.days.ago) }
+
+      before { create_list(:offer, 5, offerer:) }
+
+      it "stops a sixth application within a day, with a clear message and no emails" do
+        expect { post_offer }
+          .to not_change(Offer, :count)
+          .and not_have_enqueued_mail(OfferMailer, :offer_received_email)
+
+        expect(flash[:alert]).to include("5 applications a day")
+      end
+
+      it "allows more once a day has passed" do
+        travel 1.day + 1.minute
+
+        expect { post_offer }.to change(Offer, :count).by(1)
+      end
+
+      it "stops applying at 7 days old" do
+        offerer.update!(created_at: 7.days.ago + 1.minute)
+
+        expect { post_offer }.not_to change(Offer, :count)
+      end
+
+      it "doesn't apply to an account older than 7 days" do
+        offerer.update!(created_at: 7.days.ago - 1.minute)
+
+        expect { post_offer }.to change(Offer, :count).by(1)
+      end
+    end
+
+    it "lets a new account send its fifth application" do
+      offerer.update!(created_at: 1.day.ago)
+      create_list(:offer, 4, offerer:)
+
+      expect { post_offer }.to change(Offer, :count).by(1)
+    end
+
     it "saves the answers" do
       post_offer
 
