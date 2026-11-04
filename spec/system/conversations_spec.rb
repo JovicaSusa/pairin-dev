@@ -53,6 +53,40 @@ RSpec.describe "conversations", type: :system do
     expect(page).to have_content("Hi Maya!")
   end
 
+  it "goes from a proposal to partners, and keeps the chat open" do
+    offer.post_message(poster, "Great to meet you")
+    offer.propose_partnership!(by: applicant)
+    sign_in(poster)
+    visit conversation_path(offer)
+
+    expect(page).to have_content("Sam wants to become partners.")
+    expect(page).not_to have_button("Become partners")
+    click_button "Accept"
+
+    expect(page).to have_content("You and Sam are partners.")
+    expect(page).to have_field("Write a message")
+    expect(page).not_to have_button("Not a match")
+    expect(offer.reload).to be_partners
+  end
+
+  it "proposes from the header and can be told not yet" do
+    offer.post_message(poster, "Great to meet you")
+    sign_in(applicant)
+    visit conversation_path(offer)
+
+    click_button "Become partners"
+
+    expect(page).to have_content("You asked to become partners. Waiting for Maya")
+    expect(page).to have_field("Write a message")
+    expect(page).not_to have_button("Become partners")
+
+    offer.decline_proposal!(by: poster)
+    visit conversation_path(offer)
+
+    expect(page).to have_content("Maya said not yet.")
+    expect(page).to have_button("Become partners")
+  end
+
   it "reports someone from the thread" do
     sign_in(poster)
     visit conversation_path(offer)

@@ -1,6 +1,6 @@
 import { Head, Link, router, useForm } from "@inertiajs/react";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Flag, Lock, MessagesSquare, Send, ShieldBan } from "lucide-react";
+import { ArrowLeft, Check, Flag, Lock, MessagesSquare, Send, ShieldBan, Users } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 const STATUS_STYLES = {
   Reply: "bg-orange text-white",
   Talking: "bg-green text-black",
+  Partners: "bg-purple text-white",
   Sent: "bg-white text-black",
   Ended: "bg-black/10 text-black/60",
 };
@@ -180,6 +181,45 @@ function NotAMatch({ conversation }) {
   );
 }
 
+function ProposalBanner({ conversation, onPost }) {
+  const name = conversation.other.name;
+
+  if (conversation.partners) {
+    return (
+      <div className="flex items-center gap-2 border-b-2 border-black bg-green/30 p-3 text-sm font-bold">
+        <Users className="h-4 w-4 shrink-0" />
+        You and {name} are partners.
+      </div>
+    );
+  }
+  if (conversation.proposal === "incoming") {
+    return (
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-black bg-green/30 p-3">
+        <b className="text-sm">{name} wants to become partners.</b>
+        <span className="flex gap-2">
+          <Button size="sm" onClick={() => onPost("accept_proposal")}><Check />Accept</Button>
+          <Button size="sm" variant="neutral" onClick={() => onPost("decline_proposal")}>Not yet</Button>
+        </span>
+      </div>
+    );
+  }
+  if (conversation.proposal === "waiting") {
+    return (
+      <div className="border-b-2 border-black bg-yellow-100 p-3 text-sm font-bold">
+        You asked to become partners. Waiting for {name}, and you can keep talking.
+      </div>
+    );
+  }
+  if (conversation.proposal === "declined") {
+    return (
+      <div className="border-b-2 border-black bg-yellow-100 p-3 text-sm font-bold">
+        {name} said not yet. You can keep talking, and ask again when it feels right.
+      </div>
+    );
+  }
+  return null;
+}
+
 function ReportForm({ conversation, onDone }) {
   const { data, setData, post, processing, errors } = useForm({ reason: "" });
 
@@ -242,6 +282,7 @@ function Thread({ conversation }) {
   }, [conversation.id, conversation.messages.length]);
 
   const pinned = application && !chatOpen && !ended;
+  const postProposal = (action) => router.post(`/conversations/${conversation.id}/${action}`, {}, { preserveScroll: true });
 
   return (
     <>
@@ -266,8 +307,13 @@ function Thread({ conversation }) {
             Block
           </button>
           <StatusBadge status={conversation.status} />
+          {conversation.can_propose && (
+            <Button size="sm" onClick={() => postProposal("propose")}><Users />Become partners</Button>
+          )}
         </div>
       </header>
+
+      <ProposalBanner conversation={conversation} onPost={postProposal} />
 
       {reporting && <ReportForm conversation={conversation} onDone={() => setReporting(false)} />}
       {confirmingBlock && <BlockConfirmation conversation={conversation} onCancel={() => setConfirmingBlock(false)} />}
@@ -304,7 +350,7 @@ function Thread({ conversation }) {
                 You can write more once {other.name} replies.
               </p>
             )}
-            <NotAMatch key={`end-${conversation.id}`} conversation={conversation} />
+            {!conversation.partners && <NotAMatch key={`end-${conversation.id}`} conversation={conversation} />}
           </>
         )}
       </div>

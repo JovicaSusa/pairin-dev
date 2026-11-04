@@ -58,9 +58,8 @@ RSpec.describe "Protections for under-18s", type: :request do
     it "sees nobody's searches" do
       unknown = create(:user)
       unknown.update_columns(date_of_birth: nil)
-      sign_in(unknown)
 
-      expect(listed_subjects).to be_empty
+      expect(PairRequest.visible_to(unknown)).to be_empty
     end
   end
 

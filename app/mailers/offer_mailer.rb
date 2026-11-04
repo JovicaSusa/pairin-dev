@@ -16,6 +16,21 @@ class OfferMailer < ApplicationMailer
     mail(to: @offer.offerer.email, subject: "No answer yet on #{@offer.pair_request.subject}")
   end
 
+  def proposal_email
+    @proposer = @offer.proposed_by
+    mail(to: @offer.other_person(@proposer).email, subject: "#{@proposer.display_name} wants to become partners")
+  end
+
+  def proposal_reminder_email
+    @proposer = @offer.proposed_by
+    mail(to: @offer.other_person(@proposer).email, subject: "Reminder: #{@proposer.display_name} wants to become partners")
+  end
+
+  def proposal_accepted_email
+    @accepter = @offer.other_person(params[:recipient])
+    mail(to: params[:recipient].email, subject: "You and #{@accepter.display_name} are partners")
+  end
+
   # Says how many and who from, but not what: the words stay in the app.
   def unread_messages_email
     @recipient = params[:recipient]

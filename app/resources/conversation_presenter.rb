@@ -29,6 +29,9 @@ class ConversationPresenter
       ended: @offer.ended?,
       ended_by_viewer: @offer.ended_by_id == @viewer.id,
       can_send: @offer.can_message?(@viewer),
+      partners: @offer.partners?,
+      can_propose: @offer.can_propose?,
+      proposal: proposal,
       search: { subject: @offer.pair_request.subject, commitment_label: @offer.pair_request.commitment_label },
       application: application,
       other: other_profile.slice(:name, :image_url, :level, :github_url),
@@ -46,6 +49,16 @@ class ConversationPresenter
 
   def status
     @offer.conversation_status_for(@viewer)
+  end
+
+  # Each person sees their own side of it. A "not yet" only shows to the person
+  # who proposed, until someone proposes again.
+  def proposal
+    return unless @offer.chat_open?
+    return "waiting" if @offer.proposal_pending? && @offer.proposed_by_id == @viewer.id
+    return "incoming" if @offer.proposal_pending?
+
+    "declined" if @offer.proposal_declined_at? && @offer.proposed_by_id == @viewer.id && !@offer.partners?
   end
 
   def application

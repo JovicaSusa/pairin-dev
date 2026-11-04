@@ -45,7 +45,49 @@ class ConversationsController < ApplicationController
     end
   end
 
+  def propose
+    offer = conversations.find(params[:id])
+
+    case offer.propose_partnership!(by: current_user)
+    when :proposed
+      OfferMailer.with(offer:).proposal_email.deliver_later
+      ProposalReminderJob.set(wait: Offer::PROPOSAL_REMINDER_AFTER).perform_later(offer, offer.proposed_at)
+    when :accepted
+      announce_partnership(offer)
+    end
+
+    ConversationsChannel.notify(offer)
+    redirect_to conversation_path(offer)
+  end
+
+  def accept_proposal
+    offer = conversations.find(params[:id])
+    proposer = offer.proposed_by
+
+    if offer.accept_proposal!(by: current_user)
+      announce_partnership(offer, proposer)
+    else
+      flash[:alert] = "This proposal isn't open any more."
+    end
+
+    ConversationsChannel.notify(offer)
+    redirect_to conversation_path(offer)
+  end
+
+  def decline_proposal
+    offer = conversations.find(params[:id])
+
+    ConversationsChannel.notify(offer) if offer.decline_proposal!(by: current_user)
+
+    redirect_to conversation_path(offer)
+  end
+
   private
+
+  # Whoever accepted is here to see it. The proposer may not be.
+  def announce_partnership(offer, proposer = offer.other_person(current_user))
+    OfferMailer.with(offer:, recipient: proposer).proposal_accepted_email.deliver_later
+  end
 
   def conversations
     Offer.involving(current_user)
@@ -53,7 +95,7 @@ class ConversationsController < ApplicationController
 
   def render_inbox(conversation = nil)
     rows = conversations
-      .includes(:offerer, pair_request: :user)
+      .includes(:offerer, :partnership, pair_request: :user)
       .order(last_message_at: :desc, id: :desc)
       .to_a
     latest_bodies = Message
