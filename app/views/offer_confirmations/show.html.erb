@@ -35,6 +35,13 @@
       &ndash; <%= @offer.period.end_at.in_time_zone(poster_timezone).strftime("%H:%M") %>
       (<%= poster_timezone %>)
     </p>
+
+    <% if @offer.offerer.github_url.present? %>
+      <p class="mt-2">
+        <span class="font-bold">GitHub:</span>
+        <%= link_to @offer.offerer.github_url, @offer.offerer.github_url, class: "text-purple font-bold underline", target: "_blank", rel: "noopener noreferrer" %>
+      </p>
+    <% end %>
   </div>
 
   <% case @offer.status %>

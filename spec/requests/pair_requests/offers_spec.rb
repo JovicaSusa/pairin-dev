@@ -11,6 +11,19 @@ RSpec.describe "PairRequests::Offers", type: :request do
 
   before { sign_in(offerer) }
 
+  describe "GET /pair_requests/:pair_request_id/offers" do
+    it "sends the poster each applicant's GitHub link" do
+      offerer.update!(github_url: "https://github.com/ada")
+      create(:offer, pair_request:, offerer:)
+      sign_in(pair_request.user)
+
+      get pair_request_offers_path(pair_request)
+
+      props = JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]
+      expect(props["offers"].first.dig("offerer", "github_url")).to eq("https://github.com/ada")
+    end
+  end
+
   describe "GET /pair_requests/:pair_request_id/offers/new" do
     it "offers the request's bookable slots in the offerer's timezone" do
       offerer.update!(timezone: "Asia/Tokyo")

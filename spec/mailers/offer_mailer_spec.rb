@@ -24,6 +24,14 @@ RSpec.describe OfferMailer, type: :mailer do
       expect(body).to match(%r{https?://[^/"]+/offers/confirm/[^"\s]+})
     end
 
+    it "shows the applicant's GitHub link only when they've added one" do
+      expect(mail.body.encoded).not_to include("GitHub:")
+
+      offerer.update!(github_url: "https://github.com/ada")
+
+      expect(described_class.with(offer:).offer_received_email.body.encoded).to include("https://github.com/ada")
+    end
+
     it "never reveals the offerer's email address" do
       expect(mail.body.encoded).not_to include("offerer@example.com")
     end

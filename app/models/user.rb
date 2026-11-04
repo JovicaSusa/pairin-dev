@@ -24,6 +24,13 @@ class User < ApplicationRecord
   validate :old_enough_for_an_account, on: :create, if: :under_age?
   # The age gate relies on it, so once given it stays put.
   validate :date_of_birth_unchanged, on: :update, if: -> { date_of_birth_changed? && date_of_birth_was.present? }
+  # Only github.com links: this one is shown to other people and put in emails.
+  normalizes :github_url, with: ->(url) {
+    url = url.strip
+    url.empty? || url.match?(%r{\A[a-z][a-z0-9+.-]*:}i) ? url.presence : "https://#{url}"
+  }
+  validate :github_url_is_a_github_link, if: :github_url?
+
   TIMEZONES = TZInfo::Timezone.all_identifiers.to_set.freeze
 
   validates :timezone, inclusion: { in: TIMEZONES, message: "isn't a known timezone" }, if: :timezone_changed?
@@ -42,6 +49,14 @@ class User < ApplicationRecord
     today = Time.find_zone(timezone)&.today || Date.current
 
     date_of_birth <= today && !self.class.old_enough?(date_of_birth, today:)
+  end
+
+  private def github_url_is_a_github_link
+    uri = URI.parse(github_url)
+    valid = uri.is_a?(URI::HTTP) && %w(github.com www.github.com).include?(uri.host&.downcase) && uri.path.to_s.length > 1
+    errors.add(:github_url, "must be a github.com link, like https://github.com/your-name") unless valid
+  rescue URI::InvalidURIError
+    errors.add(:github_url, "must be a github.com link, like https://github.com/your-name")
   end
 
   private def date_of_birth_unchanged

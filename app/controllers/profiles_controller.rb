@@ -5,7 +5,7 @@ class ProfilesController < ApplicationController
     @user = current_user
 
     render inertia: 'Profile', props: {
-      user: current_user.as_json(only: [:id, :name, :profession, :about, :date_of_birth, :programming_since, :language, :country, :level], methods: [:image_url]),
+      user: current_user.as_json(only: [:id, :name, :profession, :about, :date_of_birth, :programming_since, :language, :country, :level, :github_url], methods: [:image_url]),
       languages: I18nData.languages.invert.to_a,
       countries: I18nData.countries.invert.to_a,
       levels: User::LEVELS.map { |l| [l.capitalize, l] }
@@ -26,7 +26,7 @@ class ProfilesController < ApplicationController
 
   def profile_attributes
     params.permit(
-      :about, :programming_since, :country, :language, :level, :image, :name, :profession
+      :about, :programming_since, :country, :language, :level, :image, :name, :profession, :github_url
     )
   end
 end

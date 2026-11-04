@@ -1,4 +1,37 @@
 RSpec.describe User, type: :model do
+  describe "github_url" do
+    it "is optional, and blank is saved as nothing" do
+      expect(build(:user, github_url: nil)).to be_valid
+      expect(build(:user, github_url: "  ").github_url).to be_nil
+    end
+
+    it "accepts a github.com link" do
+      expect(build(:user, github_url: "https://github.com/ada")).to be_valid
+      expect(build(:user, github_url: "https://www.github.com/ada")).to be_valid
+    end
+
+    it "adds https when it's left off" do
+      expect(build(:user, github_url: " github.com/ada ").github_url).to eq("https://github.com/ada")
+    end
+
+    it "refuses anything that isn't a link to someone on github.com" do
+      [
+        "javascript:alert(1)",
+        "https://evil.example/ada",
+        "https://github.com.evil.example/ada",
+        "https://github.com",
+        "https://github.com/",
+        "ftp://github.com/ada",
+        "not a link"
+      ].each do |url|
+        user = build(:user, github_url: url)
+
+        expect(user).not_to be_valid, "expected #{url} to be refused"
+        expect(user.errors[:github_url]).to be_present
+      end
+    end
+  end
+
   describe ".old_enough?" do
     let(:today) { Date.new(2026, 11, 2) }
 

@@ -88,6 +88,16 @@ export default function Profile({ user, countries, languages, levels }) {
                 <Textarea name="about" rows="4" defaultValue={user.about || ""} />
               </div>
 
+              <div>
+                <Label htmlFor="github_url" className="block mb-1">GitHub link <span className="font-normal text-black/50">(optional)</span></Label>
+                <Input id="github_url" name="github_url" defaultValue={user.github_url || ""} placeholder="https://github.com/your-name" />
+                {errors.github_url ? (
+                  <div className="text-red font-bold mt-1 text-sm">{errors.github_url}</div>
+                ) : (
+                  <p className="mt-1 text-xs text-black/50">Shown to people whose partner searches you apply to.</p>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {user.date_of_birth && (
                   <div>
