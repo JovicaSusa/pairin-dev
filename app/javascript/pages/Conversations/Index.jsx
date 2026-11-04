@@ -1,6 +1,6 @@
 import { Head, Link, router, useForm } from "@inertiajs/react";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Lock, MessagesSquare, Send, ShieldBan } from "lucide-react";
+import { ArrowLeft, Flag, Lock, MessagesSquare, Send, ShieldBan } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -180,6 +180,31 @@ function NotAMatch({ conversation }) {
   );
 }
 
+function ReportForm({ conversation, onDone }) {
+  const { data, setData, post, processing, errors } = useForm({ reason: "" });
+
+  const submit = (e) => {
+    e.preventDefault();
+    post(`/conversations/${conversation.id}/report`, { preserveScroll: true, onSuccess: onDone });
+  };
+
+  return (
+    <form onSubmit={submit} aria-label="Report" className="border-b-2 border-black bg-yellow-50 p-3">
+      <p className="text-sm font-bold">Report {conversation.other.name}</p>
+      <p className="mb-2 text-xs text-black/60">
+        The Pairin team will see your reason and your recent messages here, and may read this chat. {conversation.other.name} won't be told.
+      </p>
+      <Label htmlFor="report_reason" className="mb-1 block text-xs">What happened?</Label>
+      <Textarea id="report_reason" rows={2} value={data.reason} onChange={(e) => setData("reason", e.target.value)} />
+      {errors.reason && <div className="mt-1 text-sm font-bold text-red">{errors.reason}</div>}
+      <div className="mt-2 flex gap-2">
+        <Button type="submit" size="sm" disabled={processing}>Send report</Button>
+        <Button type="button" size="sm" variant="neutral" onClick={onDone}>Cancel</Button>
+      </div>
+    </form>
+  );
+}
+
 function BlockConfirmation({ conversation, onCancel }) {
   const [processing, setProcessing] = useState(false);
 
@@ -209,6 +234,7 @@ function Thread({ conversation }) {
   const { other, search, chat_open: chatOpen, ended, can_send: canSend, application } = conversation;
   const [showApplication, setShowApplication] = useState(false);
   const [confirmingBlock, setConfirmingBlock] = useState(false);
+  const [reporting, setReporting] = useState(false);
   const scroller = useRef(null);
 
   useEffect(() => {
@@ -231,6 +257,10 @@ function Thread({ conversation }) {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <button type="button" onClick={() => setReporting(true)} className="flex items-center gap-1 text-xs font-bold text-black/50 hover:text-black">
+            <Flag className="h-3.5 w-3.5" />
+            Report
+          </button>
           <button type="button" onClick={() => setConfirmingBlock(true)} className="flex items-center gap-1 text-xs font-bold text-black/50 hover:text-black">
             <ShieldBan className="h-3.5 w-3.5" />
             Block
@@ -239,6 +269,7 @@ function Thread({ conversation }) {
         </div>
       </header>
 
+      {reporting && <ReportForm conversation={conversation} onDone={() => setReporting(false)} />}
       {confirmingBlock && <BlockConfirmation conversation={conversation} onCancel={() => setConfirmingBlock(false)} />}
 
       <div ref={scroller} className={`flex-1 overflow-y-auto p-4 ${ended ? "opacity-70" : ""}`}>

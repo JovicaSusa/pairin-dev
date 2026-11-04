@@ -1,0 +1,16 @@
+<h1>Chat report</h1>
+
+<p><strong>Reported by:</strong> <%= @reporter.display_name %> (user <%= @reporter.id %>, <%= @reporter.email %>)</p>
+<p><strong>Reported:</strong> <%= @reported.display_name %> (user <%= @reported.id %>, <%= @reported.email %>)</p>
+<p><strong>Conversation:</strong> <%= @offer.id %>, on "<%= @offer.pair_request.subject %>" (partner search <%= @offer.pair_request_id %>)</p>
+
+<h2>Reason</h2>
+<p style="white-space: pre-wrap"><%= @reason %></p>
+
+<h2>Most recent messages (up to <%= ReportMailer::RECENT_MESSAGES %>)</h2>
+<% @messages.each do |message| %>
+  <p>
+    <strong><%= message.sender.display_name %></strong>, <%= message.created_at.utc.to_fs(:long) %> UTC<br>
+    <span style="white-space: pre-wrap"><%= message.body %></span>
+  </p>
+<% end %>
