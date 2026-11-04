@@ -2,13 +2,13 @@ class PairRequest < ApplicationRecord
   include ActivityGeneratable
 
   belongs_to :user
-  has_many :offers, dependent: nil # TODO: Reconsider
+  has_many :offers, dependent: :destroy
   has_one :accepted_offer, -> { accepted }, class_name: "Offer"
   # Legacy: requests used to own their time slots. Slots now come from the
   # poster's weekly hours (#bookable_slots) and offers own their booked period.
   has_many :periods, as: :periodable, dependent: :destroy, inverse_of: :periodable
   has_many :sessions, as: :sessionable
-  has_many :taggings, as: :taggable
+  has_many :taggings, as: :taggable, dependent: :destroy
   has_many :tags, through: :taggings
 
   MAX_DURATION = 180

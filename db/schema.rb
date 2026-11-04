@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_10_30_224219) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -128,6 +128,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_30_224219) do
     t.string "name"
     t.string "profession"
     t.string "timezone", default: "UTC", null: false
+    t.datetime "suspended_at"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["country"], name: "index_users_on_country"
     t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
@@ -135,6 +136,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_30_224219) do
     t.index ["language"], name: "index_users_on_language"
     t.index ["programming_since"], name: "index_users_on_programming_since"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["suspended_at"], name: "index_users_on_suspended_at"
   end
 
   add_foreign_key "activities", "users", column: "receiver_id"
