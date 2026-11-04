@@ -53,6 +53,21 @@ RSpec.describe "conversations", type: :system do
     expect(page).to have_content("Hi Maya!")
   end
 
+  it "reports someone from the thread" do
+    sign_in(poster)
+    visit conversation_path(offer)
+
+    click_button "Report"
+    click_button "Send report"
+    expect(page).to have_content("Please say what happened")
+
+    fill_in "What happened?", with: "They were rude"
+    click_button "Send report"
+
+    expect(page).to have_content("Thanks for telling us.")
+    expect(page).not_to have_field("What happened?")
+  end
+
   it "blocks after asking first" do
     sign_in(poster)
     visit conversation_path(offer)

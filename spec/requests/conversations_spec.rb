@@ -368,6 +368,44 @@ RSpec.describe "Conversations", type: :request do
     end
   end
 
+  describe "reporting" do
+    it "emails the team, tells the reporter, and tells the other person nothing" do
+      sign_in(poster)
+
+      expect { post report_conversation_path(offer), params: { reason: "They were rude" } }
+        .to have_enqueued_mail(ReportMailer, :chat_report).with(params: { offer:, reporter: poster, reason: "They were rude" }, args: []).once
+
+      expect(flash[:notice]).to include("Thanks")
+      expect(offer.reload).not_to be_ended
+    end
+
+    it "works for the applicant, and on an ended chat" do
+      offer.not_a_match!(by: poster)
+      sign_in(applicant)
+
+      expect { post report_conversation_path(offer), params: { reason: "They were rude" } }
+        .to have_enqueued_mail(ReportMailer, :chat_report).once
+    end
+
+    it "needs a reason" do
+      sign_in(poster)
+
+      expect { post report_conversation_path(offer), params: { reason: "   " } }
+        .not_to have_enqueued_mail(ReportMailer, :chat_report)
+
+      expect(session[:inertia_errors]).to include(:reason)
+    end
+
+    it "can't be used by anyone outside the chat" do
+      sign_in(create(:user))
+
+      expect { post report_conversation_path(offer), params: { reason: "Hm" } }
+        .not_to have_enqueued_mail(ReportMailer, :chat_report)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
   describe "the list" do
     it "shows each person the other, a status and the newest first" do
       older = create(:offer, pair_request: create(:pair_request, user: create(:user, name: "Tom")), offerer: applicant)

@@ -33,6 +33,18 @@ class ConversationsController < ApplicationController
     redirect_to conversation_path(offer), notice: "You've blocked #{other.display_name}. You won't see each other's partner searches."
   end
 
+  def report
+    offer = conversations.find(params[:id])
+    reason = params[:reason].to_s.strip.first(Message::MAX_LENGTH)
+
+    if reason.empty?
+      redirect_to conversation_path(offer), inertia: { errors: { reason: "Please say what happened" } }
+    else
+      ReportMailer.with(offer:, reporter: current_user, reason:).chat_report.deliver_later
+      redirect_to conversation_path(offer), notice: "Thanks for telling us. We'll look into it."
+    end
+  end
+
   private
 
   def conversations
