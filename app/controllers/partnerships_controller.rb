@@ -32,6 +32,7 @@ class PartnershipsController < ApplicationController
         id: partnership.id,
         goal: partnership.goal,
         ended: partnership.ended?,
+        ended_by_viewer: partnership.ended_by_id == current_user.id,
         your_commitment: partnership.commitment_of(current_user),
         partner_commitment: partnership.commitment_of(partner),
         conversation: ConversationPresenter.new(partnership.offer, current_user).thread
@@ -44,12 +45,22 @@ class PartnershipsController < ApplicationController
 
     if partnership.ended?
       redirect_to partner_path(partnership), alert: "This partnership has ended."
-    elsif partnership.update(goal: params[:goal].to_s)
+    elsif partnership.update(goal: params.fetch(:goal, partnership.goal).to_s)
       ConversationsChannel.notify(partnership.offer)
       redirect_to partner_path(partnership)
     else
       redirect_to partner_path(partnership), inertia: { errors: partnership.errors.to_hash(true) }
     end
+  end
+
+  def end_partnership
+    partnership = partnerships.find(params[:id])
+
+    if partnership.end!(by: current_user, reason: params[:reason].to_s.strip.first(Message::MAX_LENGTH))
+      ConversationsChannel.notify(partnership.offer)
+    end
+
+    redirect_to partner_path(partnership)
   end
 
   private

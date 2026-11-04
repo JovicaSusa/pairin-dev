@@ -9,6 +9,11 @@ class OfferMailerPreview < ActionMailer::Preview
     OfferMailer.with(offer:, recipient: offer.poster).unread_messages_email
   end
 
+  def partnership_ended_email
+    offer = Partnership.last.offer
+    OfferMailer.with(offer:, ended_by: offer.poster).partnership_ended_email
+  end
+
   def search_filled_email
     OfferMailer.with(offer: Offer.last).search_filled_email
   end

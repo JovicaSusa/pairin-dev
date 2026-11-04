@@ -65,6 +65,39 @@ function Goal({ partnership }) {
   );
 }
 
+function EndPartnership({ partnership }) {
+  const [open, setOpen] = useState(false);
+  const { data, setData, post, processing } = useForm({ reason: "" });
+  const name = partnership.conversation.other.name;
+
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="text-left text-xs font-bold text-black/50 underline hover:text-black">
+        End partnership
+      </button>
+    );
+  }
+
+  return (
+    <form
+      className="rounded-2xl border-2 border-black bg-yellow-50 p-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        post(`/partners/${partnership.id}/end_partnership`, { preserveScroll: true });
+      }}
+    >
+      <p className="text-sm font-bold">End this partnership?</p>
+      <p className="mb-2 text-xs text-black/60">We'll tell {name} kindly. The Workspace stays readable, but neither of you can write here afterwards.</p>
+      <Label htmlFor="end_reason" className="mb-1 block text-xs">Why? (optional, only we see this)</Label>
+      <Textarea id="end_reason" rows={2} value={data.reason} onChange={(e) => setData("reason", e.target.value)} />
+      <div className="mt-2 flex gap-2">
+        <Button type="submit" size="sm" disabled={processing}>End partnership</Button>
+        <Button type="button" size="sm" variant="neutral" onClick={() => setOpen(false)}>Keep going</Button>
+      </div>
+    </form>
+  );
+}
+
 function Commitments({ partnership }) {
   const rows = [
     ["You", partnership.your_commitment],
@@ -153,7 +186,7 @@ export default function Show({ partnership }) {
             ) : (
               <div className="flex items-start gap-2 rounded-xl border-2 border-black bg-black/5 p-3 text-sm">
                 <Lock className="mt-0.5 h-4 w-4 shrink-0" />
-                <b>This partnership has ended. You can still read it.</b>
+                <b>{partnership.ended_by_viewer ? "You ended this partnership." : "This partnership has ended."} You can still read it.</b>
               </div>
             )}
           </div>
@@ -161,6 +194,7 @@ export default function Show({ partnership }) {
 
         <div className="flex flex-col gap-6">
           <Commitments partnership={partnership} />
+          {!partnership.ended && <EndPartnership partnership={partnership} />}
         </div>
       </div>
     </div>
