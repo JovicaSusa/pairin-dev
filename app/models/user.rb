@@ -4,6 +4,10 @@ class User < ApplicationRecord
   LEVELS = %w(expert proficient competent advanced_beginner novice).freeze
   # Not legal advice: see the "Minimum-age requirements for Pairin" research.
   MINIMUM_AGE = 16
+  # Starting points for rate limits, meant to be changed as we learn.
+  NEW_ACCOUNT_AGE = 7.days
+  NEW_ACCOUNT_APPLICATIONS_PER_DAY = 5
+  MESSAGES_PER_HOUR = 60
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -52,6 +56,14 @@ class User < ApplicationRecord
 
       Offer.between(self, other).to_a.each { |offer| offer.not_a_match!(by: self) }
     end
+  end
+
+  def application_limit_reached?
+    created_at > NEW_ACCOUNT_AGE.ago && offers.where(created_at: 1.day.ago..).count >= NEW_ACCOUNT_APPLICATIONS_PER_DAY
+  end
+
+  def message_limit_reached?
+    Message.where(sender: self, created_at: 1.hour.ago..).count >= MESSAGES_PER_HOUR
   end
 
   def display_name

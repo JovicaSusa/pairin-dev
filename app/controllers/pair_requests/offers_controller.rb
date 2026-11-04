@@ -3,6 +3,7 @@ class PairRequests::OffersController < ApplicationController
   include Alba::Inertia::Controller
 
   before_action :reject_switched_off_request, only: [:new, :create]
+  before_action :enforce_application_limit, only: :create
 
   def index
     @pair_request = current_user.pair_requests.find_by(id: params[:pair_request_id])
@@ -72,6 +73,12 @@ class PairRequests::OffersController < ApplicationController
     URI.parse(request.referer.to_s).path == pair_requests_path
   rescue URI::InvalidURIError
     false
+  end
+
+  def enforce_application_limit
+    return unless current_user.application_limit_reached?
+
+    redirect_back_or_to pair_requests_path, alert: "New accounts can send #{User::NEW_ACCOUNT_APPLICATIONS_PER_DAY} applications a day, and you've reached that for now. Please try again tomorrow."
   end
 
   def reject_switched_off_request
