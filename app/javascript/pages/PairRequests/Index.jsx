@@ -1,18 +1,21 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import FilterForm from "@/components/FilterForm";
+import ApplyDrawer from "@/components/ApplyDrawer";
 import Card from "./Card";
 import { Head, router, usePage, InfiniteScroll } from "@inertiajs/react";
 import { SlidersHorizontal, SearchX } from "lucide-react";
 
-export default function Index({ pairRequests, filterOptions, filters }) {
+export default function Index({ pairRequests, filterOptions, filters, applicationOptions, needsLevel }) {
   const { auth } = usePage().props;
   const currentUser = auth.user;
 
   const { tags, commitments, userLevels, languages } = filterOptions;
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [applyingTo, setApplyingTo] = useState(null);
+  const closeDrawer = useCallback(() => setApplyingTo(null), []);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-16 md:px-8">
@@ -57,7 +60,7 @@ export default function Index({ pairRequests, filterOptions, filters }) {
           }
         >
           {pairRequests.map((req) => (
-            <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} />
+            <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} onApply={setApplyingTo} />
           ))}
         </InfiniteScroll>
 
@@ -70,6 +73,10 @@ export default function Index({ pairRequests, filterOptions, filters }) {
         )}
       </div>
       </div>
+
+      {applyingTo && (
+        <ApplyDrawer pairRequest={applyingTo} options={applicationOptions} needsLevel={needsLevel} onClose={closeDrawer} />
+      )}
     </div>
   );
 }
