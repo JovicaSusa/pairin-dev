@@ -22,15 +22,17 @@ export default function UserOfferCard({ offer }) {
     <div className="mb-6 rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:p-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <h3 className="text-xl">{offer.subject}</h3>
-        <div className="flex flex-wrap items-center gap-1.5">
-          <Badge variant="neutral" className="rounded-full text-xs">
-            {formatShort(offer.start_at)}
-          </Badge>
-          <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
-          <Badge variant="neutral" className="rounded-full text-xs">
-            {formatShort(offer.end_at)}
-          </Badge>
-        </div>
+        {offer.start_at && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badge variant="neutral" className="rounded-full text-xs">
+              {formatShort(offer.start_at)}
+            </Badge>
+            <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
+            <Badge variant="neutral" className="rounded-full text-xs">
+              {formatShort(offer.end_at)}
+            </Badge>
+          </div>
+        )}
       </div>
 
       <div className="mt-4 flex items-center gap-3">

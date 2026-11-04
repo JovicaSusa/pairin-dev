@@ -10,7 +10,7 @@ RSpec.describe "poster accepts an offer from the email link", type: :system do
 
     click_button "Accept"
 
-    expect(page).to have_content("You're pairing with Ada")
+    expect(page).to have_content("You accepted Ada's application")
     expect(page).not_to have_button("Accept")
     expect(offer.reload).to be_accepted
   end

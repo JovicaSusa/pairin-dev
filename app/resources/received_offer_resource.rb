@@ -10,11 +10,11 @@ class ReceivedOfferResource < ApplicationResource
   end
 
   attribute :start_at do |offer|
-    offer.period.start_at
+    offer.period&.start_at
   end
 
   attribute :end_at do |offer|
-    offer.period.end_at
+    offer.period&.end_at
   end
 
   attribute :should_overlay do |offer|

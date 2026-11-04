@@ -111,7 +111,7 @@ export default function UserPairRequestCard({ request }) {
             </div>
           </div>
 
-          <form onSubmit={submitCallLink} className="mt-4 flex flex-col items-stretch gap-2 md:flex-row md:items-end">
+          {request.sessions.length > 0 && <form onSubmit={submitCallLink} className="mt-4 flex flex-col items-stretch gap-2 md:flex-row md:items-end">
             <div className="flex flex-1 flex-col">
               <Label htmlFor="pair_request_sessions_attributes_0_call_link" className="mb-1">Call link</Label>
               <Input
@@ -130,7 +130,7 @@ export default function UserPairRequestCard({ request }) {
             <Button disabled={processing} className="md:w-32">
               {processing ? '...' : 'Add'}
             </Button>
-          </form>
+          </form>}
         </div>
       )}
     </div>

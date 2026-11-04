@@ -17,7 +17,7 @@ RSpec.describe OfferReminderJob, type: :job do
   end
 
   it "stays quiet when the poster accepted another offer" do
-    create(:offer, :accepted, pair_request: offer.pair_request, period: offer.period)
+    create(:offer, :accepted, pair_request: offer.pair_request)
 
     expect { perform }.not_to have_enqueued_mail(OfferMailer, :offer_reminder_email)
   end
@@ -28,8 +28,8 @@ RSpec.describe OfferReminderJob, type: :job do
     expect { perform }.not_to have_enqueued_mail(OfferMailer, :offer_reminder_email)
   end
 
-  it "stays quiet when the offered slot has already started" do
-    travel_to(offer.period.start_at + 1.minute)
+  it "stays quiet when the application has expired" do
+    travel_to(offer.expires_at + 1.minute)
 
     expect { perform }.not_to have_enqueued_mail(OfferMailer, :offer_reminder_email)
   end

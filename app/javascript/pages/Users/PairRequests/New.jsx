@@ -1,4 +1,4 @@
-import { useForm, Head, Link } from '@inertiajs/react';
+import { useForm, Head } from '@inertiajs/react';
 import { X } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -53,7 +53,7 @@ export default function New({ tags, commitments }) {
       <PageHeader
         eyebrow="Partner searches"
         title="Start a partner search"
-        description="Say what you want to learn and how long you'd like to commit. Others book a time from your weekly hours."
+        description="Say what you want to learn and how long you'd like to commit."
       />
 
       <form onSubmit={handleSubmit} className="flex flex-col items-stretch">
@@ -96,15 +96,7 @@ export default function New({ tags, commitments }) {
           {errors.description && <div className="text-red font-bold mt-1 text-sm">{errors.description}</div>}
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div>
-            <h4 className="mb-3 font-headline text-sm font-bold uppercase tracking-widest text-black/50">When</h4>
-            <p className="rounded-xl border-2 border-black bg-white p-3 text-sm">
-              Others book a time from your weekly hours.{" "}
-              <Link href="/availability" className="font-bold text-purple">Edit weekly hours</Link>
-            </p>
-          </div>
-
+        <div className="mt-8">
           <div>
             <h4 className="mb-3 font-headline text-sm font-bold uppercase tracking-widest text-black/50">Tags</h4>
 

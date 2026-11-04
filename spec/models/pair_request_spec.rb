@@ -30,27 +30,11 @@ RSpec.describe PairRequest, type: :model do
   end
 
   describe "#switch_on!" do
-    let(:pair_request) { create(:pair_request, paused_at: 1.hour.ago, weekly_hours: false) }
-
-    it "refuses while the poster has no weekly hours" do
-      expect(pair_request.switch_on!).to be(false)
-      expect(pair_request.reload).to be_paused
-    end
-
-    it "switches on once the poster has weekly hours" do
-      create(:availability_window, user: pair_request.user)
+    it "works without weekly hours" do
+      pair_request = create(:pair_request, paused_at: 1.hour.ago)
 
       expect(pair_request.switch_on!).to be(true)
       expect(pair_request.reload).not_to be_paused
-    end
-  end
-
-  describe "#bookable_slots" do
-    it "comes from the poster's weekly hours" do
-      pair_request = create(:pair_request)
-
-      expect(pair_request.bookable_slots).to eq(PairRequests::BookableSlots.call(pair_request))
-      expect(pair_request.bookable_slots).not_to be_empty
     end
   end
 end

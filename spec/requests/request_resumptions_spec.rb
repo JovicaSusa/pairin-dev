@@ -27,7 +27,7 @@ RSpec.describe "Request resumptions", type: :request do
   describe "POST /requests/resume/:token" do
     let(:expired_offer) { create(:offer, pair_request:) }
 
-    before { travel_to(expired_offer.period.start_at + 1.minute) }
+    before { travel_to(expired_offer.expires_at + 1.minute) }
 
     it "switches the request back on and leaves expired offers expired" do
       post request_resumption_path(token:)
@@ -41,15 +41,12 @@ RSpec.describe "Request resumptions", type: :request do
   end
 
   context "when the poster has no weekly hours" do
-    before { pair_request.user.availability_windows.destroy_all }
+    it "still switches the request back on" do
+      expect(pair_request.user.availability_windows).to be_empty
 
-    it "keeps the request off and points to weekly hours" do
       post request_resumption_path(token:)
 
-      expect(pair_request.reload).to be_paused
-      follow_redirect!
-      expect(response.body).to include("Add your weekly hours")
-      expect(response.body).to include(availability_path)
+      expect(pair_request.reload).not_to be_paused
     end
   end
 

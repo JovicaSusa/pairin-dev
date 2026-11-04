@@ -3,7 +3,6 @@ class Users::PairRequestsController < ApplicationController
   include Alba::Inertia::Controller
 
   before_action :set_and_authorize_own_pair_request, only: [:pause, :resume]
-  before_action :require_weekly_hours, only: [:new, :create]
 
   def index
     @pair_requests = current_user.pair_requests
@@ -52,20 +51,11 @@ class Users::PairRequestsController < ApplicationController
   end
 
   def resume
-    if @pair_request.switch_on!
-      redirect_to users_pair_requests_path, notice: "Partner search switched on. Others can see it and apply again."
-    else
-      redirect_to users_pair_requests_path, alert: "Add your weekly hours before switching a partner search on. Others book your partner searches into them."
-    end
+    @pair_request.switch_on!
+    redirect_to users_pair_requests_path, notice: "Partner search switched on. Others can see it and apply again."
   end
 
   private
-
-  def require_weekly_hours
-    return if current_user.availability_windows.exists?
-
-    redirect_to availability_path, alert: "Add your weekly hours first. Others book your partner searches into them."
-  end
 
   def set_and_authorize_own_pair_request
     @pair_request = current_user.pair_requests.find(params[:id])

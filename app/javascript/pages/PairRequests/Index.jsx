@@ -7,7 +7,7 @@ import Card from "./Card";
 import { Head, router, usePage, InfiniteScroll } from "@inertiajs/react";
 import { SlidersHorizontal, SearchX } from "lucide-react";
 
-export default function Index({ pairRequests, filterOptions, filters, timezone }) {
+export default function Index({ pairRequests, filterOptions, filters }) {
   const { auth } = usePage().props;
   const currentUser = auth.user;
 
@@ -57,7 +57,7 @@ export default function Index({ pairRequests, filterOptions, filters, timezone }
           }
         >
           {pairRequests.map((req) => (
-            <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} timezone={timezone} />
+            <Card key={req.id} pairRequest={req} currentUserId={currentUser.id} />
           ))}
         </InfiniteScroll>
 

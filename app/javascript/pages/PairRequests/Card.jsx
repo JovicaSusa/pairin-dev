@@ -1,5 +1,4 @@
 import { Link } from "@inertiajs/react";
-import { slotParts } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
 
-export default function PairRequestCard({ pairRequest, currentUserId, timezone }) {
+export default function PairRequestCard({ pairRequest, currentUserId }) {
   const alreadyOffered = pairRequest.offers
     ?.map(o => o.offerer_id)
     .includes(currentUserId);
@@ -17,21 +16,7 @@ export default function PairRequestCard({ pairRequest, currentUserId, timezone }
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <h3 className="text-xl">{pairRequest.subject}</h3>
 
-        <div className="flex flex-wrap gap-2 md:flex-col md:items-end">
-          <Badge className="rounded-full border-black bg-green text-xs text-black">Partner · {pairRequest.commitment_label}</Badge>
-          {pairRequest.slots.map((slot) => {
-            const { day, time } = slotParts(slot.start_at, slot.end_at, timezone);
-
-            return (
-              <Badge key={slot.start_at} variant="neutral" className="rounded-full text-xs">
-                {day}, {time}
-              </Badge>
-            );
-          })}
-          {pairRequest.more_slots > 0 && (
-            <span className="text-xs text-black/50">+{pairRequest.more_slots} more times</span>
-          )}
-        </div>
+        <Badge className="w-fit shrink-0 rounded-full border-black bg-green text-xs text-black">Partner · {pairRequest.commitment_label}</Badge>
       </div>
 
       <ExpandableText className="mt-3 leading-relaxed text-black/60">{pairRequest.description}</ExpandableText>

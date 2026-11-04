@@ -43,25 +43,23 @@ RSpec.describe "Offer confirmations", type: :request do
   end
 
   describe "POST /offers/confirm/:token" do
-    it "accepts the offer, schedules the session and emails both participants" do
-      expect { post offer_confirmation_path(token:) }
-        .to have_enqueued_mail(SessionMailer, :session_scheduled_email).twice
+    it "accepts the application and schedules no session" do
+      expect { post offer_confirmation_path(token:) }.not_to change(Session, :count)
 
       expect(offer.reload).to be_accepted
-      expect(Session.last.participants).to contain_exactly(offerer, offer.pair_request.user)
       expect(response).to redirect_to(offer_confirmation_path(token:))
       follow_redirect!
-      expect(response.body).to include("You're pairing with Ada")
+      expect(response.body).to include("You accepted Ada's application")
     end
   end
 
-  context "when the offered slot has already started" do
-    before { travel_to(offer.period.start_at + 1.minute) }
+  context "when the application has expired" do
+    before { travel_to(offer.expires_at + 1.minute) }
 
-    it "says the slot has passed" do
+    it "says so" do
       get offer_confirmation_path(token:)
 
-      expect(response.body).to include("This time slot has passed")
+      expect(response.body).to include("This application has expired")
       expect(response.body).not_to include(">Accept")
     end
 
