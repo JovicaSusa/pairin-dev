@@ -187,8 +187,8 @@ export default function MainNav({ currentUser, currentPath }) {
           }`}
         />
         <div
-          className={`absolute inset-y-0 left-0 flex w-72 max-w-[80%] flex-col border-r-2 border-black bg-white shadow-[8px_0px_0px_0px_rgba(0,0,0,1)] transition-transform duration-300 ease-in-out ${
-            drawerOpen ? "translate-x-0" : "-translate-x-full"
+          className={`absolute inset-y-0 left-0 flex w-72 max-w-[80%] flex-col border-r-2 border-black bg-white transition-transform duration-300 ease-in-out ${
+            drawerOpen ? "translate-x-0 shadow-[8px_0px_0px_0px_rgba(0,0,0,1)]" : "-translate-x-full"
           }`}
         >
           <button
