@@ -25,15 +25,10 @@ RSpec.describe "Request resumptions", type: :request do
   end
 
   describe "POST /requests/resume/:token" do
-    let(:expired_offer) { create(:offer, pair_request:) }
-
-    before { travel_to(expired_offer.expires_at + 1.minute) }
-
-    it "switches the request back on and leaves expired offers expired" do
+    it "switches the request back on" do
       post request_resumption_path(token:)
 
       expect(pair_request.reload).not_to be_paused
-      expect(expired_offer.reload.status).to eq("EXPIRED")
       expect(response).to redirect_to(request_resumption_path(token:))
       follow_redirect!
       expect(response.body).to include("Your partner search is back on")

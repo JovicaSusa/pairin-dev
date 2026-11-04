@@ -75,18 +75,10 @@ RSpec.describe OfferMailer, type: :mailer do
     it "apologises to the offerer whose offer is still ahead" do
       expect(mail.to).to eq(["offerer@example.com"])
       expect(mail.body.encoded).to include("Grace has gone quiet")
-      expect(mail.body.encoded).to include("Your application still stands")
+      expect(mail.body.encoded).to include("If they come back and reply")
       expect(mail.body.encoded).not_to include("closed")
       expect(mail.body.encoded).to include("Learn Python together")
       expect(mail.body.encoded).not_to include("poster@example.com")
-    end
-
-    it "doesn't promise anything for an application that has expired" do
-      travel_to(offer.expires_at + 1.minute)
-
-      expect(mail.body.encoded).to include("Your application went unanswered")
-      expect(mail.body.encoded).not_to include("Your application still stands")
-      expect(mail.body.encoded).not_to include("if they accept it")
     end
 
     it "suggests open requests, each linking to its offer form" do
@@ -99,6 +91,22 @@ RSpec.describe OfferMailer, type: :mailer do
     it "links to the open requests list when there's nothing to suggest" do
       expect(mail.body.encoded).to include("/pair_requests\"")
       expect(mail.body.encoded).not_to include("/offers/new")
+    end
+  end
+
+  describe "#late_reply_email" do
+    let(:poster) { create(:user, name: "Maya", email: "poster@example.com") }
+    let(:applicant) { create(:user, email: "applicant@example.com") }
+    let(:offer) { create(:offer, pair_request: create(:pair_request, user: poster, subject: "Python buddy"), offerer: applicant) }
+
+    let(:mail) { described_class.with(offer:).late_reply_email }
+
+    it "tells the applicant the poster came back, and links to the thread" do
+      expect(mail.to).to eq(["applicant@example.com"])
+      expect(mail.subject).to eq("Maya came back and replied")
+      expect(mail.body.encoded).to include("Python buddy")
+      expect(mail.body.encoded).to include("/conversations/#{offer.id}")
+      expect(mail.body.encoded).not_to include("poster@example.com")
     end
   end
 

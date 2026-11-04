@@ -4,6 +4,10 @@ class OfferMailerPreview < ActionMailer::Preview
     OfferMailer.with(offer: Offer.last).offer_received_email
   end
 
+  def late_reply_email
+    OfferMailer.with(offer: Offer.last).late_reply_email
+  end
+
   def not_a_match_email
     OfferMailer.with(offer: Offer.where.not(ended_at: nil).last).not_a_match_email
   end

@@ -45,6 +45,48 @@ RSpec.describe "Conversations", type: :request do
     end
   end
 
+  describe "a late reply" do
+    before { sign_in(poster) }
+
+    it "still opens the chat and emails the applicant, after the search went Off" do
+      search.switch_off!
+      travel_to(offer.expires_at + 1.day)
+
+      expect { reply }
+        .to have_enqueued_mail(OfferMailer, :late_reply_email).with(params: { offer: }, args: []).once
+
+      expect(offer.reload).to be_chat_open
+      expect(search.reload).to be_paused
+    end
+
+    it "only sends that email for the first reply" do
+      travel_to(offer.expires_at + 1.day)
+      reply
+
+      expect { reply("And another thing") }.not_to have_enqueued_mail(OfferMailer, :late_reply_email)
+    end
+
+    it "isn't sent for a reply in time" do
+      expect { reply }.not_to have_enqueued_mail(OfferMailer, :late_reply_email)
+    end
+
+    it "isn't sent when the reply is refused" do
+      travel_to(offer.expires_at + 1.day)
+
+      expect { reply("") }.not_to have_enqueued_mail(OfferMailer, :late_reply_email)
+      expect(offer.reload).to be_overdue
+    end
+
+    it "keeps a conversation that's open from timing out" do
+      reply
+      travel_to(offer.expires_at + 30.days)
+
+      sign_in(poster)
+      expect { reply("Still here") }.to change(offer.messages, :count).by(1)
+      expect(offer.reload).to be_chat_open
+    end
+  end
+
   describe "the poster's first reply" do
     before do
       sign_in(poster)

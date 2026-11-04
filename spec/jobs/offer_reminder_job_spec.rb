@@ -28,8 +28,14 @@ RSpec.describe OfferReminderJob, type: :job do
     expect { perform }.not_to have_enqueued_mail(OfferMailer, :offer_reminder_email)
   end
 
-  it "stays quiet when the application has expired" do
-    travel_to(offer.expires_at + 1.minute)
+  it "stays quiet when the poster has replied" do
+    offer.post_message(offer.poster, "Great to meet you")
+
+    expect { perform }.not_to have_enqueued_mail(OfferMailer, :offer_reminder_email)
+  end
+
+  it "stays quiet when the conversation has ended" do
+    offer.not_a_match!(by: offer.poster)
 
     expect { perform }.not_to have_enqueued_mail(OfferMailer, :offer_reminder_email)
   end
