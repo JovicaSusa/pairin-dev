@@ -29,6 +29,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
 
     super
+    session.delete(:shared_search_token) if resource.persisted?
   end
 
   # GET /resource/edit
@@ -58,6 +59,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # protected
 
   # If you have extra params to permit, append them to the sanitizer.
+  # Set on the server from the session, so it can't be sent in the form.
+  def build_resource(hash = {})
+    super
+    token = session[:shared_search_token]
+    resource.signup_pair_request = PairRequest.find_by(share_token: token) if action_name == "create" && token.present?
+  end
+
   def configure_sign_up_params
     devise_parameter_sanitizer.permit(:sign_up, keys: [:timezone, :date_of_birth])
   end

@@ -28,10 +28,10 @@ function Choice({ id, label, value, options, onChange, error }) {
 
 // The poster's name, the search's commitment and the answers. Used in the drawer
 // on the list and on the full page that links in emails open.
-export default function ApplicationForm({ pairRequest, options, needsLevel, onSuccess }) {
+export default function ApplicationForm({ pairRequest, options, needsLevel, onSuccess, viaShareLink = false }) {
   const posterName = pairRequest.user.name || "the poster";
   const { data, setData, post, processing, errors } = useForm({
-    offer: { goal: "", how_often: "", how_long: "", message: "", level: "" },
+    offer: { goal: "", how_often: "", how_long: "", message: "", level: "", via_share_link: viaShareLink },
   });
 
   const field = (name) => ({

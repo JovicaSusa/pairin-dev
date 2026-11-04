@@ -73,6 +73,10 @@ Rails.application.routes.draw do
   # Emails sent before replies needed sign-in linked here.
   get "offers/confirm/:token", to: redirect("/conversations")
 
+  # A partner search's shareable link, readable with no account.
+  get "s/:token", to: "public_searches#show", as: :public_search
+  get "s/:token/apply", to: "public_searches#apply", as: :public_search_apply
+
   # No-login Yes/No, reached from the weekly check-in email.
   get "check-ins/:token", to: "check_ins#show", as: :check_in
   post "check-ins/:token", to: "check_ins#create"

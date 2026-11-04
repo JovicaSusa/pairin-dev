@@ -19,6 +19,7 @@ class User < ApplicationRecord
 
   # Deleting an account deletes every conversation the person was in, on either
   # side, including the other person's messages. The privacy policy promises this.
+  belongs_to :signup_pair_request, class_name: "PairRequest", optional: true
   has_many :pair_requests, dependent: :destroy
   has_many :offers, foreign_key: :offerer_id, dependent: :destroy
   has_many :participations, foreign_key: :participant_id, dependent: :destroy
@@ -97,6 +98,15 @@ class User < ApplicationRecord
 
   def opt_out_of!(category)
     update_columns("#{category}_opted_out_at" => Time.current) unless opted_out_of?(category)
+  end
+
+  # The search whose shared link brought them here, the first time they sign in.
+  # It's kept on the account because confirming an email can happen on another device.
+  def take_search_from_signup
+    return if signup_pair_request.nil? || signup_search_taken_at?
+
+    update_columns(signup_search_taken_at: Time.current)
+    signup_pair_request if signup_pair_request.taking_applications?
   end
 
   # Sent to onboarding after sign-in until they've posted a search or said not now.

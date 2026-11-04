@@ -19,6 +19,9 @@ module Stats
     # A proposal leaves proposed_by behind, even once it's accepted or declined.
     def proposals = offers.where.not(proposed_by_id: nil).count
 
+    def signups_via_share_link = User.where(created_at: @since..).where.not(signup_pair_request_id: nil).count
+    def applications_via_share_link = offers.where(via_share_link: true).count
+
     def partnerships_formed = partnerships.count
     def partnerships_ended = partnerships.where.not(ended_at: nil).count
 
@@ -47,6 +50,9 @@ module Stats
         Pairs, #{FOLLOW_UP_WEEKS}+ Yes weeks:   #{partnerships_with_three_yes_weeks}
 
         Partnerships ended:     #{partnerships_ended}
+
+        Signups via shared link:       #{signups_via_share_link}
+        Applications via shared link:  #{applications_via_share_link}
 
         Target: #{pairs_with_a_yes_in_time} of #{TARGET_PAIRS} pairs with a Yes within #{TARGET_DAYS} days
         Follow-up: #{pairs_with_three_yes_weeks_in_time} pairs with #{FOLLOW_UP_WEEKS} Yes weeks within #{FOLLOW_UP_DAYS} days

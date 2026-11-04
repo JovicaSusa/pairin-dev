@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm, Link, router } from '@inertiajs/react';
-import { Inbox, CheckCircle2, Power, EyeOff } from "lucide-react";
+import { Inbox, CheckCircle2, Power, EyeOff, Share2 } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,34 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
+
+function ShareLink({ path }) {
+  const url = `${window.location.origin}${path}`;
+  const [copied, setCopied] = useState(false);
+
+  const copy = async (e) => {
+    const field = e.currentTarget.previousElementSibling;
+    field.select();
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // No clipboard access, such as on plain http: the link is selected to copy by hand.
+      return;
+    }
+    setCopied(true);
+  };
+
+  return (
+    <div className="mt-4 rounded-xl border-2 border-black bg-yellow-50 p-3">
+      <Label htmlFor={`share_${path}`} className="mb-1 block">Send this to someone who might be a good partner</Label>
+      <div className="flex gap-2">
+        <Input id={`share_${path}`} readOnly value={url} onFocus={(e) => e.target.select()} className="bg-white" />
+        <Button type="button" size="sm" onClick={copy}>{copied ? "Copied" : "Copy"}</Button>
+      </div>
+      <p className="mt-1 text-xs text-black/50">Anyone with this link can read this search and apply. It isn't listed on search engines.</p>
+    </div>
+  );
+}
 
 export default function UserPairRequestCard({ request }) {
   const { data, setData, patch, processing } = useForm({
@@ -27,6 +55,7 @@ export default function UserPairRequestCard({ request }) {
   };
 
   const [toggling, setToggling] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   const toggleOnOff = () => {
     router.patch(`/users/pair_requests/${request.id}/${request.paused ? 'resume' : 'pause'}`, {}, {
@@ -45,6 +74,12 @@ export default function UserPairRequestCard({ request }) {
             <Power className="h-4 w-4" />
             {request.paused ? 'Switch on' : 'Switch off'}
           </Button>
+          {request.share_path && (
+            <Button type="button" variant="neutral" size="sm" aria-expanded={sharing} onClick={() => setSharing(!sharing)}>
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+          )}
           <Button asChild variant="neutral" size="sm">
             <Link href={`/pair_requests/${request.id}/offers`}>
               <Inbox className="h-4 w-4" />
@@ -53,6 +88,8 @@ export default function UserPairRequestCard({ request }) {
           </Button>
         </div>
       </div>
+
+      {sharing && request.share_path && <ShareLink path={request.share_path} />}
 
       <Badge className="mt-3 rounded-full border-black bg-green text-xs text-black">Partner · {request.commitment_label}</Badge>
 
