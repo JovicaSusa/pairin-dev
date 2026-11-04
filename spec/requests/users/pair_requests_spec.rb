@@ -7,14 +7,14 @@ RSpec.describe "Users::PairRequests", type: :request do
   before { sign_in(poster) }
 
   describe "posting a request" do
-    let(:params) { { subject: "Learn Rust", description: "Ownership and borrowing", duration: 60 } }
+    let(:params) { { subject: "Learn Rust", description: "Ownership and borrowing", commitment: "open_ended" } }
 
     context "without weekly hours" do
       it "sends the poster to add weekly hours first, from the form" do
         get new_users_pair_request_path
 
         expect(response).to redirect_to(availability_path)
-        expect(flash[:alert]).to eq("Add your weekly hours first. Others book your requests into them.")
+        expect(flash[:alert]).to eq("Add your weekly hours first. Others book your partner searches into them.")
       end
 
       it "saves nothing when posted anyway" do
@@ -35,9 +35,9 @@ RSpec.describe "Users::PairRequests", type: :request do
       end
 
       it "refuses a call longer than 3 hours" do
-        expect { post users_pair_requests_path, params: params.merge(duration: 240) }.not_to change(PairRequest, :count)
+        expect { post users_pair_requests_path, params: params.merge(subject: "") }.not_to change(PairRequest, :count)
 
-        expect(session[:inertia_errors]).to include(:duration)
+        expect(session[:inertia_errors]).to include(:subject)
       end
     end
   end
@@ -75,7 +75,7 @@ RSpec.describe "Users::PairRequests", type: :request do
       patch resume_users_pair_request_path(pair_request)
 
       expect(pair_request.reload).to be_paused
-      expect(flash[:alert]).to eq("Add your weekly hours before switching a request on. Others book your requests into them.")
+      expect(flash[:alert]).to eq("Add your weekly hours before switching a partner search on. Others book your partner searches into them.")
     end
   end
 end

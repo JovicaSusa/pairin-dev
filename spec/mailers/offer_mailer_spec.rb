@@ -48,7 +48,7 @@ RSpec.describe OfferMailer, type: :mailer do
     it "apologises to the offerer whose offer is still ahead" do
       expect(mail.to).to eq(["offerer@example.com"])
       expect(mail.body.encoded).to include("Grace has gone quiet")
-      expect(mail.body.encoded).to include("Your offer still stands")
+      expect(mail.body.encoded).to include("Your application still stands")
       expect(mail.body.encoded).not_to include("closed")
       expect(mail.body.encoded).to include("Learn Python together")
       expect(mail.body.encoded).not_to include("poster@example.com")
@@ -57,9 +57,9 @@ RSpec.describe OfferMailer, type: :mailer do
     it "doesn't promise anything for an offer whose time has already passed" do
       travel_to(offer.period.start_at + 1.minute)
 
-      expect(mail.body.encoded).to include("The time you offered has passed")
-      expect(mail.body.encoded).not_to include("Your offer still stands")
-      expect(mail.body.encoded).not_to include("if they accept your offer")
+      expect(mail.body.encoded).to include("The time you chose has passed")
+      expect(mail.body.encoded).not_to include("Your application still stands")
+      expect(mail.body.encoded).not_to include("if they accept it")
     end
 
     it "suggests open requests, each linking to its offer form" do

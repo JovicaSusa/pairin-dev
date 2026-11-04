@@ -13,10 +13,9 @@ RSpec.describe "generates expected activites", type: :system do
 
       fill_in "Subject", with: "AAA"
       fill_in "Description", with: "BBB"
-      fill_in "Duration", with: 45
 
       perform_enqueued_jobs do
-        click_button "Create Pair request"
+        click_button "Post partner search"
       end
 
       visit activities_path

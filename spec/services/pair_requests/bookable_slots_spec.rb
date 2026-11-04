@@ -5,7 +5,7 @@ RSpec.describe PairRequests::BookableSlots, type: :unit do
   # Sunday 25 Oct, then winter time (UTC+1).
   let(:now) { Time.utc(2026, 10, 19, 8, 0) }
   let(:poster) { create(:user, timezone: "Europe/Berlin") }
-  let(:pair_request) { create(:pair_request, user: poster, duration: 45, weekly_hours: false) }
+  let(:pair_request) { create(:pair_request, user: poster, weekly_hours: false) }
 
   around { |example| travel_to(now) { example.run } }
 
@@ -22,16 +22,16 @@ RSpec.describe PairRequests::BookableSlots, type: :unit do
     slots.map { |slot| slot.start_at.utc }
   end
 
-  it "cuts each window into back-to-back slots of the call length, dropping a slot that would overrun" do
-    window(weekday: 2, from: "18:00", to: "20:00")
+  it "cuts each window into back-to-back hour-long slots, dropping a slot that would overrun" do
+    window(weekday: 2, from: "18:00", to: "20:30")
 
-    expect(starts.first(2)).to eq([Time.utc(2026, 10, 20, 16, 0), Time.utc(2026, 10, 20, 16, 45)])
-    expect(slots.first.end_at.utc).to eq(Time.utc(2026, 10, 20, 16, 45))
-    expect(starts).not_to include(Time.utc(2026, 10, 20, 17, 30))
+    expect(starts.first(2)).to eq([Time.utc(2026, 10, 20, 16, 0), Time.utc(2026, 10, 20, 17, 0)])
+    expect(slots.first.end_at.utc).to eq(Time.utc(2026, 10, 20, 17, 0))
+    expect(starts).not_to include(Time.utc(2026, 10, 20, 18, 0))
   end
 
   it "reads windows in the poster's timezone, across a daylight-saving change" do
-    window(weekday: 2, from: "18:00", to: "18:45")
+    window(weekday: 2, from: "18:00", to: "19:00")
 
     expect(starts).to eq([Time.utc(2026, 10, 20, 16, 0), Time.utc(2026, 10, 27, 17, 0)])
   end
@@ -43,10 +43,10 @@ RSpec.describe PairRequests::BookableSlots, type: :unit do
     it "drops the slot that would cross the change" do
       window(weekday: 7, from: "01:00", to: "04:00")
 
-      # 00:30–01:15 UTC would read 02:30–02:15 on the clock.
+      # 00:00–01:00 UTC would read 02:00–02:00 on the clock.
       expect(starts.select { |start| start < Time.utc(2026, 10, 25, 12) }).to eq([
-        Time.utc(2026, 10, 24, 23, 0), Time.utc(2026, 10, 24, 23, 45),
-        Time.utc(2026, 10, 25, 1, 15), Time.utc(2026, 10, 25, 2, 0)
+        Time.utc(2026, 10, 24, 23, 0),
+        Time.utc(2026, 10, 25, 1, 0), Time.utc(2026, 10, 25, 2, 0)
       ])
     end
   end
@@ -58,45 +58,45 @@ RSpec.describe PairRequests::BookableSlots, type: :unit do
     it "drops the slot that would cross the change" do
       window(weekday: 7, from: "01:00", to: "04:00")
 
-      # 00:45–01:30 UTC would read 01:45–03:30 on the clock.
-      expect(starts.select { |start| start < Time.utc(2027, 3, 28, 12) }).to eq([Time.utc(2027, 3, 28, 0, 0)])
+      # 00:00–01:00 UTC would read 01:00–03:00 on the clock.
+      expect(starts.select { |start| start < Time.utc(2027, 3, 28, 12) }).to eq([Time.utc(2027, 3, 28, 1, 0)])
     end
   end
 
   it "only looks 14 days ahead" do
-    window(weekday: 1, from: "18:00", to: "18:45")
+    window(weekday: 1, from: "18:00", to: "19:00")
 
     # Today's (19 Oct) and the next Monday's slots; 2 Nov is 14 days out.
     expect(starts).to eq([Time.utc(2026, 10, 19, 16, 0), Time.utc(2026, 10, 26, 17, 0)])
   end
 
   it "needs at least 3 hours' notice" do
-    window(weekday: 1, from: "12:30", to: "14:00")
+    window(weekday: 1, from: "12:30", to: "15:00")
 
-    # 12:30 Berlin is 10:30 UTC, 2.5h away; 13:15 Berlin is 11:15 UTC, 3.25h away.
-    expect(starts.first).to eq(Time.utc(2026, 10, 19, 11, 15))
+    # 12:30 Berlin is 10:30 UTC, 2.5h away; 13:30 Berlin is 11:30 UTC, 3.5h away.
+    expect(starts.first).to eq(Time.utc(2026, 10, 19, 11, 30))
   end
 
   it "handles a window that runs to midnight" do
     window(weekday: 2, from: "23:00", to: "24:00")
 
     expect(starts.first).to eq(Time.utc(2026, 10, 20, 21, 0))
-    expect(slots.first.end_at.utc).to eq(Time.utc(2026, 10, 20, 21, 45))
+    expect(slots.first.end_at.utc).to eq(Time.utc(2026, 10, 20, 22, 0))
   end
 
   it "hides slots overlapping any accepted session of the poster, on any of their requests" do
     window(weekday: 2, from: "18:00", to: "20:00")
     other_request = create(:pair_request, user: poster, weekly_hours: false)
-    session = create(:session, sessionable: other_request, start_at: Time.utc(2026, 10, 20, 16, 30), end_at: Time.utc(2026, 10, 20, 17, 0))
+    session = create(:session, sessionable: other_request, start_at: Time.utc(2026, 10, 20, 16, 30), end_at: Time.utc(2026, 10, 20, 17, 30))
 
     expect(session.participants).to include(poster)
-    expect(starts).to eq([Time.utc(2026, 10, 27, 17, 0), Time.utc(2026, 10, 27, 17, 45)])
+    expect(starts).to eq([Time.utc(2026, 10, 27, 17, 0), Time.utc(2026, 10, 27, 18, 0)])
   end
 
   it "keeps a slot that only touches a session" do
-    window(weekday: 2, from: "18:00", to: "18:45")
+    window(weekday: 2, from: "18:00", to: "19:00")
     create(:session, sessionable: create(:pair_request, user: poster, weekly_hours: false),
-      start_at: Time.utc(2026, 10, 20, 16, 45), end_at: Time.utc(2026, 10, 20, 17, 30))
+      start_at: Time.utc(2026, 10, 20, 17, 0), end_at: Time.utc(2026, 10, 20, 17, 30))
 
     expect(starts.first).to eq(Time.utc(2026, 10, 20, 16, 0))
   end

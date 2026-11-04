@@ -78,7 +78,7 @@ function NavContent({ currentPath, currentUser, onNavigate }) {
                 }`}
               >
                 <ClipboardList className="h-[18px] w-[18px] shrink-0" strokeWidth={2.25} />
-                <span className="flex-1 text-left truncate">Pair Requests</span>
+                <span className="flex-1 text-left truncate">Partner searches</span>
                 <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
               </button>
             </CollapsibleTrigger>

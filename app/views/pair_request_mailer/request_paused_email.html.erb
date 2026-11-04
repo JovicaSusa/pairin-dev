@@ -1,7 +1,7 @@
 <div style="display: none">
-  Your request "<%= @pair_request.subject %>" is paused. Still looking?
+  Your partner search "<%= @pair_request.subject %>" is paused. Still looking?
 </div>
-<div role="article" aria-roledescription="email" aria-label="Request paused" lang="en">
+<div role="article" aria-roledescription="email" aria-label="Partner search paused" lang="en">
   <div class="sm-px-4" style="background-color: #f8fafc; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif">
     <table align="center" cellpadding="0" cellspacing="0" role="none">
       <tr>
@@ -18,8 +18,8 @@
                   Still looking for a partner?
                 </h1>
                 <p style="margin: 0; line-height: 24px">
-                  We paused your request "<strong><%= @pair_request.subject %></strong>" because an offer went unanswered
-                  before its time slot. It's hidden from others for now, so nobody else offers and waits.
+                  We paused your partner search "<strong><%= @pair_request.subject %></strong>" because an application went unanswered
+                  before its time slot. It's hidden from others for now, so nobody else applies and waits.
                 </p>
                 <p style="margin: 32px 0; text-align: center">
                   <a href="<%= @resume_url %>" style="display: inline-block; border: 2px solid #000001; border-radius: 12px; background-color: #FF8B37; padding: 12px 24px; font-weight: 600; color: #000001; text-decoration: none">
@@ -27,7 +27,7 @@
                   </a>
                 </p>
                 <p style="margin: 0; font-size: 14px; line-height: 20px; color: #475569">
-                  No login needed. Offers that already expired stay expired.
+                  No login needed. Applications that already expired stay expired.
                 </p>
               </td>
             </tr>

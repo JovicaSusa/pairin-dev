@@ -11,10 +11,15 @@ class PairRequest < ApplicationRecord
   has_many :taggings, as: :taggable
   has_many :tags, through: :taggings
 
-  MAX_DURATION = 180
+  COMMITMENTS = {
+    "few_weeks" => "A few weeks",
+    "one_to_three_months" => "1–3 months",
+    "open_ended" => "Open-ended"
+  }.freeze
 
-  validates :description, :subject, :duration, presence: true
-  validates :duration, numericality: { greater_than: 0, less_than_or_equal_to: MAX_DURATION, message: "must be between 1 and #{MAX_DURATION} minutes" }
+  enum :commitment, COMMITMENTS.keys.index_with(&:itself), validate: true
+
+  validates :description, :subject, presence: true
 
   scope :switched_on, -> { where(paused_at: nil) }
 
@@ -32,8 +37,12 @@ class PairRequest < ApplicationRecord
     end
 
     def ransackable_attributes(auth_object=nil)
-      ["duration"]
+      ["commitment"]
     end
+  end
+
+  def commitment_label
+    COMMITMENTS.fetch(commitment)
   end
 
   # Off requests are hidden from others and can't receive offers.

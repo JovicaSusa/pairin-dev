@@ -1,11 +1,12 @@
 module PairRequests
   # The times someone can book on a request: the poster's weekly hours, read in
-  # the poster's timezone and cut into back-to-back slots of the request's call
-  # length. Only the next 14 days, nothing within 3 hours, and nothing that
+  # the poster's timezone and cut into back-to-back hour-long slots.
+  # Only the next 14 days, nothing within 3 hours, and nothing that
   # overlaps a session the poster already has on any of their requests.
   class BookableSlots
     HORIZON = 14.days
     NOTICE = 3.hours
+    LENGTH = 60.minutes
 
     Slot = Data.define(:start_at, :end_at)
 
@@ -18,8 +19,6 @@ module PairRequests
     end
 
     def call
-      return [] unless @pair_request.duration.to_i.positive?
-
       earliest = @now + NOTICE
       latest = @now + HORIZON
       busy = @poster.sessions.where("sessions.end_at > ?", @now).to_a
@@ -48,13 +47,12 @@ module PairRequests
     end
 
     def cut(from, to)
-      length = @pair_request.duration.minutes
       slots = []
 
-      while from + length <= to
+      while from + LENGTH <= to
         # A slot spanning a DST change would read e.g. 02:30–02:15 on the clock; skip it.
-        slots << Slot.new(start_at: from, end_at: from + length) if from.utc_offset == (from + length).utc_offset
-        from += length
+        slots << Slot.new(start_at: from, end_at: from + LENGTH) if from.utc_offset == (from + LENGTH).utc_offset
+        from += LENGTH
       end
 
       slots

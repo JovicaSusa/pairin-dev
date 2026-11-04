@@ -11,12 +11,23 @@ RSpec.describe "users pair requests", type: :system do
 
     fill_in "Subject", with: "AAA"
     fill_in "Description", with: "BBB"
-    fill_in "Duration", with: 45
-
-    click_button "Create Pair request"
+    click_button "Post partner search"
 
     expect(page).to have_content("AAA")
     expect(page).to have_content("BBB")
+    expect(page).to have_content("Partner · 1–3 months")
+  end
+
+  it "saves the chosen commitment" do
+    visit new_users_pair_request_path
+
+    fill_in "Subject", with: "AAA"
+    fill_in "Description", with: "BBB"
+    select_option!("Commitment", "Open-ended")
+    click_button "Post partner search"
+
+    expect(page).to have_content("Partner · Open-ended")
+    expect(PairRequest.find_by!(subject: "AAA")).to be_open_ended
   end
 
   context "when details not provided" do
@@ -25,18 +36,13 @@ RSpec.describe "users pair requests", type: :system do
 
       fill_in "Subject", with: ""
       fill_in "Description", with: ""
-      fill_in "Duration", with: 0
-
-      click_button "Create Pair request"
+      click_button "Post partner search"
 
       within(".pair_request_subject") do
         expect(page).to have_content("can't be blank")
       end
       within(".pair_request_description") do
         expect(page).to have_content("can't be blank")
-      end
-      within(".pair_request_duration") do
-        expect(page).to have_content("must be between 1 and 180 minutes")
       end
     end
   end

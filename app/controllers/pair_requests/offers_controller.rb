@@ -44,7 +44,7 @@ class PairRequests::OffersController < ApplicationController
         OfferReminderJob.set(wait_until: remind_at).perform_later(@offer)
       end
 
-      redirect_to pair_requests_path, notice: "Offer sent! We've emailed the poster, and you'll get an email when they accept. If they don't respond before your chosen time, the offer expires."
+      redirect_to pair_requests_path, notice: "Application sent! We've emailed the poster, and you'll get an email when they accept. If they don't respond before your chosen time, the application expires."
     else
       redirect_to new_pair_request_offer_path(@pair_request), inertia: { errors: @offer.errors.to_hash(true) }
     end
@@ -59,7 +59,7 @@ class PairRequests::OffersController < ApplicationController
       .call(offer)
       .either(
         -> (success) { redirect_to pair_request_offers_path(offer.pair_request_id), notice: "You just scheduled yourself a new pairing session. Happy pairin!" },
-        -> (failure) { redirect_to pair_request_offers_path(offer.pair_request_id), alert: "Could not accept offer." }
+        -> (failure) { redirect_to pair_request_offers_path(offer.pair_request_id), alert: "Could not accept this application." }
       )
   end
 
@@ -69,7 +69,7 @@ class PairRequests::OffersController < ApplicationController
     @pair_request = PairRequest.find(params[:pair_request_id])
 
     if @pair_request.paused?
-      redirect_to pair_requests_path, alert: "This request is switched off and isn't taking offers right now."
+      redirect_to pair_requests_path, alert: "This partner search is switched off and isn't taking applications right now."
     end
   end
 
