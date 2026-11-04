@@ -76,6 +76,11 @@ class User < ApplicationRecord
     Message.where(sender: self, created_at: 1.hour.ago..).count >= MESSAGES_PER_HOUR
   end
 
+  # Sent to onboarding after sign-in until they've posted a search or said not now.
+  def needs_onboarding?
+    onboarding_skipped_at.nil? && pair_requests.none?
+  end
+
   def display_name
     name.presence || "A Pairin member"
   end
