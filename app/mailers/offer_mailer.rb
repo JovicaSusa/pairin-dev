@@ -16,6 +16,15 @@ class OfferMailer < ApplicationMailer
     mail(to: @offer.offerer.email, subject: "No answer yet on #{@offer.pair_request.subject}")
   end
 
+  # Says how many and who from, but not what: the words stay in the app.
+  def unread_messages_email
+    @recipient = params[:recipient]
+    @sender = @offer.other_person(@recipient)
+    @count = @offer.unread_messages_for(@recipient).count
+
+    mail(to: @recipient.email, subject: "#{@sender.display_name} sent you #{@count == 1 ? 'a message' : "#{@count} messages"}")
+  end
+
   # The applicant was told the poster had gone quiet, so this one's good news.
   def late_reply_email
     mail(to: @offer.offerer.email, subject: "#{@poster.display_name} came back and replied")

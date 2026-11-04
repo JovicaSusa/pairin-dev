@@ -4,6 +4,11 @@ class OfferMailerPreview < ActionMailer::Preview
     OfferMailer.with(offer: Offer.last).offer_received_email
   end
 
+  def unread_messages_email
+    offer = Offer.last
+    OfferMailer.with(offer:, recipient: offer.poster).unread_messages_email
+  end
+
   def late_reply_email
     OfferMailer.with(offer: Offer.last).late_reply_email
   end

@@ -94,6 +94,32 @@ RSpec.describe OfferMailer, type: :mailer do
     end
   end
 
+  describe "#unread_messages_email" do
+    let(:poster) { create(:user, name: "Maya", email: "poster@example.com") }
+    let(:applicant) { create(:user, email: "applicant@example.com") }
+    let(:offer) { create(:offer, pair_request: create(:pair_request, user: poster, subject: "Python buddy"), offerer: applicant) }
+
+    let(:mail) { described_class.with(offer:, recipient: applicant).unread_messages_email }
+
+    before { offer.post_message(poster, "A private thought") }
+
+    it "says who and links to the thread, without the words" do
+      expect(mail.to).to eq(["applicant@example.com"])
+      expect(mail.subject).to eq("Maya sent you a message")
+      expect(mail.body.encoded).to include("Python buddy")
+      expect(mail.body.encoded).to include("/conversations/#{offer.id}")
+      expect(mail.body.encoded).not_to include("A private thought")
+      expect(mail.body.encoded).not_to include("poster@example.com")
+    end
+
+    it "counts them" do
+      offer.post_message(poster, "Another")
+
+      expect(mail.subject).to eq("Maya sent you 2 messages")
+      expect(mail.body.encoded).to include("2 unread messages")
+    end
+  end
+
   describe "#late_reply_email" do
     let(:poster) { create(:user, name: "Maya", email: "poster@example.com") }
     let(:applicant) { create(:user, email: "applicant@example.com") }
