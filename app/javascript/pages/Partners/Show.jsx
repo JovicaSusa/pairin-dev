@@ -98,6 +98,32 @@ function EndPartnership({ partnership }) {
   );
 }
 
+function ThisWeek({ partnership }) {
+  const nextCheckIn = new Intl.DateTimeFormat(undefined, { weekday: "long", day: "numeric", month: "long" }).format(new Date(partnership.next_check_in_at));
+
+  return (
+    <div className="rounded-2xl border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      <p className="mb-2 font-bold">This week</p>
+      {!partnership.ended && (
+        <p className="text-sm text-black/60">The next check-in email goes out on {nextCheckIn}: did you two work together?</p>
+      )}
+      {partnership.weeks.length > 0 && (
+        <ul className="mt-2 flex flex-wrap gap-1">
+          {partnership.weeks.map(({ week, worked_together: worked }) => (
+            <li
+              key={week}
+              title={worked ? `Week ${week}: you worked together` : `Week ${week}: no Yes`}
+              className={`min-w-10 flex-1 rounded-md border-2 border-black py-1 text-center text-xs font-bold ${worked ? "bg-green" : "bg-white"}`}
+            >
+              W{week}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function Commitments({ partnership }) {
   const rows = [
     ["You", partnership.your_commitment],
@@ -193,6 +219,7 @@ export default function Show({ partnership }) {
         </div>
 
         <div className="flex flex-col gap-6">
+          <ThisWeek partnership={partnership} />
           <Commitments partnership={partnership} />
           {!partnership.ended && <EndPartnership partnership={partnership} />}
         </div>

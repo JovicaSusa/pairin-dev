@@ -60,6 +60,10 @@ Rails.application.routes.draw do
   # Emails sent before replies needed sign-in linked here.
   get "offers/confirm/:token", to: redirect("/conversations")
 
+  # No-login Yes/No, reached from the weekly check-in email.
+  get "check-ins/:token", to: "check_ins#show", as: :check_in
+  post "check-ins/:token", to: "check_ins#create"
+
   # No-login "Turn it back on", reached from the request-paused email.
   get "requests/resume/:token", to: "request_resumptions#show", as: :request_resumption
   post "requests/resume/:token", to: "request_resumptions#create"

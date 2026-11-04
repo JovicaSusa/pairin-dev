@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_04_240000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_250000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -43,6 +43,18 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_240000) do
     t.datetime "updated_at", null: false
     t.index ["blocked_id"], name: "index_blocks_on_blocked_id"
     t.index ["blocker_id", "blocked_id"], name: "index_blocks_on_blocker_id_and_blocked_id", unique: true
+  end
+
+  create_table "check_ins", force: :cascade do |t|
+    t.bigint "partnership_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "week", null: false
+    t.boolean "worked_together"
+    t.datetime "answered_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["partnership_id", "user_id", "week"], name: "index_check_ins_on_partnership_id_and_user_id_and_week", unique: true
+    t.index ["user_id"], name: "index_check_ins_on_user_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -194,6 +206,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_240000) do
   add_foreign_key "activities", "users", column: "receiver_id"
   add_foreign_key "blocks", "users", column: "blocked_id"
   add_foreign_key "blocks", "users", column: "blocker_id"
+  add_foreign_key "check_ins", "partnerships"
+  add_foreign_key "check_ins", "users"
   add_foreign_key "messages", "offers"
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "offers", "users", column: "ended_by_id"

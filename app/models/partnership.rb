@@ -6,8 +6,10 @@ class Partnership < ApplicationRecord
   belongs_to :offer
   belongs_to :pair_request
   belongs_to :ended_by, class_name: "User", optional: true
+  has_many :check_ins, dependent: :destroy
 
   GOAL_MAX_LENGTH = 500
+  CHECK_IN_EVERY = 1.week
 
   validates :offer_id, :pair_request_id, uniqueness: true
   validates :goal, length: { maximum: GOAL_MAX_LENGTH }
@@ -46,6 +48,40 @@ class Partnership < ApplicationRecord
   # poster, and the answer on the application for the applicant.
   def commitment_of(user)
     user == offer.poster ? pair_request.commitment_label : offer.how_long_label
+  end
+
+  def people
+    [offer.offerer, offer.poster]
+  end
+
+  # How many whole weeks it has run: week 1's check-in goes out after 7 days.
+  def weeks_completed
+    ((Time.current - created_at) / CHECK_IN_EVERY).floor
+  end
+
+  def next_check_in_at
+    created_at + (CHECK_IN_EVERY * (weeks_completed + 1))
+  end
+
+  # The latest finished week gets a check-in. Runs daily and is safe to repeat:
+  # the unique index means each person gets one per week. A week missed because
+  # the job didn't run isn't sent late.
+  def send_due_check_ins
+    return if ended? || weeks_completed.zero?
+
+    people.each do |user|
+      check_in = check_ins.create!(user:, week: weeks_completed)
+      CheckInMailer.with(check_in:).weekly_email.deliver_later
+    rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+      next
+    end
+  end
+
+  # One entry per week so far. A week counts when at least one partner said Yes.
+  def weeks_summary
+    yes_weeks = check_ins.select(&:worked_together).map(&:week).to_set
+
+    (1..weeks_completed).map { |week| { week:, worked_together: yes_weeks.include?(week) } }
   end
 
   private
