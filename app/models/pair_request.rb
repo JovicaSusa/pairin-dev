@@ -27,6 +27,8 @@ class PairRequest < ApplicationRecord
 
   # Signed token for the no-login "Turn it back on" link in the paused email.
   generates_token_for :resume, expires_in: 30.days
+  # And for the "Pause this search" link in the emails about it.
+  generates_token_for :pause, expires_in: 30.days
 
   accepts_nested_attributes_for :taggings,
     reject_if: ->(attrs) { attrs["tag_attributes"].blank? || attrs["tag_attributes"]["name"].blank? },

@@ -76,6 +76,29 @@ class User < ApplicationRecord
     Message.where(sender: self, created_at: 1.hour.ago..).count >= MESSAGES_PER_HOUR
   end
 
+  # Optional emails, each with a one-click unsubscribe. Emails about someone's own
+  # searches and conversations are always sent.
+  EMAIL_CATEGORIES = %w[suggestions announcements].freeze
+
+  generates_token_for :unsubscribe_suggestions
+  generates_token_for :unsubscribe_announcements
+
+  def self.find_by_unsubscribe_token(category, token)
+    find_by_token_for(:"unsubscribe_#{category}", token) if EMAIL_CATEGORIES.include?(category)
+  end
+
+  def unsubscribe_token(category)
+    generate_token_for(:"unsubscribe_#{category}")
+  end
+
+  def opted_out_of?(category)
+    public_send(:"#{category}_opted_out_at?")
+  end
+
+  def opt_out_of!(category)
+    update_columns("#{category}_opted_out_at" => Time.current) unless opted_out_of?(category)
+  end
+
   # Sent to onboarding after sign-in until they've posted a search or said not now.
   def needs_onboarding?
     onboarding_skipped_at.nil? && pair_requests.none?

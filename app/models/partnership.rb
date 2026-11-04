@@ -70,6 +70,8 @@ class Partnership < ApplicationRecord
     return if ended? || weeks_completed.zero?
 
     people.each do |user|
+      next if user.opted_out_of?("suggestions")
+
       check_in = check_ins.create!(user:, week: weeks_completed)
       CheckInMailer.with(check_in:).weekly_email.deliver_later
     rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
@@ -111,7 +113,7 @@ class Partnership < ApplicationRecord
   def tell_the_other_applicants
     return unless Rails.configuration.x.send_suggestion_emails
 
-    @closed.reject(&:expiry_notified_at?).each do |closed|
+    @closed.reject { |closed| closed.expiry_notified_at? || closed.offerer.opted_out_of?("suggestions") }.each do |closed|
       OfferMailer.with(offer: closed).search_filled_email.deliver_later
       closed.update_columns(expiry_notified_at: Time.current)
     end

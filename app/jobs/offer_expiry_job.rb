@@ -30,7 +30,10 @@ class OfferExpiryJob < ApplicationJob
   def point_offerers_elsewhere(pair_request)
     return unless Rails.configuration.x.send_suggestion_emails
 
-    not_yet_told = pair_request.offers.where(expiry_notified_at: nil, replied_at: nil, ended_at: nil).to_a
+    not_yet_told = pair_request.offers
+      .where(expiry_notified_at: nil, replied_at: nil, ended_at: nil)
+      .where(offerer_id: User.where(suggestions_opted_out_at: nil).select(:id))
+      .to_a
     not_yet_told.each do |offer|
       OfferMailer.with(offer:).offer_expired_email.deliver_later
     end
