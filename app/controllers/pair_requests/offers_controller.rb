@@ -84,8 +84,8 @@ class PairRequests::OffersController < ApplicationController
   def reject_switched_off_request
     @pair_request = PairRequest.find(params[:pair_request_id])
 
-    # A block gets the same answer, so it doesn't give itself away.
-    if @pair_request.paused? || current_user.blocked_with?(@pair_request.user)
+    # A block or a different age group gets the same answer, so neither gives itself away.
+    if @pair_request.paused? || current_user.blocked_with?(@pair_request.user) || !current_user.same_age_group?(@pair_request.user)
       redirect_to pair_requests_path, alert: "This partner search is switched off and isn't taking applications right now."
     end
   end

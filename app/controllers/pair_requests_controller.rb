@@ -8,7 +8,7 @@ class PairRequestsController < ApplicationController
       .visible_to(current_user)
       .where.not(user_id: current_user.id)
 
-    @q = base.ransack(params[:q]&.compact_blank)
+    @q = base.ransack(searchable_filters)
 
     @pagy, page = pagy(@q.result(distinct: true).order(created_at: :desc, id: :desc), items: 15, overflow: :empty_page)
 
@@ -19,11 +19,10 @@ class PairRequestsController < ApplicationController
           pair_request.as_json(
             methods: [:commitment_label],
             include: {
-              user: { only: [:id, :name, :profession], methods: [:image_url, :level_titleized] },
               tags: { only: [:id, :name] },
               offers: { only: [:offerer_id] }
             }
-          )
+          ).merge("user" => pair_request.user.profile_for_others.merge(id: pair_request.user_id, name: pair_request.user.name))
         }
       },
       applicationOptions: InertiaRails.once { Offer.form_options },
@@ -37,5 +36,17 @@ class PairRequestsController < ApplicationController
         }
       }
     }
+  end
+
+  private
+
+  # Under-18s only get filters on the search itself. Any filter or sort on the
+  # poster would reveal what an under-18's profile hides, and adults can't reach
+  # under-18 searches at all.
+  MINOR_FILTERS = %w[tags_name_eq commitment_eq].freeze
+
+  def searchable_filters
+    filters = params[:q]&.compact_blank
+    current_user.minor? ? filters&.slice(*MINOR_FILTERS) : filters
   end
 end

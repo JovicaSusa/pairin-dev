@@ -38,8 +38,8 @@ export default function PairRequestCard({ pairRequest, currentUserId, onApply })
             <p className="font-bold text-sm">{pairRequest.user.name}</p>
             <span className="text-xs text-black/50">
               {pairRequest.user.profession}
-              {pairRequest.user.profession && pairRequest.user.level_titleized && " · "}
-              {pairRequest.user.level_titleized}
+              {pairRequest.user.profession && pairRequest.user.level && " · "}
+              {pairRequest.user.level}
             </span>
           </div>
         </div>
