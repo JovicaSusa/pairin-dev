@@ -18,6 +18,7 @@ export default function PairRequestCard({ pairRequest, currentUserId, timezone }
         <h3 className="text-xl">{pairRequest.subject}</h3>
 
         <div className="flex flex-wrap gap-2 md:flex-col md:items-end">
+          <Badge className="rounded-full border-black bg-green text-xs text-black">Partner · {pairRequest.commitment_label}</Badge>
           {pairRequest.slots.map((slot) => {
             const { day, time } = slotParts(slot.start_at, slot.end_at, timezone);
 
@@ -60,7 +61,7 @@ export default function PairRequestCard({ pairRequest, currentUserId, timezone }
         </div>
 
         {alreadyOffered ? (
-          <span className="text-sm font-bold italic text-black/40">You have already sent an offer</span>
+          <span className="text-sm font-bold italic text-black/40">You've already applied</span>
         ) : (
           <Button asChild>
             <Link href={`/pair_requests/${pairRequest.id}/offers/new`}>Apply</Link>

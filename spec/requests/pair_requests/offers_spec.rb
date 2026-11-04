@@ -6,7 +6,7 @@ RSpec.describe "PairRequests::Offers", type: :request do
   around { |example| travel_to(Time.utc(2026, 11, 2, 8, 0)) { example.run } }
 
   let(:offerer) { create(:user) }
-  let(:pair_request) { create(:pair_request, duration: 60) }
+  let(:pair_request) { create(:pair_request) }
   let(:slot_start) { Time.utc(2026, 11, 2, 11, 0) }
 
   before { sign_in(offerer) }
@@ -100,14 +100,14 @@ RSpec.describe "PairRequests::Offers", type: :request do
           .and not_have_enqueued_mail(OfferMailer, :offer_received_email)
 
         expect(response).to redirect_to(pair_requests_path)
-        expect(flash[:alert]).to eq("This request is switched off and isn't taking offers right now.")
+        expect(flash[:alert]).to eq("This partner search is switched off and isn't taking applications right now.")
       end
 
       it "doesn't show the offer form either" do
         get new_pair_request_offer_path(pair_request)
 
         expect(response).to redirect_to(pair_requests_path)
-        expect(flash[:alert]).to eq("This request is switched off and isn't taking offers right now.")
+        expect(flash[:alert]).to eq("This partner search is switched off and isn't taking applications right now.")
       end
     end
 

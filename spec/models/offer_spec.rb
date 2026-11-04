@@ -27,12 +27,12 @@ RSpec.describe Offer, type: :model do
       offer = create(:offer)
 
       expect(offer.period.periodable).to eq(offer)
-      expect(offer.period.end_at - offer.period.start_at).to eq(offer.pair_request.duration.minutes)
+      expect(offer.period.end_at - offer.period.start_at).to eq(PairRequests::BookableSlots::LENGTH)
     end
   end
 
   describe "booking a slot" do
-    let(:pair_request) { create(:pair_request, duration: 60) }
+    let(:pair_request) { create(:pair_request) }
     let(:slot) { PairRequests::BookableSlots.call(pair_request).first }
 
     def book(start_at)
@@ -47,7 +47,7 @@ RSpec.describe Offer, type: :model do
       offer = book(slot.start_at + 10.minutes)
 
       expect(offer.save(context: :booking)).to be(false)
-      expect(offer.errors[:period]).to include("isn't one of this request's open slots")
+      expect(offer.errors[:period]).to include("isn't one of this partner search's open slots")
     end
 
     it "needs a slot" do

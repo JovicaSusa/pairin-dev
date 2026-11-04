@@ -23,7 +23,7 @@ if Rails.env.development?
       user.pair_requests.create!(
         subject: Faker::ProgrammingLanguage.name,
         description: Faker::Hacker.say_something_smart,
-        duration: [30, 45, 60, 90, 120, 150].sample
+        commitment: PairRequest::COMMITMENTS.keys.sample
       )
     end
 

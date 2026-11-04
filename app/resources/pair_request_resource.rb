@@ -1,5 +1,5 @@
 class PairRequestResource < ApplicationResource
-  attributes :id, :subject, :description
+  attributes :id, :subject, :description, :commitment_label
 
   attribute :paused do |pair_request|
     pair_request.paused?

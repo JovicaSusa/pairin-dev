@@ -11,9 +11,9 @@ export default function Index({ offers }) {
       <Head title="Applications" />
 
       <PageHeader
-        eyebrow="Pair Requests"
+        eyebrow="Partner searches"
         title="Applications"
-        description="Every offer you've sent, and where it stands."
+        description="Every application you've sent, and where it stands."
       />
 
       {offers.length > 0 ? (
@@ -21,9 +21,9 @@ export default function Index({ offers }) {
           <Card key={offer.id} offer={offer} />
         ))
       ) : (
-        <EmptyState icon={Send} title="You haven't applied to any pair requests yet" description="Browse open requests and find someone to build or learn with.">
+        <EmptyState icon={Send} title="You haven't applied to any partner searches yet" description="Browse open partner searches and find someone to learn with.">
           <Button asChild className="mt-2">
-            <Link href="/pair_requests">Browse requests</Link>
+            <Link href="/pair_requests">Browse partner searches</Link>
           </Button>
         </EmptyState>
       )}

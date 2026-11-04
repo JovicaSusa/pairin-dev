@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function New({ tags }) {
+export default function New({ tags, commitments }) {
   const { data, setData, post, processing, errors } = useForm({
     subject: '',
-    duration: 45,
+    commitment: 'one_to_three_months',
     description: '',
     taggings_attributes: [{ tag_attributes: { name: '' } }]
   })
@@ -47,17 +48,17 @@ export default function New({ tags }) {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
-      <Head title="Create a Request" />
+      <Head title="Start a partner search" />
 
       <PageHeader
-        eyebrow="Pair Requests"
-        title="Create a request"
-        description="Share what you're working on and what stack you're looking for. Others book a time from your weekly hours."
+        eyebrow="Partner searches"
+        title="Start a partner search"
+        description="Say what you want to learn and how long you'd like to commit. Others book a time from your weekly hours."
       />
 
       <form onSubmit={handleSubmit} className="flex flex-col items-stretch">
         <div className="flex flex-col gap-4 md:flex-row">
-          <div className="pair_request_subject w-full md:w-3/4">
+          <div className="pair_request_subject w-full md:w-2/3">
             <Label htmlFor="subject" className="block mb-1">Subject</Label>
             <Input
               id="subject"
@@ -68,19 +69,19 @@ export default function New({ tags }) {
             {errors.subject && <div className="text-red font-bold mt-1 text-sm">{errors.subject}</div>}
           </div>
 
-          <div className="pair_request_duration w-full md:w-1/4">
-            <Label htmlFor="duration" className="block mb-1">Duration (min)</Label>
-            <Input
-              id="duration"
-              type="number"
-              value={data.duration}
-              onChange={e => setData('duration', e.target.value)}
-            />
-            {errors.duration ? (
-              <div className="text-red font-bold mt-1 text-sm">{errors.duration}</div>
-            ) : (
-              <div className="mt-1 text-xs text-black/50">Up to 180</div>
-            )}
+          <div className="pair_request_commitment w-full md:w-1/3">
+            <Label className="block mb-1">Commitment</Label>
+            <Select value={data.commitment} onValueChange={(value) => setData('commitment', value)}>
+              <SelectTrigger className="w-full" aria-label="Commitment">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {commitments.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.commitment && <div className="text-red font-bold mt-1 text-sm">{errors.commitment}</div>}
           </div>
         </div>
 
@@ -99,7 +100,7 @@ export default function New({ tags }) {
           <div>
             <h4 className="mb-3 font-headline text-sm font-bold uppercase tracking-widest text-black/50">When</h4>
             <p className="rounded-xl border-2 border-black bg-white p-3 text-sm">
-              Others book a time from your weekly hours, cut into calls of this length.{" "}
+              Others book a time from your weekly hours.{" "}
               <Link href="/availability" className="font-bold text-purple">Edit weekly hours</Link>
             </p>
           </div>
@@ -157,7 +158,7 @@ export default function New({ tags }) {
         </div>
 
         <Button type="submit" size="lg" disabled={processing} className="mt-12 self-center">
-          {processing ? 'Creating...' : 'Create Pair request'}
+          {processing ? 'Creating...' : 'Post partner search'}
         </Button>
       </form>
     </div>

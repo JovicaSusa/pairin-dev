@@ -19,7 +19,7 @@ RSpec.describe PairRequests::Suggestions, type: :unit do
     create(:availability_window, user: poster, weekday: start.to_date.cwday,
       start_minute: start.hour * 60 + start.min, end_minute: start.hour * 60 + start.min + 60)
 
-    create(:pair_request, user: poster, duration: 60, **attrs).tap do |request|
+    create(:pair_request, user: poster, **attrs).tap do |request|
       tags.each { |tag| create(:tagging, taggable: request, tag:) }
     end
   end

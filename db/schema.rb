@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_10_30_224219) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -55,8 +55,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_10_30_224219) do
     t.string "subject", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "duration", null: false
     t.datetime "paused_at"
+    t.string "commitment", default: "one_to_three_months", null: false
     t.index ["user_id"], name: "index_pair_requests_on_user_id"
   end
 

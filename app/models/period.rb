@@ -19,7 +19,7 @@ class Period < ApplicationRecord
   def set_end_at
     return if start_at.nil?
 
-    self.end_at = start_at.advance(minutes: self.periodable.duration || 0)
+    self.end_at = start_at + PairRequests::BookableSlots::LENGTH
   end
 
   def dates_in_future

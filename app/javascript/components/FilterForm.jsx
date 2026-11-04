@@ -1,24 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 
-export default function FilterForm({ tags, userLevels, languages, filters = {}, onSubmit }) {
+export default function FilterForm({ tags, commitments, userLevels, languages, filters = {}, onSubmit }) {
   const [form, setForm] = useState({
     tags_name_eq: filters.tags_name_eq || "",
-    duration_eq: filters.duration_eq || "",
+    commitment_eq: filters.commitment_eq || "",
     user_level_eq: filters.user_level_eq || "",
     user_language_eq: filters.user_language_eq || "",
     available_from: filters.available_from || "",
     available_to: filters.available_to || "",
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
 
   const handleSelectChange = (name, value) => {
     setForm({ ...form, [name]: value });
@@ -34,7 +28,7 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
       <p className="font-headline font-bold text-sm">Refine your search</p>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4">
       <div>
         <Label htmlFor="tags_name_eq" className="block mb-1">
           Tags
@@ -52,17 +46,17 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div>
-        <Label htmlFor="duration_eq" className="block mb-1">
-          Duration
-        </Label>
-        <Input
-          type="number"
-          id="duration_eq"
-          name="duration_eq"
-          value={form.duration_eq}
-          onChange={handleChange}
-          placeholder="Duration in minutes"
-        />
+        <Label className="block mb-1">Commitment</Label>
+        <Select value={form.commitment_eq} onValueChange={(val) => handleSelectChange("commitment_eq", val)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select commitment" />
+          </SelectTrigger>
+          <SelectContent>
+            {commitments.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>{label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div>

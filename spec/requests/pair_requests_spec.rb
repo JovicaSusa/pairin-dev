@@ -28,10 +28,19 @@ RSpec.describe "PairRequests", type: :request do
 
     it "leaves out requests with no bookable slot in the next 14 days" do
       create(:pair_request, subject: "No weekly hours", weekly_hours: false)
-      create(:pair_request, subject: "Call longer than any window", user: poster_free_on(2), duration: 180)
-      create(:pair_request, subject: "Bookable", user: poster_free_on(2), duration: 60)
+      create(:pair_request, subject: "Bookable", user: poster_free_on(2))
 
       expect(listed_subjects).to eq(["Bookable"])
+    end
+
+    it "filters by commitment and sends its label" do
+      create(:pair_request, subject: "Short", commitment: "few_weeks", user: poster_free_on(2))
+      create(:pair_request, subject: "Long", commitment: "open_ended", user: poster_free_on(2))
+
+      expect(listed_subjects(q: { commitment_eq: "open_ended" })).to eq(["Long"])
+
+      long = JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"]).dig("props", "pairRequests", 0)
+      expect(long["commitment_label"]).to eq("Open-ended")
     end
 
     it "leaves out the viewer's own requests" do
@@ -41,8 +50,8 @@ RSpec.describe "PairRequests", type: :request do
     end
 
     it "lists the soonest bookable request first and sends its upcoming slots" do
-      create(:pair_request, subject: "Thursday", user: poster_free_on(4), duration: 60)
-      create(:pair_request, subject: "Tuesday", user: poster_free_on(2), duration: 60)
+      create(:pair_request, subject: "Thursday", user: poster_free_on(4))
+      create(:pair_request, subject: "Tuesday", user: poster_free_on(2))
 
       expect(listed_subjects).to eq(["Tuesday", "Thursday"])
 
@@ -51,8 +60,8 @@ RSpec.describe "PairRequests", type: :request do
     end
 
     it "filters by requests with a bookable slot between two dates" do
-      create(:pair_request, subject: "Tuesday", user: poster_free_on(2), duration: 60)
-      create(:pair_request, subject: "Thursday", user: poster_free_on(4), duration: 60)
+      create(:pair_request, subject: "Tuesday", user: poster_free_on(2))
+      create(:pair_request, subject: "Thursday", user: poster_free_on(4))
 
       expect(listed_subjects(q: { available_from: "2026-11-05", available_to: "2026-11-05" })).to eq(["Thursday"])
       expect(listed_subjects(q: { available_from: "2026-11-09" })).to eq(["Tuesday", "Thursday"])

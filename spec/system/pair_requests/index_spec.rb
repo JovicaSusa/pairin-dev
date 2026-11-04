@@ -26,7 +26,7 @@ RSpec.describe "display pair requests", type: :system do
       visit pair_requests_path
 
       expect(page).to have_content("Apply")
-      expect(page).to have_content("You have already sent an offer")
+      expect(page).to have_content("You've already applied")
     end
   end
 end

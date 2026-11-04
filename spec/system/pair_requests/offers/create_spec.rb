@@ -3,7 +3,7 @@ RSpec.describe "create pair request offer", type: :system do
 
   before { sign_in(current_user) }
 
-  let!(:pair_request) { create(:pair_request, duration: 60) }
+  let!(:pair_request) { create(:pair_request) }
 
   it "creates offer for pair request" do
     visit pair_requests_path
