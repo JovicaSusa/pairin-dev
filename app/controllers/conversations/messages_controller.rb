@@ -9,7 +9,11 @@ class Conversations::MessagesController < ApplicationController
     if message.nil?
       redirect_to conversation_path(offer), alert: "You can't write in this conversation right now."
     elsif message.persisted?
-      OfferMailer.with(offer:).late_reply_email.deliver_later if late_reply
+      if late_reply
+        OfferMailer.with(offer:).late_reply_email.deliver_later
+      else
+        UnreadMessagesEmailJob.set(wait: Offer::UNREAD_EMAIL_AFTER).perform_later(offer, offer.other_person(current_user))
+      end
       redirect_to conversation_path(offer)
     else
       redirect_to conversation_path(offer), inertia: { errors: message.errors.to_hash(true) }

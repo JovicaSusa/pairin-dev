@@ -87,6 +87,34 @@ RSpec.describe "Conversations", type: :request do
     end
   end
 
+  describe "scheduling the unread email" do
+    it "checks 15 minutes after each message, for the other person" do
+      sign_in(poster)
+
+      freeze_time do
+        expect { reply }
+          .to have_enqueued_job(UnreadMessagesEmailJob).with(offer, applicant).at(15.minutes.from_now).once
+      end
+    end
+
+    it "isn't scheduled by a new application, which has its own email" do
+      expect { create(:offer, pair_request: search) }.not_to have_enqueued_job(UnreadMessagesEmailJob)
+    end
+
+    it "isn't scheduled by a late reply, which has its own email" do
+      sign_in(poster)
+      travel_to(offer.expires_at + 1.day)
+
+      expect { reply }.not_to have_enqueued_job(UnreadMessagesEmailJob)
+    end
+
+    it "isn't scheduled by a refused message" do
+      sign_in(applicant)
+
+      expect { reply("Too soon") }.not_to have_enqueued_job(UnreadMessagesEmailJob)
+    end
+  end
+
   describe "the poster's first reply" do
     before do
       sign_in(poster)

@@ -23,6 +23,7 @@ class Offer < ApplicationRecord
   validate :offerer_has_a_level, on: :create
   validates :pair_request_id, uniqueness: { scope: :offerer_id }
 
+  UNREAD_EMAIL_AFTER = 15.minutes
   REMIND_AFTER = 24.hours
   ANSWER_WITHIN = 72.hours
 
@@ -105,6 +106,30 @@ class Offer < ApplicationRecord
     update_columns(read_column_for(user) => Time.current)
   end
 
+  def unread_messages_for(user)
+    read_at = public_send(read_column_for(user))
+    unread = messages.where.not(sender: user)
+
+    read_at ? unread.where("messages.created_at > ?", read_at) : unread
+  end
+
+  # One email per stretch of unread: none until they've read since the last one,
+  # and not before the oldest unread message has waited long enough.
+  def unread_email_due_for?(user)
+    return false if ended?
+
+    emailed_at = public_send(emailed_column_for(user))
+    read_at = public_send(read_column_for(user))
+    return false if emailed_at && (read_at.nil? || emailed_at > read_at)
+
+    oldest_unread = unread_messages_for(user).minimum(:created_at)
+    oldest_unread.present? && oldest_unread <= UNREAD_EMAIL_AFTER.ago
+  end
+
+  def mark_unread_emailed_to!(user)
+    update_columns(emailed_column_for(user) => Time.current)
+  end
+
   def how_often_label
     HOW_OFTEN[how_often]
   end
@@ -150,6 +175,10 @@ class Offer < ApplicationRecord
 
   def read_column_for(user)
     user == offerer ? :offerer_read_at : :poster_read_at
+  end
+
+  def emailed_column_for(user)
+    user == offerer ? :offerer_emailed_at : :poster_emailed_at
   end
 
   # Their level comes from their profile. The form asks once when it's blank.
