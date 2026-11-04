@@ -13,3 +13,6 @@ production:
   delete_suspended_accounts:
     class: DeleteSuspendedAccountsJob
     schedule: at 3am every day
+  send_weekly_check_ins:
+    class: SendWeeklyCheckInsJob
+    schedule: at 9am every day

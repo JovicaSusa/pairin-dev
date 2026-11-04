@@ -23,7 +23,7 @@ class PartnershipsController < ApplicationController
   end
 
   def show
-    partnership = partnerships.find(params[:id])
+    partnership = partnerships.includes(:check_ins).find(params[:id])
     partnership.offer.mark_read_by!(current_user)
     partner = partnership.offer.other_person(current_user)
 
@@ -33,6 +33,8 @@ class PartnershipsController < ApplicationController
         goal: partnership.goal,
         ended: partnership.ended?,
         ended_by_viewer: partnership.ended_by_id == current_user.id,
+        weeks: partnership.weeks_summary,
+        next_check_in_at: partnership.next_check_in_at.utc.iso8601,
         your_commitment: partnership.commitment_of(current_user),
         partner_commitment: partnership.commitment_of(partner),
         conversation: ConversationPresenter.new(partnership.offer, current_user).thread

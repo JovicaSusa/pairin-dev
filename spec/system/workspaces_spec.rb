@@ -93,6 +93,21 @@ RSpec.describe "workspaces", type: :system do
       expect(Partnership.last.end_reason).to eq("Different goals")
     end
 
+    it "shows when the next check-in goes out, then a marker for each week" do
+      visit partner_path(Partnership.last)
+      expect(page).to have_content("The next check-in email goes out on")
+      expect(page).not_to have_content("W1")
+
+      partnership = Partnership.last
+      travel 7.days + 1.minute do
+        CheckIn.create!(partnership:, user: partner, week: 1).answer!(true)
+        visit partner_path(partnership)
+
+        expect(page).to have_content("W1")
+        expect(page).to have_css('li[title="Week 1: you worked together"]')
+      end
+    end
+
     it "links to the Workspace from the conversation" do
       visit conversation_path(offer)
 
