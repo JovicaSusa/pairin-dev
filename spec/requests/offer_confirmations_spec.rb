@@ -79,7 +79,7 @@ RSpec.describe "Offer confirmations", type: :request do
     it "says the request is already matched" do
       get offer_confirmation_path(token:)
 
-      expect(response.body).to include("This request is already matched")
+      expect(response.body).to include("This partner search is already matched")
       expect(response.body).not_to include(">Accept")
     end
 

@@ -14,8 +14,6 @@ class Offer < ApplicationRecord
   # the open slots change as time passes and the poster gets sessions.
   validate :period_is_a_bookable_slot, on: :booking
 
-  delegate :duration, to: :pair_request
-
   # Signed token for the poster's no-login confirmation link. What the link
   # still allows (accept, already matched, slot passed) follows the offer's state.
   generates_token_for :poster_confirmation, expires_in: 60.days
@@ -67,6 +65,6 @@ class Offer < ApplicationRecord
     return if period.nil? || pair_request.nil?
 
     bookable = PairRequests::BookableSlots.call(pair_request).any? { |slot| slot.start_at == period.start_at }
-    errors.add(:period, "isn't one of this request's open slots") unless bookable
+    errors.add(:period, "isn't one of this partner search's open slots") unless bookable
   end
 end

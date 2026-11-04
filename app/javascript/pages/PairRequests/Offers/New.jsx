@@ -30,7 +30,7 @@ export default function New({ pairRequestId, slots, timezone }) {
       {slots.length === 0 ? (
         <p className="rounded-2xl border-2 border-black bg-white p-5">
           No open times in the next two weeks.{" "}
-          <Link href="/pair_requests" className="font-bold text-purple">See other requests</Link>
+          <Link href="/pair_requests" className="font-bold text-purple">See other partner searches</Link>
         </p>
       ) : (
         <Form method="post" action={`/pair_requests/${pairRequestId}/offers`} className="flex flex-col items-stretch">

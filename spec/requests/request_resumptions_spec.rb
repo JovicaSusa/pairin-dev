@@ -36,7 +36,7 @@ RSpec.describe "Request resumptions", type: :request do
       expect(expired_offer.reload.status).to eq("EXPIRED")
       expect(response).to redirect_to(request_resumption_path(token:))
       follow_redirect!
-      expect(response.body).to include("Your request is back on")
+      expect(response.body).to include("Your partner search is back on")
     end
   end
 
@@ -59,7 +59,7 @@ RSpec.describe "Request resumptions", type: :request do
     it "says so and offers no button" do
       get request_resumption_path(token:)
 
-      expect(response.body).to include("Your request is back on")
+      expect(response.body).to include("Your partner search is back on")
       expect(response.body).not_to include(">Turn it back on")
     end
   end

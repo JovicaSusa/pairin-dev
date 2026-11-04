@@ -11,7 +11,7 @@ RSpec.describe PairRequestMailer, type: :mailer do
       expect(mail.to).to eq(["poster@example.com"])
       expect(mail.subject).to include("paused")
       expect(mail.body.encoded).to include("Learn Rust together")
-      expect(mail.body.encoded).to include("an offer went unanswered")
+      expect(mail.body.encoded).to include("an application went unanswered")
     end
 
     it "links to a no-login page for turning the request back on" do

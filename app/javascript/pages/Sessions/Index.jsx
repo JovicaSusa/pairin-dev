@@ -16,7 +16,7 @@ export default function Index( {sessions} ) {
           <Card key={session.id} session={session} />
         ))
       ) : (
-        <EmptyState icon={CalendarClock} title="No upcoming sessions found" description="Once a request is matched, your sessions will show up here." />
+        <EmptyState icon={CalendarClock} title="No upcoming sessions found" description="Once a partner search is matched, your sessions will show up here." />
       )}
     </div>
   )

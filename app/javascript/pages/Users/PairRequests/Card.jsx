@@ -54,8 +54,10 @@ export default function UserPairRequestCard({ request }) {
         </div>
       </div>
 
+      <Badge className="mt-3 rounded-full border-black bg-green text-xs text-black">Partner · {request.commitment_label}</Badge>
+
       {request.paused && (
-        <Badge variant="neutral" className="mt-3 rounded-full">
+        <Badge variant="neutral" className="ml-2 mt-3 rounded-full">
           <EyeOff className="h-3.5 w-3.5" />
           Off: hidden from others
         </Badge>

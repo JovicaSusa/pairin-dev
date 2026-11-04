@@ -55,8 +55,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_140000) do
     t.string "subject", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "duration", null: false
     t.datetime "paused_at"
+    t.string "commitment", default: "one_to_three_months", null: false
     t.index ["user_id"], name: "index_pair_requests_on_user_id"
   end
 

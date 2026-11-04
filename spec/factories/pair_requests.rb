@@ -10,7 +10,6 @@ FactoryBot.define do
 
     subject { Faker::Lorem.sentence(word_count: 3) }
     description { Faker::Lorem.sentence(word_count: 33) }
-    duration { Faker::Number.between(from: 1, to: 90) }
 
     after(:create) do |pair_request, evaluator|
       poster = pair_request.user

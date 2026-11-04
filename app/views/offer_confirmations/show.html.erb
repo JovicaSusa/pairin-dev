@@ -1,4 +1,4 @@
-<% content_for :title, "Pairing offer - Pairin" %>
+<% content_for :title, "Application - Pairin" %>
 
 <% offerer_name = @offer.offerer_display_name %>
 <% poster_timezone = @offer.pair_request.user.timezone %>
@@ -15,7 +15,7 @@
     <% when "ACCEPTED" %>
       You're pairing with <%= offerer_name %>
     <% when "ACCEPTED OTHER" %>
-      This request is already matched
+      This partner search is already matched
     <% when "EXPIRED" %>
       This time slot has passed
     <% else %>
@@ -24,7 +24,7 @@
   </h1>
 
   <div class="rounded-xl border-2 border-black bg-white p-6">
-    <p class="text-sm text-gray-500 mb-1">On your request</p>
+    <p class="text-sm text-gray-500 mb-1">On your partner search</p>
     <p class="font-bold mb-4"><%= @offer.pair_request.subject %></p>
 
     <blockquote class="border-l-4 border-purple pl-4 mb-4"><%= @offer.message %></blockquote>
@@ -52,6 +52,6 @@
   <% when "ACCEPTED" %>
     <p class="mt-8 text-gray-700">We've emailed you both the session details. Add a call link from your <a href="<%= sessions_path %>" class="text-purple font-bold">sessions</a> page.</p>
   <% else %>
-    <p class="mt-8 text-gray-700">You can't accept this offer anymore. <a href="<%= users_pair_requests_path %>" class="text-purple font-bold">See your requests</a>.</p>
+    <p class="mt-8 text-gray-700">You can't accept this application anymore. <a href="<%= users_pair_requests_path %>" class="text-purple font-bold">See your partner searches</a>.</p>
   <% end %>
 </div>

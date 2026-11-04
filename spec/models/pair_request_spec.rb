@@ -17,10 +17,15 @@ RSpec.describe PairRequest, type: :model do
     end
   end
 
-  describe "call length" do
-    it "is capped at 3 hours" do
-      expect(build(:pair_request, duration: 180)).to be_valid
-      expect(build(:pair_request, duration: 181).tap(&:validate).errors[:duration]).to be_present
+  describe "commitment" do
+    it "defaults to 1–3 months" do
+      expect(PairRequest.new.commitment).to eq("one_to_three_months")
+      expect(PairRequest.new.commitment_label).to eq("1–3 months")
+    end
+
+    it "only accepts the listed options" do
+      expect(build(:pair_request, commitment: "open_ended")).to be_valid
+      expect(build(:pair_request, commitment: "forever").tap(&:validate).errors[:commitment]).to be_present
     end
   end
 
@@ -42,7 +47,7 @@ RSpec.describe PairRequest, type: :model do
 
   describe "#bookable_slots" do
     it "comes from the poster's weekly hours" do
-      pair_request = create(:pair_request, duration: 60)
+      pair_request = create(:pair_request)
 
       expect(pair_request.bookable_slots).to eq(PairRequests::BookableSlots.call(pair_request))
       expect(pair_request.bookable_slots).not_to be_empty

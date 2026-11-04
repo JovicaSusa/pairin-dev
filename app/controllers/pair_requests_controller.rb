@@ -28,6 +28,7 @@ class PairRequestsController < ApplicationController
       pairRequests: InertiaRails.scroll(@pagy) {
         page.map { |pair_request, slots|
           pair_request.as_json(
+            methods: [:commitment_label],
             include: {
               user: { only: [:id, :name, :profession], methods: [:image_url, :level_titleized] },
               tags: { only: [:id, :name] },
@@ -42,6 +43,7 @@ class PairRequestsController < ApplicationController
       filterOptions: InertiaRails.once {
         {
           tags: Tag.all.as_json(only: [:id, :name]),
+          commitments: PairRequest::COMMITMENTS.map { |value, label| { value:, label: } },
           userLevels: User::LEVELS,
           languages: I18nData.languages.map { |k, v| [v, k] }
         }
