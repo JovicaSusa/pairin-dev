@@ -1,4 +1,4 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import {
   Search,
@@ -29,7 +29,7 @@ const PAIR_REQUEST_SUBMENU = [
   { href: "/users/pair_requests", label: "Opened", icon: Inbox },
 ];
 
-function NavLink({ href, label, icon: Icon, active, small = false, onClick }) {
+function NavLink({ href, label, icon: Icon, active, small = false, onClick, count = 0 }) {
   return (
     <Link
       href={href}
@@ -44,11 +44,17 @@ function NavLink({ href, label, icon: Icon, active, small = false, onClick }) {
     >
       {Icon && <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={2.25} />}
       <span className="truncate">{label}</span>
+      {count > 0 && (
+        <span aria-label={`${count} unread`} className="ml-auto shrink-0 rounded-full border-2 border-black bg-orange px-1.5 text-xs text-white">
+          {count}
+        </span>
+      )}
     </Link>
   );
 }
 
 function NavContent({ currentPath, currentUser, onNavigate }) {
+  const { unreadMessages } = usePage().props;
   const cleanPath = currentPath.split("?")[0];
   const isActive = (path) => cleanPath === path || cleanPath.startsWith(`${path}/`);
   const isPairRequestSubmenuActive = () => PAIR_REQUEST_SUBMENU.some((item) => item.href === cleanPath);
@@ -89,7 +95,7 @@ function NavContent({ currentPath, currentUser, onNavigate }) {
             </CollapsibleContent>
           </Collapsible>
 
-          <NavLink {...NAV_ITEMS[1]} active={isActive(NAV_ITEMS[1].href)} onClick={onNavigate} />
+          <NavLink {...NAV_ITEMS[1]} active={isActive(NAV_ITEMS[1].href)} onClick={onNavigate} count={unreadMessages} />
           <NavLink {...NAV_ITEMS[2]} active={isActive(NAV_ITEMS[2].href)} onClick={onNavigate} />
           <NavLink {...NAV_ITEMS[3]} active={isActive(NAV_ITEMS[3].href)} onClick={onNavigate} />
         </div>

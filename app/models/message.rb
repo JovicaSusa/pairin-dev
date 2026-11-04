@@ -7,4 +7,5 @@ class Message < ApplicationRecord
   validates :body, presence: true, length: { maximum: MAX_LENGTH }
 
   after_create { offer.update_columns(last_message_at: created_at) }
+  after_create_commit { ConversationsChannel.notify(offer) }
 end

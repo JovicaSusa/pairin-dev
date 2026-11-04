@@ -159,6 +159,84 @@ RSpec.describe "Conversations", type: :request do
     end
   end
 
+  describe "live signals and unread counts" do
+    it "signals both people when someone writes" do
+      sign_in(poster)
+
+      expect { reply }
+        .to have_broadcasted_to(applicant).from_channel(ConversationsChannel).with(conversation_id: offer.id)
+        .and have_broadcasted_to(poster).from_channel(ConversationsChannel).with(conversation_id: offer.id)
+    end
+
+    it "signals both people when a conversation ends" do
+      sign_in(poster)
+
+      expect { post not_a_match_conversation_path(offer) }
+        .to have_broadcasted_to(applicant).from_channel(ConversationsChannel)
+    end
+
+    it "signals the poster about a new application" do
+      expect { create(:offer, pair_request: search) }
+        .to have_broadcasted_to(poster).from_channel(ConversationsChannel)
+    end
+
+    it "counts the other person's unread messages, not your own" do
+      sign_in(poster)
+      get conversations_path
+
+      expect(props["unreadMessages"]).to eq(1)
+      expect(props["conversations"].first["unread"]).to eq(1)
+
+      sign_in(applicant)
+      get conversations_path
+
+      expect(props["unreadMessages"]).to eq(0)
+    end
+
+    it "clears them when the conversation is opened, and counts new ones after" do
+      sign_in(poster)
+      get conversation_path(offer)
+
+      expect(props["unreadMessages"]).to eq(0)
+      expect(props["conversations"].first["unread"]).to eq(0)
+
+      travel 1.minute do
+        offer.messages.create!(sender: applicant, body: "One more")
+
+        get conversations_path
+
+        expect(props["unreadMessages"]).to eq(1)
+      end
+    end
+
+    it "keeps each person's read position separate" do
+      sign_in(applicant)
+      get conversation_path(offer)
+
+      sign_in(poster)
+      get conversations_path
+
+      expect(props["unreadMessages"]).to eq(1)
+    end
+
+    it "adds up across conversations, on any page" do
+      create(:offer, pair_request: search)
+      sign_in(poster)
+
+      get activities_path
+
+      expect(props["unreadMessages"]).to eq(2)
+    end
+
+    it "keeps other people's messages out of everyone else's count" do
+      sign_in(create(:user))
+
+      get conversations_path
+
+      expect(props["unreadMessages"]).to eq(0)
+    end
+  end
+
   describe "the list" do
     it "shows each person the other, a status and the newest first" do
       older = create(:offer, pair_request: create(:pair_request, user: create(:user, name: "Tom")), offerer: applicant)

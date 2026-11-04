@@ -7,7 +7,10 @@ class ConversationsController < ApplicationController
   end
 
   def show
-    render_inbox(conversations.find(params[:id]))
+    conversation = conversations.find(params[:id])
+    conversation.mark_read_by!(current_user)
+
+    render_inbox(conversation)
   end
 
   def not_a_match
@@ -15,6 +18,7 @@ class ConversationsController < ApplicationController
 
     if offer.not_a_match!(by: current_user, reason: params[:reason].to_s.first(Message::MAX_LENGTH))
       OfferMailer.with(offer:).not_a_match_email.deliver_later
+      ConversationsChannel.notify(offer)
     end
 
     redirect_to conversation_path(offer)
@@ -37,8 +41,10 @@ class ConversationsController < ApplicationController
       .order(:offer_id, created_at: :desc, id: :desc)
       .to_h { |message| [message.offer_id, message.body] }
 
+    unread = current_user.unread_message_counts
+
     render inertia: "Conversations/Index", props: {
-      conversations: rows.map { |offer| ConversationPresenter.new(offer, current_user, latest_body: latest_bodies[offer.id]).row },
+      conversations: rows.map { |offer| ConversationPresenter.new(offer, current_user, latest_body: latest_bodies[offer.id], unread: unread.fetch(offer.id, 0)).row },
       conversation: conversation && ConversationPresenter.new(conversation, current_user).thread
     }
   end

@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   layout -> { devise_controller? ? 'devise' : 'application' }
 
   inertia_share auth: -> { { user: current_user } }
+  inertia_share unreadMessages: -> { current_user ? current_user.unread_message_counts.values.sum : 0 }
 
   before_action :redirect_to_canonical_host
 
