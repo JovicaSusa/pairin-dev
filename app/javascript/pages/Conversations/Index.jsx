@@ -50,7 +50,14 @@ function ConversationList({ conversations, activeId }) {
                     <span className="truncate">{c.other.name}</span>
                     <StatusBadge status={c.status} />
                   </p>
-                  <p className="truncate text-xs text-black/50">{c.line}</p>
+                  <p className="flex items-center justify-between gap-2 text-xs text-black/50">
+                    <span className="truncate">{c.line}</span>
+                    {c.unread > 0 && (
+                      <span aria-label={`${c.unread} unread`} className="shrink-0 rounded-full border-2 border-black bg-orange px-1.5 font-bold text-white">
+                        {c.unread}
+                      </span>
+                    )}
+                  </p>
                 </div>
               </Link>
             </li>

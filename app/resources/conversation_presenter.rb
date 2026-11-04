@@ -2,10 +2,11 @@
 class ConversationPresenter
   LINE_LENGTH = 60
 
-  def initialize(offer, viewer, latest_body: nil)
+  def initialize(offer, viewer, latest_body: nil, unread: 0)
     @offer = offer
     @viewer = viewer
     @latest_body = latest_body
+    @unread = unread
     @other = offer.other_person(viewer)
   end
 
@@ -14,6 +15,7 @@ class ConversationPresenter
       id: @offer.id,
       status: status,
       line: line,
+      unread: @unread,
       other: { name: @other.display_name, image_url: @other.image_url }
     }
   end

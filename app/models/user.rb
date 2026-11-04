@@ -16,6 +16,23 @@ class User < ApplicationRecord
   has_many :sessions, through: :participations, source: :participable, source_type: Session.name
   has_many :availability_windows, dependent: :destroy
 
+  # Messages from the other person since this user last opened each conversation,
+  # as { offer_id => count }.
+  def unread_message_counts
+    Message
+      .joins(offer: :pair_request)
+      .where("offers.offerer_id = :id OR pair_requests.user_id = :id", id:)
+      .where.not(sender_id: id)
+      .where(<<~SQL.squish, id:)
+        messages.created_at > COALESCE(
+          CASE WHEN offers.offerer_id = :id THEN offers.offerer_read_at ELSE offers.poster_read_at END,
+          '-infinity'
+        )
+      SQL
+      .group(:offer_id)
+      .count
+  end
+
   def display_name
     name.presence || "A Pairin member"
   end

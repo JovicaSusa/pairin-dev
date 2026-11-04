@@ -101,6 +101,10 @@ class Offer < ApplicationRecord
     user == poster ? "Reply" : "Sent"
   end
 
+  def mark_read_by!(user)
+    update_columns(read_column_for(user) => Time.current)
+  end
+
   def how_often_label
     HOW_OFTEN[how_often]
   end
@@ -143,6 +147,10 @@ class Offer < ApplicationRecord
   end
 
   private
+
+  def read_column_for(user)
+    user == offerer ? :offerer_read_at : :poster_read_at
+  end
 
   # Their level comes from their profile. The form asks once when it's blank.
   def offerer_has_a_level
