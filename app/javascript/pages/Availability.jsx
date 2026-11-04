@@ -63,7 +63,7 @@ export default function Availability({ timezone, windows, weekdays }) {
       <PageHeader
         eyebrow="Availability"
         title="When are you free?"
-        description="Your weekly hours, in your own timezone. Others book sessions inside these windows."
+        description="Optional. Your weekly hours, in your own timezone, so others can see when you're usually free."
       />
 
       <form onSubmit={saveTimezone} className="mb-10 rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">

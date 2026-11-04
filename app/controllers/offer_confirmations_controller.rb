@@ -10,7 +10,7 @@ class OfferConfirmationsController < ApplicationController
 
   def create
     if @offer.pending?
-      Offers::Accept.call(@offer).or { flash[:alert] = "Something went wrong accepting this offer. Please try again." }
+      Offers::Accept.call(@offer).or { flash[:alert] = "Something went wrong accepting this application. Please try again." }
     end
 
     redirect_to offer_confirmation_path(token: params[:token])

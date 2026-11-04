@@ -4,8 +4,7 @@ class PairRequest < ApplicationRecord
   belongs_to :user
   has_many :offers, dependent: nil # TODO: Reconsider
   has_one :accepted_offer, -> { accepted }, class_name: "Offer"
-  # Legacy: requests used to own their time slots. Slots now come from the
-  # poster's weekly hours (#bookable_slots) and offers own their booked period.
+  # History only: requests used to own their time slots.
   has_many :periods, as: :periodable, dependent: :destroy, inverse_of: :periodable
   has_many :sessions, as: :sessionable
   has_many :taggings, as: :taggable
@@ -56,16 +55,8 @@ class PairRequest < ApplicationRecord
     update_columns(paused_at: Time.current, updated_at: Time.current)
   end
 
-  # A request is booked into the poster's weekly hours, so it can't be On
-  # without them. Returns false when it stays Off.
   def switch_on!
-    return false unless user.availability_windows.exists?
-
     update_columns(paused_at: nil, updated_at: Time.current)
-  end
-
-  def bookable_slots
-    PairRequests::BookableSlots.call(self)
   end
 
   def has_accepted_offer?

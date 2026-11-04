@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory(:offer) do
     transient do
-      with_period { true }
+      with_old_period { false }
     end
 
     offerer factory: :user
@@ -15,8 +15,9 @@ FactoryBot.define do
     after(:build) do |offer, evaluator|
       offer.pair_request ||= create(:pair_request)
 
-      if evaluator.with_period && offer.period.nil?
-        offer.period = build(:period, periodable: offer, start_at: 30.minutes.from_now)
+      # Applications used to book a time; some old ones still have one.
+      if evaluator.with_old_period && offer.period.nil?
+        offer.period = build(:period, periodable: offer, start_at: 30.minutes.from_now, end_at: 90.minutes.from_now)
       end
     end
   end

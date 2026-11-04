@@ -41,15 +41,17 @@ export default function OfferCard({ offer, pairRequestId }) {
       <ExpandableText className="mt-4 whitespace-pre-wrap leading-relaxed text-black/60">{offer.message}</ExpandableText>
 
       <div className="mt-4 flex flex-col gap-4 border-t-2 border-black/10 pt-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-1.5">
-          <Badge variant="neutral" className="rounded-full text-xs">
-            {formatShort(offer.start_at)}
-          </Badge>
-          <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
-          <Badge variant="neutral" className="rounded-full text-xs">
-            {formatShort(offer.end_at)}
-          </Badge>
-        </div>
+        {offer.start_at ? (
+          <div className="flex items-center gap-1.5">
+            <Badge variant="neutral" className="rounded-full text-xs">
+              {formatShort(offer.start_at)}
+            </Badge>
+            <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
+            <Badge variant="neutral" className="rounded-full text-xs">
+              {formatShort(offer.end_at)}
+            </Badge>
+          </div>
+        ) : <span />}
 
         {offer.show_accept_button && (
           <Button onClick={handleAccept}>Accept</Button>

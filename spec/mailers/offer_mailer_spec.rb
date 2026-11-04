@@ -5,8 +5,7 @@ RSpec.describe OfferMailer, type: :mailer do
     let(:poster) { create(:user, email: "poster@example.com", timezone: "UTC") }
     let(:offerer) { create(:user, email: "offerer@example.com", name: "Ada") }
     let(:pair_request) { create(:pair_request, user: poster, subject: "Learn Python together") }
-    let(:period) { create(:period, periodable: pair_request, start_at: Time.utc(2030, 1, 15, 18, 0), end_at: Time.utc(2030, 1, 15, 19, 0)) }
-    let(:offer) { create(:offer, pair_request:, period:, offerer:, message: "Happy to pair on this!") }
+    let(:offer) { create(:offer, pair_request:, offerer:, message: "Happy to pair on this!") }
 
     let(:mail) { described_class.with(offer:).offer_received_email }
 
@@ -20,8 +19,14 @@ RSpec.describe OfferMailer, type: :mailer do
       expect(body).to include("Ada")
       expect(body).to include("Happy to pair on this!")
       expect(body).to include("Learn Python together")
-      expect(body).to include("15 Jan 18:00")
+      expect(body).not_to include("Time:")
       expect(body).to match(%r{https?://[^/"]+/offers/confirm/[^"\s]+})
+    end
+
+    it "still shows an old application's time" do
+      old = create(:offer, pair_request:, offerer: create(:user), period: create(:period, periodable: pair_request, start_at: Time.utc(2030, 1, 15, 18, 0), end_at: Time.utc(2030, 1, 15, 19, 0)))
+
+      expect(described_class.with(offer: old).offer_received_email.body.encoded).to include("15 Jan 18:00")
     end
 
     it "shows the applicant's GitHub link only when they've added one" do
@@ -62,10 +67,10 @@ RSpec.describe OfferMailer, type: :mailer do
       expect(mail.body.encoded).not_to include("poster@example.com")
     end
 
-    it "doesn't promise anything for an offer whose time has already passed" do
-      travel_to(offer.period.start_at + 1.minute)
+    it "doesn't promise anything for an application that has expired" do
+      travel_to(offer.expires_at + 1.minute)
 
-      expect(mail.body.encoded).to include("The time you chose has passed")
+      expect(mail.body.encoded).to include("Your application went unanswered")
       expect(mail.body.encoded).not_to include("Your application still stands")
       expect(mail.body.encoded).not_to include("if they accept it")
     end

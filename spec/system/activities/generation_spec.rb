@@ -38,10 +38,11 @@ RSpec.describe "generates expected activites", type: :system do
         click_button "Accept"
       end
 
+      expect(page).to have_content("Application accepted.")
+
       visit activities_path
 
-      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
-      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.content"))
+      expect(page).not_to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
     end
   end
 
@@ -76,8 +77,7 @@ RSpec.describe "generates expected activites", type: :system do
     it "displays expected activities" do
       visit activities_path
 
-      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
-      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.content"))
+      expect(page).not_to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
       expect(page).to have_one_of_the_texts(I18n.t("activities.offer_accepted.titles"))
       expect(page).to have_one_of_the_texts(I18n.t("activities.offer_accepted.content"))
     end

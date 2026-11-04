@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
 
 export default function FilterForm({ tags, commitments, userLevels, languages, filters = {}, onSubmit }) {
   const [form, setForm] = useState({
@@ -10,8 +9,6 @@ export default function FilterForm({ tags, commitments, userLevels, languages, f
     commitment_eq: filters.commitment_eq || "",
     user_level_eq: filters.user_level_eq || "",
     user_language_eq: filters.user_language_eq || "",
-    available_from: filters.available_from || "",
-    available_to: filters.available_to || "",
   });
 
   const handleSelectChange = (name, value) => {
@@ -89,24 +86,6 @@ export default function FilterForm({ tags, commitments, userLevels, languages, f
             ))}
           </SelectContent>
         </Select>
-      </div>
-
-      <div>
-        <Label className="block mb-1">Free from</Label>
-        <DatePicker
-          value={form.available_from}
-          onChange={(v) => setForm({ ...form, available_from: v })}
-          placeholder="Pick a start date"
-        />
-      </div>
-
-      <div>
-        <Label className="block mb-1">Free until</Label>
-        <DatePicker
-          value={form.available_to}
-          onChange={(v) => setForm({ ...form, available_to: v })}
-          placeholder="Pick an end date"
-        />
       </div>
 
       </div>

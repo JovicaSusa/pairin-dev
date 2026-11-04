@@ -13,11 +13,11 @@
   <h1 class="font-display font-extrabold text-4xl tracking-tight leading-none mt-6 mb-6">
     <% case @offer.status %>
     <% when "ACCEPTED" %>
-      You're pairing with <%= offerer_name %>
+      You accepted <%= offerer_name %>'s application
     <% when "ACCEPTED OTHER" %>
       This partner search is already matched
     <% when "EXPIRED" %>
-      This time slot has passed
+      This application has expired
     <% else %>
       <%= offerer_name %> wants to pair with you
     <% end %>
@@ -29,12 +29,14 @@
 
     <blockquote class="border-l-4 border-purple pl-4 mb-4"><%= @offer.message %></blockquote>
 
+    <% if @offer.period %>
     <p>
       <span class="font-bold">Time:</span>
       <%= @offer.period.start_at.in_time_zone(poster_timezone).to_fs(:short) %>
       &ndash; <%= @offer.period.end_at.in_time_zone(poster_timezone).strftime("%H:%M") %>
       (<%= poster_timezone %>)
     </p>
+    <% end %>
 
     <% if @offer.offerer.github_url.present? %>
       <p class="mt-2">
@@ -48,9 +50,8 @@
   <% when "PENDING" %>
     <%= button_to "Accept", offer_confirmation_path(token: params[:token]),
           class: "mt-8 rounded-xl border-2 border-black bg-orange px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none" %>
-    <p class="mt-3 text-sm text-gray-500">Accepting schedules the session and emails you both the details.</p>
   <% when "ACCEPTED" %>
-    <p class="mt-8 text-gray-700">We've emailed you both the session details. Add a call link from your <a href="<%= sessions_path %>" class="text-purple font-bold">sessions</a> page.</p>
+    <p class="mt-8 text-gray-700">See it in <a href="<%= users_pair_requests_path %>" class="text-purple font-bold">your partner searches</a>.</p>
   <% else %>
     <p class="mt-8 text-gray-700">You can't accept this application anymore. <a href="<%= users_pair_requests_path %>" class="text-purple font-bold">See your partner searches</a>.</p>
   <% end %>

@@ -3,22 +3,19 @@ class Offer < ApplicationRecord
 
   belongs_to :offerer, class_name: "User"
   belongs_to :pair_request
-  # The slot this offer booked. Requests don't own slots; they're cut from the
-  # poster's weekly hours (PairRequests::BookableSlots).
+  # History only: applications used to book a time. New ones have no period.
   has_one :period, as: :periodable, dependent: :destroy, inverse_of: :periodable, autosave: true
 
   validates :message, presence: true
   validates :pair_request_id, uniqueness: { scope: :offerer_id }
-  validates :period, presence: true
-  # Run when an offerer books (save(context: :booking)), not on every save:
-  # the open slots change as time passes and the poster gets sessions.
-  validate :period_is_a_bookable_slot, on: :booking
+
+  REMIND_AFTER = 24.hours
+  ANSWER_WITHIN = 72.hours
 
   # Signed token for the poster's no-login confirmation link. What the link
-  # still allows (accept, already matched, slot passed) follows the offer's state.
+  # still allows (accept, already matched, expired) follows the offer's state.
   generates_token_for :poster_confirmation, expires_in: 60.days
 
-  scope :future, -> { joins(:period).merge(Period.future) }
   scope :accepted, -> { where.not(accepted_at: nil) }
 
   def accepted?
@@ -29,12 +26,12 @@ class Offer < ApplicationRecord
     status == "PENDING"
   end
 
-  # When to remind the poster: 24h after the offer, or 3h before the slot if
-  # that's sooner. Nil when the slot is too close for a reminder to help.
   def reminder_at
-    at = [created_at + 24.hours, period.start_at - 3.hours].min
+    created_at + REMIND_AFTER
+  end
 
-    at if at > Time.current
+  def expires_at
+    created_at + ANSWER_WITHIN
   end
 
   def offerer_display_name
@@ -42,7 +39,7 @@ class Offer < ApplicationRecord
   end
 
   def expired?
-    period.start_at < Time.current
+    expires_at <= Time.current
   end
 
   def status
@@ -55,16 +52,5 @@ class Offer < ApplicationRecord
     else
       "PENDING"
     end
-  end
-
-  private
-
-  # The chosen period drives the session time and the expiry job, so it must be
-  # a slot the request is actually offering right now.
-  def period_is_a_bookable_slot
-    return if period.nil? || pair_request.nil?
-
-    bookable = PairRequests::BookableSlots.call(pair_request).any? { |slot| slot.start_at == period.start_at }
-    errors.add(:period, "isn't one of this partner search's open slots") unless bookable
   end
 end

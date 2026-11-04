@@ -12,6 +12,6 @@ RSpec.describe "accept pair request offer", type: :system do
     click_link "See applications"
     click_button "Accept"
 
-    expect(page).to have_content("You just scheduled yourself a new pairing session. Happy pairin!")
+    expect(page).to have_content("Application accepted. Happy pairin!")
   end
 end
