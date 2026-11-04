@@ -1,4 +1,6 @@
 class OfferMailer < ApplicationMailer
+  include Unsubscribable
+
   before_action :set_offer
 
   def offer_received_email
@@ -12,6 +14,7 @@ class OfferMailer < ApplicationMailer
   def offer_expired_email
     @poster_name = @poster.name.presence || "The poster"
     @suggestions = PairRequests::Suggestions.call(@offer)
+    allow_unsubscribe(@offer.offerer, "suggestions")
 
     mail(to: @offer.offerer.email, subject: "No answer yet on #{@offer.pair_request.subject}")
   end
@@ -27,6 +30,7 @@ class OfferMailer < ApplicationMailer
 
   def search_filled_email
     @suggestions = PairRequests::Suggestions.call(@offer)
+    allow_unsubscribe(@offer.offerer, "suggestions")
 
     mail(to: @offer.offerer.email, subject: "An update on #{@offer.pair_request.subject}")
   end
@@ -76,5 +80,6 @@ class OfferMailer < ApplicationMailer
     @poster = @offer.pair_request.user
     @offerer_name = @offer.offerer_display_name
     @conversation_url = conversation_url(@offer)
+    @pause_url = request_pause_url(token: @offer.pair_request.generate_token_for(:pause))
   end
 end

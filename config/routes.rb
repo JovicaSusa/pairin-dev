@@ -68,6 +68,14 @@ Rails.application.routes.draw do
   get "check-ins/:token", to: "check_ins#show", as: :check_in
   post "check-ins/:token", to: "check_ins#create"
 
+  # No-login "Pause this search", reached from the emails about a search.
+  get "requests/pause/:token", to: "request_pauses#show", as: :request_pause
+  post "requests/pause/:token", to: "request_pauses#create"
+
+  # No-login unsubscribe from an optional email's footer and mail app.
+  get "unsubscribe/:category/:token", to: "unsubscribes#show", as: :unsubscribe
+  post "unsubscribe/:category/:token", to: "unsubscribes#create"
+
   # No-login "Turn it back on", reached from the request-paused email.
   get "requests/resume/:token", to: "request_resumptions#show", as: :request_resumption
   post "requests/resume/:token", to: "request_resumptions#create"

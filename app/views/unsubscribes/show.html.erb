@@ -1,0 +1,15 @@
+<% content_for :title, "Unsubscribe - Pairin" %>
+<% what = params[:category] == "suggestions" ? "suggested partner searches and weekly check-ins" : "announcements from Pairin" %>
+
+<div class="px-6 md:px-16 lg:px-24 py-16 md:py-20 max-w-2xl mx-auto">
+  <a href="<%= root_path %>" class="text-sm font-bold text-purple hover:underline">&larr; Back to Pairin</a>
+
+  <% if @user.opted_out_of?(params[:category]) %>
+    <h1 class="font-display font-extrabold text-4xl tracking-tight leading-none mt-6 mb-6">You're unsubscribed</h1>
+    <p class="text-gray-700">We won't send you <%= what %> any more. You'll still get emails about your own partner searches and conversations.</p>
+  <% else %>
+    <h1 class="font-display font-extrabold text-4xl tracking-tight leading-none mt-6 mb-6">Unsubscribe?</h1>
+    <p class="text-gray-700">We'll stop sending you <%= what %>. You'll still get emails about your own partner searches and conversations.</p>
+    <%= button_to "Unsubscribe", unsubscribe_path(category: params[:category], token: params[:token]), class: "mt-8 rounded-xl border-2 border-black bg-orange px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none" %>
+  <% end %>
+</div>

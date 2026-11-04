@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_04_260000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_270000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -194,6 +194,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_260000) do
     t.string "github_url"
     t.datetime "suspended_at"
     t.datetime "onboarding_skipped_at"
+    t.datetime "suggestions_opted_out_at"
+    t.datetime "announcements_opted_out_at"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["country"], name: "index_users_on_country"
     t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
