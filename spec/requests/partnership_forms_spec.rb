@@ -50,7 +50,7 @@ RSpec.describe "When a partnership forms", type: :request do
     it "doesn't email someone who was already told the poster went quiet" do
       waiting.update_columns(expiry_notified_at: 1.day.ago)
 
-      expect { form }.not_to have_enqueued_mail(OfferMailer, :search_filled_email)
+      expect { form }.not_to have_enqueued_mail(OfferMailer, :search_filled_email).with(params: { offer: waiting }, args: [])
       expect(waiting.reload).to be_ended
     end
 
@@ -60,6 +60,17 @@ RSpec.describe "When a partnership forms", type: :request do
       expect { form }.not_to have_enqueued_mail(OfferMailer, :search_filled_email)
       expect(waiting.reload).to be_ended
     end
+  end
+
+  it "emails someone in another open chat too, in words that fit" do
+    expect { form }
+      .to have_enqueued_mail(OfferMailer, :search_filled_email).with(params: { offer: talking }, args: []).once
+
+    body = OfferMailer.with(offer: talking.reload).search_filled_email.body.encoded
+    expect(body).to include("your conversation has ended")
+    expect(body).not_to include("your application won")
+
+    expect(OfferMailer.with(offer: waiting.reload).search_filled_email.body.encoded).to include("your application won")
   end
 
   describe "another open chat" do
@@ -77,7 +88,7 @@ RSpec.describe "When a partnership forms", type: :request do
       expect(props.dig("conversation", "messages").last).to include("from_pairin" => true, "mine" => false)
     end
 
-    it "doesn't get the polite email, and doesn't count the closing message as unread" do
+    it "doesn't count the closing message as unread" do
       sign_in(talking.offerer)
       get conversation_path(talking)
 
@@ -117,6 +128,15 @@ RSpec.describe "When a partnership forms", type: :request do
 
     expect(ended.reload.ended_at).to eq(at)
     expect(ended.ended_by).to eq(poster)
+  end
+
+  it "refuses an application that arrives once the search has closed" do
+    form
+    sign_in(create(:user))
+    answers = { message: "Hi", goal: "A goal", how_often: "once_a_week", how_long: "few_weeks" }
+
+    expect { post pair_request_offers_path(search), params: { offer: answers } }.not_to change(Offer, :count)
+    expect(flash[:alert]).to include("switched off")
   end
 
   it "stays Off: it can't be switched back on" do

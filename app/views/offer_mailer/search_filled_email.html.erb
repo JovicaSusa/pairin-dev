@@ -18,8 +18,12 @@
                   This one's taken, but others are looking
                 </h1>
                 <p style="margin: 0; line-height: 24px">
-                  "<strong><%= @offer.pair_request.subject %></strong>" has found its partner, so your application won't
-                  go any further. Thanks for applying. Your application didn't get a reply, and that's no reflection on you.
+                  "<strong><%= @offer.pair_request.subject %></strong>" has found its partner,
+                  <% if @offer.replied_at? %>
+                    so your conversation has ended. Thanks for talking, and you can still read what you wrote to each other.
+                  <% else %>
+                    so your application won't go any further. Thanks for applying, and it's no reflection on you.
+                  <% end %>
                 </p>
                 <% if @suggestions.any? %>
                   <p style="margin: 24px 0 8px; line-height: 24px; font-weight: 600">People looking for a partner right now:</p>
