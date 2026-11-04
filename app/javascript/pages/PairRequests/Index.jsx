@@ -5,10 +5,10 @@ import EmptyState from "@/components/EmptyState";
 import FilterForm from "@/components/FilterForm";
 import ApplyDrawer from "@/components/ApplyDrawer";
 import Card from "./Card";
-import { Head, router, usePage, InfiniteScroll } from "@inertiajs/react";
+import { Head, Link, router, usePage, InfiniteScroll } from "@inertiajs/react";
 import { SlidersHorizontal, SearchX } from "lucide-react";
 
-export default function Index({ pairRequests, filterOptions, filters, applicationOptions, needsLevel }) {
+export default function Index({ pairRequests, filterOptions, filters, applicationOptions, needsLevel, finishSetup }) {
   const { auth } = usePage().props;
   const currentUser = auth.user;
 
@@ -32,6 +32,15 @@ export default function Index({ pairRequests, filterOptions, filters, applicatio
           </Button>
         }
       />
+
+      {finishSetup && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-black bg-yellow-100 p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <p className="font-bold">Finish setting up to get matched.</p>
+          <Button asChild size="sm">
+            <Link href="/onboarding">Finish setting up</Link>
+          </Button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
       <aside className={`rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] lg:block ${filtersOpen ? "" : "hidden"}`}>

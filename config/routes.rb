@@ -41,6 +41,10 @@ Rails.application.routes.draw do
     end
   end
 
+  resource :onboarding, only: [:show, :create] do
+    post :skip
+  end
+
   resources :partners, only: [:index, :show, :update], controller: "partnerships" do
     post :end_partnership, on: :member
   end

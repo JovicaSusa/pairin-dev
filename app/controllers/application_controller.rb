@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
 
   # Back to the page that asked them to sign in, like a thread linked from an email.
   def after_sign_in_path_for(resource_or_scope)
-    stored_location_for(resource_or_scope) || pair_requests_path
+    stored_location_for(resource_or_scope) || (resource_or_scope.needs_onboarding? ? onboarding_path : pair_requests_path)
   end
 
   private

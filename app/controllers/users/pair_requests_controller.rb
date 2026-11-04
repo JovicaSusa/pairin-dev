@@ -1,6 +1,7 @@
 class Users::PairRequestsController < ApplicationController
   include Authenticated
   include Alba::Inertia::Controller
+  include SearchCards
 
   before_action :set_and_authorize_own_pair_request, only: [:pause, :resume]
 
@@ -10,7 +11,8 @@ class Users::PairRequestsController < ApplicationController
       .order(created_at: :desc)
 
     render inertia: 'Users/PairRequests/Index', props: {
-      pairRequests: PairRequestResource.new(@pair_requests)
+      pairRequests: PairRequestResource.new(@pair_requests),
+      matches: PairRequests::Matches.call(@pair_requests.first).map { |match| search_card(match) }
     }
   end
 

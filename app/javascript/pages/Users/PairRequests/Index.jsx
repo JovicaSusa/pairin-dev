@@ -1,11 +1,14 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ClipboardList } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import Card from './Card';
+import SearchCard from '@/pages/PairRequests/Card';
 
-export default function Index({ pairRequests }) {
+export default function Index({ pairRequests, matches = [] }) {
+  const { auth } = usePage().props;
+
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
       <Head title="Your partner searches" />
@@ -28,6 +31,15 @@ export default function Index({ pairRequests }) {
             <Link href="/users/pair_requests/new">Start a partner search</Link>
           </Button>
         </EmptyState>
+      )}
+
+      {matches.length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-4 text-2xl">People looking for the same thing</h2>
+          {matches.map((match) => (
+            <SearchCard key={match.id} pairRequest={match} currentUserId={auth.user.id} onApply={(search) => router.visit(`/pair_requests/${search.id}/offers/new`)} />
+          ))}
+        </section>
       )}
     </div>
   );

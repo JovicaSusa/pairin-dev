@@ -1,5 +1,6 @@
 class PairRequestsController < ApplicationController
   include Authenticated
+  include SearchCards
 
   def index
     base = PairRequest
@@ -14,16 +15,9 @@ class PairRequestsController < ApplicationController
 
     render inertia: 'PairRequests/Index', props: {
       filters: params[:q]&.compact_blank || {},
+      finishSetup: current_user.pair_requests.none?,
       pairRequests: InertiaRails.scroll(@pagy) {
-        page.map { |pair_request|
-          pair_request.as_json(
-            methods: [:commitment_label],
-            include: {
-              tags: { only: [:id, :name] },
-              offers: { only: [:offerer_id] }
-            }
-          ).merge("user" => pair_request.user.profile_for_others.merge(id: pair_request.user_id, name: pair_request.user.name))
-        }
+        page.map { |pair_request| search_card(pair_request) }
       },
       applicationOptions: InertiaRails.once { Offer.form_options },
       needsLevel: current_user.level.blank?,
