@@ -4,15 +4,18 @@ class User < ApplicationRecord
   LEVELS = %w(expert proficient competent advanced_beginner novice).freeze
   # Not legal advice: see the "Minimum-age requirements for Pairin" research.
   MINIMUM_AGE = 16
+  # How long a suspended account can be put right before it's deleted.
+  SUSPENSION_GRACE_PERIOD = 14.days
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :confirmable
 
-  has_many :pair_requests, dependent: :destroy # TODO: Reconsider dependent option
-  has_many :offers, foreign_key: :offerer_id, dependent: nil # TODO: Reconsider dependent option
-  has_many :participations, foreign_key: :participant_id, dependent: nil # TODO: Reconsider dependent option
+  has_many :pair_requests, dependent: :destroy
+  has_many :offers, foreign_key: :offerer_id, dependent: :destroy
+  has_many :participations, foreign_key: :participant_id, dependent: :destroy
+  has_many :activities, foreign_key: :receiver_id, dependent: :destroy, inverse_of: :receiver
   has_many :sessions, through: :participations, source: :participable, source_type: Session.name
   has_many :availability_windows, dependent: :destroy
 
@@ -29,6 +32,30 @@ class User < ApplicationRecord
   validates :timezone, inclusion: { in: TIMEZONES, message: "isn't a known timezone" }, if: :timezone_changed?
   # Signup sends whatever the browser reports; an unknown zone shouldn't block the account.
   before_validation(on: :create) { self.timezone = "UTC" unless TIMEZONES.include?(timezone) }
+
+  scope :suspended_past_grace_period, -> { where(suspended_at: ..SUSPENSION_GRACE_PERIOD.ago) }
+
+  # Their searches go Off straight away, so nobody sees them during the grace
+  # period. The date they gave isn't kept.
+  def suspend!
+    transaction do
+      update_columns(suspended_at: Time.current)
+      pair_requests.switched_on.find_each(&:switch_off!)
+    end
+  end
+
+  def suspended?
+    suspended_at?
+  end
+
+  # Devise checks these on every request, so this also ends any other open session.
+  def active_for_authentication?
+    super && !suspended?
+  end
+
+  def inactive_message
+    suspended? ? :suspended : super
+  end
 
   def level_titleized
     level&.titleize

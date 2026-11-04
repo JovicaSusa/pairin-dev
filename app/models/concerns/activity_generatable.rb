@@ -4,7 +4,7 @@ module ActivityGeneratable
   extend ActiveSupport::Concern
 
   included do
-    after_commit :generate_activities
+    after_commit :generate_activities, on: [:create, :update]
   end
 
   private
