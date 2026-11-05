@@ -7,6 +7,8 @@ RSpec.describe "date of birth for existing users", type: :system do
     visit pair_requests_path
 
     expect(page).to have_content("Your date of birth")
+    # On what's shown, because the page's data has timestamps that can contain "16".
+    expect(page).not_to have_content(/\b16\b|minimum age/i)
     fill_in "Date of birth", with: Date.new(1990, 6, 15)
     click_button "Continue"
 
