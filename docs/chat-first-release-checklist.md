@@ -8,7 +8,7 @@ Merging `chat-first` to `main` deploys it, so do these in order.
 - [ ] SPF and DMARC are in place (#153), and `hello@pairin.dev` and `reports@pairin.dev` reach you.
 - [ ] Mailjet click tracking is still off.
 - [ ] The homepage no longer advertises "Go live" and instant matching.
-- [ ] Terms and privacy no longer mention retros and Session Summaries.
+- [ ] Terms and privacy no longer mention retros and Session Summaries, and their "Last updated" date is the day you merge.
 - [ ] The launch email (#152) is written and approved.
 - [ ] Back up the database:
 
