@@ -1,5 +1,11 @@
-<p>Welcome <%= @email %>!</p>
-
-<p>You can confirm your account email through the link below:</p>
-
-<p><%= link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token) %></p>
+<%= render layout: "devise/mailer/frame", locals: { heading: "Confirm your email", preheader: "One click to confirm this address for your Pairin account." } do %>
+  <p style="margin: 0; line-height: 24px">
+    Confirm this address to use it with your Pairin account.
+  </p>
+  <p style="margin: 32px 0; text-align: center">
+    <a href="<%= confirmation_url(@resource, confirmation_token: @token) %>" style="display: inline-block; border: 2px solid #000001; border-radius: 12px; background-color: #FF8B37; padding: 12px 24px; font-weight: 600; color: #000001; text-decoration: none">Confirm email</a>
+  </p>
+  <p style="margin: 0; font-size: 14px; line-height: 20px; color: #475569">
+    If you didn't ask for this, you can ignore this email.
+  </p>
+<% end %>

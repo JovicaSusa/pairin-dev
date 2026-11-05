@@ -1,24 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
 
-export default function FilterForm({ tags, userLevels, languages, filters = {}, onSubmit }) {
+export default function FilterForm({ tags, commitments, userLevels, languages, filters = {}, onSubmit }) {
   const [form, setForm] = useState({
     tags_name_eq: filters.tags_name_eq || "",
-    duration_eq: filters.duration_eq || "",
+    commitment_eq: filters.commitment_eq || "",
     user_level_eq: filters.user_level_eq || "",
     user_language_eq: filters.user_language_eq || "",
-    available_from: filters.available_from || "",
-    available_to: filters.available_to || "",
   });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
 
   const handleSelectChange = (name, value) => {
     setForm({ ...form, [name]: value });
@@ -34,13 +25,13 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
       <p className="font-headline font-bold text-sm">Refine your search</p>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4">
       <div>
-        <Label htmlFor="tags_name_eq" className="block mb-1">
+        <Label htmlFor="filter_tags" className="block mb-1">
           Tags
         </Label>
         <Select value={form.tags_name_eq} onValueChange={(val) => handleSelectChange("tags_name_eq", val)}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="filter_tags" className="w-full">
             <SelectValue placeholder="Select tag" />
           </SelectTrigger>
           <SelectContent>
@@ -52,25 +43,25 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div>
-        <Label htmlFor="duration_eq" className="block mb-1">
-          Duration
-        </Label>
-        <Input
-          type="number"
-          id="duration_eq"
-          name="duration_eq"
-          value={form.duration_eq}
-          onChange={handleChange}
-          placeholder="Duration in minutes"
-        />
+        <Label htmlFor="filter_commitment" className="block mb-1">Commitment</Label>
+        <Select value={form.commitment_eq} onValueChange={(val) => handleSelectChange("commitment_eq", val)}>
+          <SelectTrigger id="filter_commitment" className="w-full">
+            <SelectValue placeholder="Select commitment" />
+          </SelectTrigger>
+          <SelectContent>
+            {commitments.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>{label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div>
-        <Label htmlFor="user_level_eq" className="block mb-1">
+        <Label htmlFor="filter_level" className="block mb-1">
           User level
         </Label>
         <Select value={form.user_level_eq} onValueChange={(val) => handleSelectChange("user_level_eq", val)}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="filter_level" className="w-full">
             <SelectValue placeholder="Select level" />
           </SelectTrigger>
           <SelectContent>
@@ -82,11 +73,11 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
       </div>
 
       <div>
-        <Label htmlFor="user_language_eq" className="block mb-1">
+        <Label htmlFor="filter_language" className="block mb-1">
           User language
         </Label>
         <Select value={form.user_language_eq} onValueChange={(val) => handleSelectChange("user_language_eq", val)}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="filter_language" className="w-full">
             <SelectValue placeholder="Select language" />
           </SelectTrigger>
           <SelectContent>
@@ -97,29 +88,11 @@ export default function FilterForm({ tags, userLevels, languages, filters = {}, 
         </Select>
       </div>
 
-      <div>
-        <Label className="block mb-1">Free from</Label>
-        <DatePicker
-          value={form.available_from}
-          onChange={(v) => setForm({ ...form, available_from: v })}
-          placeholder="Pick a start date"
-        />
-      </div>
-
-      <div>
-        <Label className="block mb-1">Free until</Label>
-        <DatePicker
-          value={form.available_to}
-          onChange={(v) => setForm({ ...form, available_to: v })}
-          placeholder="Pick an end date"
-        />
-      </div>
-
       </div>
 
       <div className="flex justify-end">
         <Button type="submit" size="lg">
-          Search
+          Show results
         </Button>
       </div>
     </form>

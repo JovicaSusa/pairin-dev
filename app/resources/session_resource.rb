@@ -29,12 +29,7 @@ class SessionResource < ApplicationResource
     other = session.other_participant(params[:current_user])
     
     if other
-      {
-        name: other.name,
-        image_url: other.image_url,
-        profession: other.profession,
-        level: other.level&.titlecase
-      }
+      other.profile_for_others.slice(:name, :image_url, :profession, :level)
     end
   end
 end

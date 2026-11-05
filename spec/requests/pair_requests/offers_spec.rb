@@ -1,40 +1,208 @@
 require 'rails_helper'
 
 RSpec.describe "PairRequests::Offers", type: :request do
-  # Monday 2 Nov 2026, 08:00 UTC. The factory poster is free every hour, in UTC,
-  # so with 60-minute calls the first open slot is 11:00 (3 hours' notice).
+  # Monday 2 Nov 2026, 08:00 UTC.
   around { |example| travel_to(Time.utc(2026, 11, 2, 8, 0)) { example.run } }
 
   let(:offerer) { create(:user) }
-  let(:pair_request) { create(:pair_request, duration: 60) }
-  let(:slot_start) { Time.utc(2026, 11, 2, 11, 0) }
+  let(:pair_request) { create(:pair_request) }
 
   before { sign_in(offerer) }
 
-  describe "GET /pair_requests/:pair_request_id/offers/new" do
-    it "offers the request's bookable slots in the offerer's timezone" do
-      offerer.update!(timezone: "Asia/Tokyo")
+  describe "GET /pair_requests/:pair_request_id/offers" do
+    it "sends the poster each applicant's GitHub link" do
+      offerer.update!(github_url: "https://github.com/ada")
+      create(:offer, pair_request:, offerer:)
+      sign_in(pair_request.user)
 
-      get new_pair_request_offer_path(pair_request)
+      get pair_request_offers_path(pair_request)
 
       props = JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]
-      expect(props["timezone"]).to eq("Asia/Tokyo")
-      expect(props["slots"].first).to eq("start_at" => "2026-11-02T11:00:00Z", "end_at" => "2026-11-02T12:00:00Z")
-      expect(props["slots"].size).to eq(pair_request.bookable_slots.size)
+      expect(props["offers"].first.dig("offerer", "github_url")).to eq("https://github.com/ada")
+    end
+  end
+
+  describe "what the poster sees" do
+    it "sends each applicant's answers and level, next to the search's commitment" do
+      search = create(:pair_request, commitment: "open_ended")
+      applicant = create(:user, level: "competent")
+      create(:offer, pair_request: search, offerer: applicant, goal: "Ship a project", how_often: "twice_a_week", how_long: "few_weeks")
+      sign_in(search.user)
+
+      get pair_request_offers_path(search)
+
+      props = JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]
+      expect(props["commitmentLabel"]).to eq("Open-ended")
+      expect(props["offers"].first).to include("goal" => "Ship a project", "how_often_label" => "Twice a week", "how_long_label" => "A few weeks")
+      expect(props["offers"].first.dig("offerer", "level")).to eq("Competent")
+    end
+  end
+
+  describe "GET /pair_requests/:pair_request_id/offers/new" do
+    def props
+      JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]
+    end
+
+    it "asks for no time" do
+      get new_pair_request_offer_path(pair_request)
+
+      expect(props).not_to include("slots")
+      expect(props.dig("pairRequest", "commitment_label")).to eq("1–3 months")
+    end
+
+    it "asks for a level only when the profile has none" do
+      get new_pair_request_offer_path(pair_request)
+      expect(props["needsLevel"]).to be(false)
+
+      offerer.update!(level: nil)
+      get new_pair_request_offer_path(pair_request)
+      expect(props["needsLevel"]).to be(true)
     end
   end
 
   describe "POST /pair_requests/:pair_request_id/offers" do
-    def post_offer(start_at = slot_start)
-      post pair_request_offers_path(pair_request), params: { offer: { message: "Let's pair!", start_at: start_at&.iso8601 } }
+    let(:answers) { { message: "Let's pair!", goal: "Finish a course", how_often: "twice_a_week", how_long: "few_weeks" } }
+
+    def post_offer(extra = {})
+      post pair_request_offers_path(pair_request), params: { offer: answers.merge(extra) }
     end
 
-    it "books the slot as the offer's own period" do
-      expect { post_offer }.to change(Offer, :count).by(1)
+    describe "the limit for new accounts" do
+      let(:offerer) { create(:user, created_at: 6.days.ago) }
 
-      period = Offer.last.period
-      expect(period.periodable).to eq(Offer.last)
-      expect([period.start_at, period.end_at]).to eq([slot_start, slot_start + 1.hour])
+      before { create_list(:offer, 5, offerer:) }
+
+      it "stops a sixth application within a day, with a clear message and no emails" do
+        expect { post_offer }
+          .to not_change(Offer, :count)
+          .and not_have_enqueued_mail(OfferMailer, :offer_received_email)
+
+        expect(flash[:alert]).to include("5 applications a day")
+      end
+
+      it "allows more once a day has passed" do
+        travel 1.day + 1.minute
+
+        expect { post_offer }.to change(Offer, :count).by(1)
+      end
+
+      it "stops applying at 7 days old" do
+        offerer.update!(created_at: 7.days.ago + 1.minute)
+
+        expect { post_offer }.not_to change(Offer, :count)
+      end
+
+      it "doesn't apply to an account older than 7 days" do
+        offerer.update!(created_at: 7.days.ago - 1.minute)
+
+        expect { post_offer }.to change(Offer, :count).by(1)
+      end
+    end
+
+    it "lets a new account send its fifth application" do
+      offerer.update!(created_at: 1.day.ago)
+      create_list(:offer, 4, offerer:)
+
+      expect { post_offer }.to change(Offer, :count).by(1)
+    end
+
+    it "saves the answers" do
+      post_offer
+
+      expect(Offer.last).to have_attributes(goal: "Finish a course", how_often: "twice_a_week", how_long: "few_weeks")
+    end
+
+    shared_examples "a refused application" do |field|
+      it "saves nothing and reports #{field}" do
+        expect { post_offer(field => "") }.not_to change(Offer, :count)
+
+        expect(session[:inertia_errors]).to include(field)
+      end
+    end
+
+    it_behaves_like "a refused application", :goal
+    it_behaves_like "a refused application", :how_often
+    it_behaves_like "a refused application", :how_long
+    it_behaves_like "a refused application", :message
+
+    it "refuses an unknown option instead of raising" do
+      expect { post_offer(how_often: "daily") }.not_to change(Offer, :count)
+
+      expect(session[:inertia_errors]).to include(:how_often)
+    end
+
+    context "when the applicant's profile has no level" do
+      before { offerer.update!(level: nil) }
+
+      it "refuses without one" do
+        expect { post_offer }.not_to change(Offer, :count)
+
+        expect(session[:inertia_errors]).to include(:level)
+      end
+
+      it "saves the level given on the form to their profile" do
+        expect { post_offer(level: "competent") }.to change(Offer, :count).by(1)
+
+        expect(offerer.reload.level).to eq("competent")
+      end
+
+      it "refuses an unknown level and doesn't save it" do
+        expect { post_offer(level: "wizard") }.not_to change(Offer, :count)
+
+        expect(offerer.reload.level).to be_nil
+      end
+    end
+
+    it "ignores a level sent by someone who already has one" do
+      post_offer(level: "expert")
+
+      expect(offerer.reload.level).to eq("novice")
+    end
+
+    it "goes back to the filtered list from the drawer" do
+      list = pair_requests_url(q: { commitment_eq: "open_ended" })
+
+      post pair_request_offers_path(pair_request), params: { offer: answers }, headers: { "HTTP_REFERER" => list }
+
+      expect(response).to redirect_to(list)
+    end
+
+    it "goes to the list when the referer can't be read, and still saves" do
+      expect {
+        post pair_request_offers_path(pair_request), params: { offer: answers }, headers: { "HTTP_REFERER" => "not a url" }
+      }.to change(Offer, :count).by(1)
+
+      expect(response).to redirect_to(pair_requests_path)
+    end
+
+    it "says so when they've already applied" do
+      post_offer
+
+      expect { post_offer }.not_to change(Offer, :count)
+
+      expect(response).to redirect_to(pair_requests_path)
+      expect(flash[:alert]).to eq("You've already applied to this partner search.")
+    end
+
+    it "goes to the list from the full form page" do
+      post pair_request_offers_path(pair_request), params: { offer: answers }, headers: { "HTTP_REFERER" => new_pair_request_offer_url(pair_request) }
+
+      expect(response).to redirect_to(pair_requests_path)
+    end
+
+    it "saves the application with no time, and schedules no session" do
+      expect { post_offer }
+        .to change(Offer, :count).by(1)
+        .and not_change(Period, :count)
+        .and not_change(Session, :count)
+
+      expect(Offer.last.period).to be_nil
+    end
+
+    it "ignores a time sent anyway" do
+      post pair_request_offers_path(pair_request), params: { offer: answers.merge(start_at: 1.day.from_now.iso8601) }
+
+      expect(Offer.last.period).to be_nil
     end
 
     it "emails the request's poster about the offer" do
@@ -44,51 +212,18 @@ RSpec.describe "PairRequests::Offers", type: :request do
         .exactly(:once)
     end
 
-    it "tells the offerer the poster has been emailed and what happens next" do
+    it "tells the offerer the poster has been emailed" do
       post_offer
 
       expect(flash[:notice]).to include("emailed")
-      expect(flash[:notice]).to include("If they don't respond")
     end
 
-    shared_examples "a refused booking" do
-      it "rejects the offer and schedules nothing" do
-        expect { post_offer(start_at) }
-          .to not_change(Offer, :count)
-          .and not_change(Period, :count)
-          .and not_have_enqueued_job(OfferExpiryJob)
+    it "needs a message" do
+      expect { post_offer(message: "") }
+        .to not_change(Offer, :count)
+        .and not_have_enqueued_job(OfferExpiryJob)
 
-        expect(session[:inertia_errors]).to include(:period)
-      end
-    end
-
-    context "with a time between slots" do
-      let(:start_at) { slot_start + 30.minutes }
-
-      it_behaves_like "a refused booking"
-    end
-
-    context "with a time inside the 3-hour notice" do
-      let(:start_at) { Time.utc(2026, 11, 2, 10, 0) }
-
-      it_behaves_like "a refused booking"
-    end
-
-    context "with no time at all" do
-      let(:start_at) { nil }
-
-      it_behaves_like "a refused booking"
-    end
-
-    context "with a slot the poster is already in a session for" do
-      let(:start_at) { slot_start }
-
-      before do
-        create(:session, sessionable: create(:pair_request, user: pair_request.user),
-          start_at: slot_start + 15.minutes, end_at: slot_start + 45.minutes)
-      end
-
-      it_behaves_like "a refused booking"
+      expect(session[:inertia_errors]).to include(:message)
     end
 
     context "when the request is switched off" do
@@ -100,48 +235,25 @@ RSpec.describe "PairRequests::Offers", type: :request do
           .and not_have_enqueued_mail(OfferMailer, :offer_received_email)
 
         expect(response).to redirect_to(pair_requests_path)
-        expect(flash[:alert]).to eq("This request is switched off and isn't taking offers right now.")
+        expect(flash[:alert]).to eq("This partner search is switched off and isn't taking applications right now.")
       end
 
       it "doesn't show the offer form either" do
         get new_pair_request_offer_path(pair_request)
 
         expect(response).to redirect_to(pair_requests_path)
-        expect(flash[:alert]).to eq("This request is switched off and isn't taking offers right now.")
+        expect(flash[:alert]).to eq("This partner search is switched off and isn't taking applications right now.")
       end
     end
 
-    describe "scheduling the offer's expiry" do
-      it "checks the offer when its slot starts, even when it's too close for a reminder" do
-        expect { post_offer }
-          .to have_enqueued_job(OfferExpiryJob).with(an_instance_of(Offer)).at(slot_start).exactly(:once)
-      end
+    it "checks for an answer 72 hours later" do
+      expect { post_offer }
+        .to have_enqueued_job(OfferExpiryJob).with(an_instance_of(Offer)).at(72.hours.from_now).exactly(:once)
     end
 
-    describe "scheduling the poster's reminder" do
-      context "when the slot is days away" do
-        let(:slot_start) { 3.days.from_now }
-
-        it "reminds the poster 24 hours after the offer" do
-          expect { post_offer }
-            .to have_enqueued_job(OfferReminderJob).with(an_instance_of(Offer)).at(24.hours.from_now).exactly(:once)
-        end
-      end
-
-      context "when the slot is sooner than 27 hours away" do
-        let(:slot_start) { 10.hours.from_now }
-
-        it "reminds the poster 3 hours before the slot" do
-          expect { post_offer }
-            .to have_enqueued_job(OfferReminderJob).with(an_instance_of(Offer)).at(7.hours.from_now).exactly(:once)
-        end
-      end
-
-      context "when the slot is just 3 hours away" do
-        it "schedules no reminder" do
-          expect { post_offer }.not_to have_enqueued_job(OfferReminderJob)
-        end
-      end
+    it "reminds the poster 24 hours later" do
+      expect { post_offer }
+        .to have_enqueued_job(OfferReminderJob).with(an_instance_of(Offer)).at(24.hours.from_now).exactly(:once)
     end
   end
 end

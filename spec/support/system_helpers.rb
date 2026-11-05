@@ -15,6 +15,8 @@ module SystemHelpers
 
   def select_option!(trigger_label, option_text)
     click_button trigger_label
+    # The list highlights an option once it has opened. Before that it can still jump.
+    expect(page).to have_css('[role="option"][data-highlighted]')
     find('[role="option"]', text: option_text, exact_text: true).click
     expect(page).to have_button(option_text)
     expect(page).not_to have_css('[role="listbox"]')

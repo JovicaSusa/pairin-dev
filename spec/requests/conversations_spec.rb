@@ -1,0 +1,539 @@
+require "rails_helper"
+
+RSpec.describe "Conversations", type: :request do
+  let(:poster) { create(:user, name: "Maya") }
+  let(:applicant) { create(:user, name: "Sam") }
+  let(:search) { create(:pair_request, user: poster) }
+  let!(:offer) { create(:offer, pair_request: search, offerer: applicant, message: "Hi Maya!") }
+
+  def props
+    JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]
+  end
+
+  def reply(body = "Great to meet you")
+    post conversation_messages_path(offer), params: { message: { body: } }
+  end
+
+  describe "the application's message" do
+    it "is the first message of the thread" do
+      sign_in(poster)
+
+      get conversation_path(offer)
+
+      expect(props.dig("conversation", "messages").map { |m| m["body"] }).to eq(["Hi Maya!"])
+    end
+  end
+
+  describe "before the poster replies" do
+    it "doesn't let the applicant write more" do
+      sign_in(applicant)
+
+      expect { reply("One more thing") }.not_to change(Message, :count)
+
+      expect(flash[:alert]).to be_present
+      expect(offer.reload.replied_at).to be_nil
+    end
+
+    it "tells each person where they stand" do
+      sign_in(applicant)
+      get conversation_path(offer)
+      expect(props["conversation"]).to include("status" => "Sent", "can_send" => false, "chat_open" => false)
+
+      sign_in(poster)
+      get conversation_path(offer)
+      expect(props["conversation"]).to include("status" => "Reply", "can_send" => true, "chat_open" => false)
+    end
+  end
+
+  describe "a late reply" do
+    before { sign_in(poster) }
+
+    it "still opens the chat and emails the applicant, after the search went Off" do
+      search.switch_off!
+      travel_to(offer.expires_at + 1.day)
+
+      expect { reply }
+        .to have_enqueued_mail(OfferMailer, :late_reply_email).with(params: { offer: }, args: []).once
+
+      expect(offer.reload).to be_chat_open
+      expect(search.reload).to be_paused
+    end
+
+    it "only sends that email for the first reply" do
+      travel_to(offer.expires_at + 1.day)
+      reply
+
+      expect { reply("And another thing") }.not_to have_enqueued_mail(OfferMailer, :late_reply_email)
+    end
+
+    it "isn't sent for a reply in time" do
+      expect { reply }.not_to have_enqueued_mail(OfferMailer, :late_reply_email)
+    end
+
+    it "isn't sent when the reply is refused" do
+      travel_to(offer.expires_at + 1.day)
+
+      expect { reply("") }.not_to have_enqueued_mail(OfferMailer, :late_reply_email)
+      expect(offer.reload).to be_overdue
+    end
+
+    it "keeps a conversation that's open from timing out" do
+      reply
+      travel_to(offer.expires_at + 30.days)
+
+      sign_in(poster)
+      expect { reply("Still here") }.to change(offer.messages, :count).by(1)
+      expect(offer.reload).to be_chat_open
+    end
+  end
+
+  describe "scheduling the unread email" do
+    it "checks 15 minutes after each message, for the other person" do
+      sign_in(poster)
+
+      freeze_time do
+        expect { reply }
+          .to have_enqueued_job(UnreadMessagesEmailJob).with(offer, applicant).at(15.minutes.from_now).once
+      end
+    end
+
+    it "isn't scheduled by a new application, which has its own email" do
+      expect { create(:offer, pair_request: search) }.not_to have_enqueued_job(UnreadMessagesEmailJob)
+    end
+
+    it "isn't scheduled by a late reply, which has its own email" do
+      sign_in(poster)
+      travel_to(offer.expires_at + 1.day)
+
+      expect { reply }.not_to have_enqueued_job(UnreadMessagesEmailJob)
+    end
+
+    it "isn't scheduled by a refused message" do
+      sign_in(applicant)
+
+      expect { reply("Too soon") }.not_to have_enqueued_job(UnreadMessagesEmailJob)
+    end
+  end
+
+  describe "the message limit" do
+    before do
+      sign_in(poster)
+      stub_const("User::MESSAGES_PER_HOUR", 2)
+      offer.post_message(poster, "One")
+      offer.post_message(poster, "Two")
+    end
+
+    it "stops the next message, with a clear message and no email scheduled" do
+      expect { reply("Three") }
+        .to not_change(Message, :count)
+        .and not_have_enqueued_job(UnreadMessagesEmailJob)
+
+      expect(flash[:alert]).to include("2 messages in the last hour")
+    end
+
+    it "allows more once the hour has passed" do
+      travel 1.hour + 1.minute
+
+      expect { reply("Three") }.to change(Message, :count).by(1)
+    end
+
+    it "counts messages across every conversation" do
+      other = create(:offer, pair_request: create(:pair_request, user: poster))
+
+      expect { post conversation_messages_path(other), params: { message: { body: "Hi" } } }.not_to change(Message, :count)
+    end
+
+    it "doesn't limit the other person" do
+      sign_in(applicant)
+
+      expect { reply("Hi") }.to change(Message, :count).by(1)
+    end
+  end
+
+  it "starts the message limit at 60 an hour" do
+    expect(User::MESSAGES_PER_HOUR).to eq(60)
+  end
+
+  describe "the poster's first reply" do
+    before do
+      sign_in(poster)
+      reply
+    end
+
+    it "opens the chat for both people, without any commitment" do
+      expect(offer.reload).to be_chat_open
+      expect(offer).not_to be_accepted
+
+      sign_in(applicant)
+      get conversation_path(offer)
+      expect(props["conversation"]).to include("status" => "Talking", "can_send" => true, "chat_open" => true)
+    end
+
+    it "lets the applicant write back" do
+      sign_in(applicant)
+
+      expect { reply("Thanks!") }.to change(offer.messages, :count).by(1)
+    end
+  end
+
+  it "keeps the first reply time when the poster writes again" do
+    sign_in(poster)
+    reply
+    first = offer.reload.replied_at
+
+    travel 1.hour do
+      reply("And another thing")
+    end
+
+    expect(offer.reload.replied_at).to eq(first)
+  end
+
+  it "refuses an empty message and a very long one" do
+    sign_in(poster)
+
+    expect { reply("") }.not_to change(Message, :count)
+    expect(session[:inertia_errors]).to include(:body)
+
+    expect { reply("x" * (Message::MAX_LENGTH + 1)) }.not_to change(Message, :count)
+    expect(offer.reload.replied_at).to be_nil
+  end
+
+  describe "who can read and write" do
+    let(:stranger) { create(:user) }
+
+    before { sign_in(stranger) }
+
+    it "hides a thread from anyone else" do
+      get conversation_path(offer)
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "doesn't let anyone else write or end it" do
+      expect { reply("Hello?") }.not_to change(Message, :count)
+      expect(response).to have_http_status(:not_found)
+
+      sign_in(stranger)
+      post not_a_match_conversation_path(offer)
+      expect(response).to have_http_status(:not_found)
+      expect(offer.reload).not_to be_ended
+    end
+
+    it "doesn't list it" do
+      get conversations_path
+
+      expect(props["conversations"]).to be_empty
+    end
+  end
+
+  describe "live signals and unread counts" do
+    it "signals both people when someone writes" do
+      sign_in(poster)
+
+      expect { reply }
+        .to have_broadcasted_to(applicant).from_channel(ConversationsChannel).with(conversation_id: offer.id)
+        .and have_broadcasted_to(poster).from_channel(ConversationsChannel).with(conversation_id: offer.id)
+    end
+
+    it "signals both people when a conversation ends" do
+      sign_in(poster)
+
+      expect { post not_a_match_conversation_path(offer) }
+        .to have_broadcasted_to(applicant).from_channel(ConversationsChannel)
+    end
+
+    it "signals the poster about a new application" do
+      expect { create(:offer, pair_request: search) }
+        .to have_broadcasted_to(poster).from_channel(ConversationsChannel)
+    end
+
+    it "counts the other person's unread messages, not your own" do
+      sign_in(poster)
+      get conversations_path
+
+      expect(props["unreadMessages"]).to eq(1)
+      expect(props["conversations"].first["unread"]).to eq(1)
+
+      sign_in(applicant)
+      get conversations_path
+
+      expect(props["unreadMessages"]).to eq(0)
+    end
+
+    it "clears them when the conversation is opened, and counts new ones after" do
+      sign_in(poster)
+      get conversation_path(offer)
+
+      expect(props["unreadMessages"]).to eq(0)
+      expect(props["conversations"].first["unread"]).to eq(0)
+
+      travel 1.minute do
+        offer.messages.create!(sender: applicant, body: "One more")
+
+        get conversations_path
+
+        expect(props["unreadMessages"]).to eq(1)
+      end
+    end
+
+    it "keeps each person's read position separate" do
+      sign_in(applicant)
+      get conversation_path(offer)
+
+      sign_in(poster)
+      get conversations_path
+
+      expect(props["unreadMessages"]).to eq(1)
+    end
+
+    it "adds up across conversations, on any page" do
+      create(:offer, pair_request: search)
+      sign_in(poster)
+
+      get activities_path
+
+      expect(props["unreadMessages"]).to eq(2)
+    end
+
+    it "keeps other people's messages out of everyone else's count" do
+      sign_in(create(:user))
+
+      get conversations_path
+
+      expect(props["unreadMessages"]).to eq(0)
+    end
+  end
+
+  describe "blocking" do
+    def listed(viewer)
+      sign_in(viewer)
+      get pair_requests_path
+      props["pairRequests"].map { |request| request["id"] }
+    end
+
+    before do
+      sign_in(applicant)
+    end
+
+    it "ends the chat for both, and tells the blocked person nothing" do
+      offer.post_message(poster, "Hello")
+
+      expect { post block_conversation_path(offer) }
+        .to have_broadcasted_to(poster).from_channel(ConversationsChannel)
+        .and not_have_enqueued_mail(OfferMailer, :not_a_match_email)
+
+      expect(offer.reload).to be_ended
+      expect(Block.find_by(blocker: applicant, blocked: poster)).to be_present
+
+      follow_redirect! # Uses up the blocker's own confirmation, which this one session would otherwise carry over.
+      sign_in(poster)
+      get conversation_path(offer)
+      expect(props["conversation"]).to include("status" => "Ended", "ended_by_viewer" => false, "can_send" => false)
+      expect(response.body).not_to match(/blocked/i)
+    end
+
+    it "ends every other conversation between them" do
+      other = create(:offer, pair_request: create(:pair_request, user: applicant), offerer: poster)
+
+      post block_conversation_path(offer)
+
+      expect(other.reload).to be_ended
+    end
+
+    it "leaves their conversations with other people alone" do
+      unrelated = create(:offer, pair_request: search)
+
+      post block_conversation_path(offer)
+
+      expect(unrelated.reload).not_to be_ended
+    end
+
+    it "hides each person's searches from the other, and no one else's" do
+      theirs = search
+      mine = create(:pair_request, user: applicant)
+      someone_elses = create(:pair_request)
+
+      post block_conversation_path(offer)
+
+      expect(listed(applicant)).to contain_exactly(someone_elses.id)
+      expect(listed(poster)).not_to include(mine.id)
+      expect(listed(create(:user))).to include(theirs.id, mine.id)
+    end
+
+    it "stops either person applying, with the same answer as a switched-off search" do
+      mine = create(:pair_request, user: applicant)
+      post block_conversation_path(offer)
+
+      sign_in(poster)
+      answers = { message: "Hi", goal: "A goal", how_often: "once_a_week", how_long: "few_weeks" }
+
+      expect { post pair_request_offers_path(mine), params: { offer: answers } }.not_to change(Offer, :count)
+      expect(flash[:alert]).to eq("This partner search is switched off and isn't taking applications right now.")
+
+      get new_pair_request_offer_path(mine)
+      expect(response).to redirect_to(pair_requests_path)
+    end
+
+    it "leaves them out of suggestions" do
+      blocker_search = create(:pair_request, user: applicant)
+      dead = create(:offer, offerer: poster)
+      post block_conversation_path(offer)
+
+      expect(PairRequests::Suggestions.call(dead)).not_to include(blocker_search)
+    end
+
+    it "stops the unread email" do
+      offer.post_message(poster, "Hello")
+      post block_conversation_path(offer)
+      travel 20.minutes
+
+      expect { UnreadMessagesEmailJob.perform_now(offer, applicant) }
+        .not_to have_enqueued_mail(OfferMailer, :unread_messages_email)
+    end
+
+    it "can be done twice without trouble" do
+      post block_conversation_path(offer)
+
+      expect { post block_conversation_path(offer) }.not_to change(Block, :count)
+    end
+
+    it "can't be used on someone else's conversation" do
+      sign_in(create(:user))
+
+      post block_conversation_path(offer)
+
+      expect(response).to have_http_status(:not_found)
+      expect(Block.count).to eq(0)
+    end
+  end
+
+  describe "reporting" do
+    it "emails the team, tells the reporter, and tells the other person nothing" do
+      sign_in(poster)
+
+      expect { post report_conversation_path(offer), params: { reason: "They were rude" } }
+        .to have_enqueued_mail(ReportMailer, :chat_report).with(params: { offer:, reporter: poster, reason: "They were rude" }, args: []).once
+
+      expect(flash[:notice]).to include("Thanks")
+      expect(offer.reload).not_to be_ended
+    end
+
+    it "works for the applicant, and on an ended chat" do
+      offer.not_a_match!(by: poster)
+      sign_in(applicant)
+
+      expect { post report_conversation_path(offer), params: { reason: "They were rude" } }
+        .to have_enqueued_mail(ReportMailer, :chat_report).once
+    end
+
+    it "needs a reason" do
+      sign_in(poster)
+
+      expect { post report_conversation_path(offer), params: { reason: "   " } }
+        .not_to have_enqueued_mail(ReportMailer, :chat_report)
+
+      expect(session[:inertia_errors]).to include(:reason)
+    end
+
+    it "can't be used by anyone outside the chat" do
+      sign_in(create(:user))
+
+      expect { post report_conversation_path(offer), params: { reason: "Hm" } }
+        .not_to have_enqueued_mail(ReportMailer, :chat_report)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "the list" do
+    it "shows each person the other, a status and the newest first" do
+      older = create(:offer, pair_request: create(:pair_request, user: create(:user, name: "Tom")), offerer: applicant)
+      older.update_columns(last_message_at: 1.day.ago)
+      sign_in(applicant)
+
+      get conversations_path
+
+      expect(props["conversations"].map { |c| [c["id"], c.dig("other", "name"), c["status"]] }).to eq([
+        [offer.id, "Maya", "Sent"], [older.id, "Tom", "Sent"]
+      ])
+    end
+
+    it "moves a conversation up when someone writes" do
+      older = create(:offer, pair_request: search)
+      offer.update_columns(last_message_at: 1.day.ago)
+      older.update_columns(last_message_at: 1.hour.ago)
+      sign_in(poster)
+
+      reply
+
+      get conversations_path
+      expect(props["conversations"].first).to include("id" => offer.id, "line" => "Great to meet you", "status" => "Talking")
+    end
+  end
+
+  describe "Not a match" do
+    before { sign_in(poster) }
+
+    it "ends the conversation and tells the other person, keeping the reason private" do
+      expect { post not_a_match_conversation_path(offer), params: { reason: "Different goals" } }
+        .to have_enqueued_mail(OfferMailer, :not_a_match_email).with(params: { offer: }, args: []).once
+
+      expect(offer.reload).to have_attributes(ended_by: poster, end_reason: "Different goals")
+      expect(offer).to be_ended
+
+      sign_in(applicant)
+      get conversation_path(offer)
+      expect(props["conversation"]).to include("status" => "Ended", "can_send" => false, "ended_by_viewer" => false)
+      expect(response.body).not_to include("Different goals")
+    end
+
+    it "works without a reason, and from the applicant, before any reply" do
+      sign_in(applicant)
+
+      post not_a_match_conversation_path(offer)
+
+      expect(offer.reload.ended_by).to eq(applicant)
+      expect(offer.end_reason).to be_nil
+    end
+
+    it "stops both people writing" do
+      post not_a_match_conversation_path(offer)
+
+      expect { reply("Wait") }.not_to change(Message, :count)
+
+      sign_in(applicant)
+      expect { reply("Wait") }.not_to change(Message, :count)
+    end
+
+    it "only tells them once" do
+      post not_a_match_conversation_path(offer)
+
+      expect { post not_a_match_conversation_path(offer), params: { reason: "Changed" } }
+        .not_to have_enqueued_mail(OfferMailer, :not_a_match_email)
+      expect(offer.reload.end_reason).to be_nil
+    end
+  end
+
+  describe "the old no-login Accept link" do
+    it "goes to the inbox, through sign-in, and accepts nothing" do
+      get "/offers/confirm/some-old-token"
+
+      expect(response).to redirect_to("/conversations")
+      expect(offer.reload.replied_at).to be_nil
+
+      post "/offers/confirm/some-old-token"
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "signing in from an emailed link" do
+    it "returns the poster to the thread" do
+      get conversation_path(offer)
+      expect(response).to redirect_to(new_user_session_path)
+
+      post user_session_path, params: { user: { email: poster.email, password: poster.password } }
+
+      expect(response).to redirect_to(conversation_path(offer))
+    end
+  end
+end

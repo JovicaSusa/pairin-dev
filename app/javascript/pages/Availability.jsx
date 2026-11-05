@@ -63,7 +63,7 @@ export default function Availability({ timezone, windows, weekdays }) {
       <PageHeader
         eyebrow="Availability"
         title="When are you free?"
-        description="Your weekly hours, in your own timezone. Others book sessions inside these windows."
+        description="Optional. Your weekly hours, in your own timezone, so others can see when you're usually free."
       />
 
       <form onSubmit={saveTimezone} className="mb-10 rounded-2xl border-2 border-black bg-white p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
@@ -75,7 +75,7 @@ export default function Availability({ timezone, windows, weekdays }) {
           <Button type="submit" className="md:w-40">Save timezone</Button>
         </div>
         {suggestDetected && zone === detected && (
-          <p className="mt-2 text-sm text-black/60">Detected from your browser. Save it if it's right.</p>
+          <p className="mt-2 text-sm text-black/65">Detected from your browser. Save it if it's right.</p>
         )}
         {errors?.timezone && <p className="mt-2 text-sm font-bold text-red">{errors.timezone}</p>}
       </form>

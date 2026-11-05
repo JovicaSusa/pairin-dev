@@ -7,38 +7,25 @@ RSpec.describe "Users::PairRequests", type: :request do
   before { sign_in(poster) }
 
   describe "posting a request" do
-    let(:params) { { subject: "Learn Rust", description: "Ownership and borrowing", duration: 60 } }
+    let(:params) { { subject: "Learn Rust", description: "Ownership and borrowing", commitment: "open_ended" } }
 
-    context "without weekly hours" do
-      it "sends the poster to add weekly hours first, from the form" do
-        get new_users_pair_request_path
+    it "shows the form without weekly hours" do
+      get new_users_pair_request_path
 
-        expect(response).to redirect_to(availability_path)
-        expect(flash[:alert]).to eq("Add your weekly hours first. Others book your requests into them.")
-      end
-
-      it "saves nothing when posted anyway" do
-        expect { post users_pair_requests_path, params: }.not_to change(PairRequest, :count)
-
-        expect(response).to redirect_to(availability_path)
-      end
+      expect(response).to have_http_status(:ok)
     end
 
-    context "with weekly hours" do
-      before { create(:availability_window, user: poster) }
+    it "posts the request switched on, without weekly hours or time slots" do
+      expect { post users_pair_requests_path, params: }.to change(poster.pair_requests, :count).by(1)
 
-      it "posts the request switched on, without time slots of its own" do
-        expect { post users_pair_requests_path, params: }.to change(poster.pair_requests, :count).by(1)
+      expect(poster.pair_requests.last).not_to be_paused
+      expect(Period.where(periodable: poster.pair_requests.last)).to be_empty
+    end
 
-        expect(poster.pair_requests.last).not_to be_paused
-        expect(Period.where(periodable: poster.pair_requests.last)).to be_empty
-      end
+    it "refuses a search with no subject" do
+      expect { post users_pair_requests_path, params: params.merge(subject: "") }.not_to change(PairRequest, :count)
 
-      it "refuses a call longer than 3 hours" do
-        expect { post users_pair_requests_path, params: params.merge(duration: 240) }.not_to change(PairRequest, :count)
-
-        expect(session[:inertia_errors]).to include(:duration)
-      end
+      expect(session[:inertia_errors]).to include(:subject)
     end
   end
 
@@ -67,15 +54,6 @@ RSpec.describe "Users::PairRequests", type: :request do
 
       expect(response).to redirect_to(users_pair_requests_path)
       expect(pair_request.reload).not_to be_paused
-    end
-
-    it "keeps it off while the poster has no weekly hours" do
-      poster.availability_windows.destroy_all
-
-      patch resume_users_pair_request_path(pair_request)
-
-      expect(pair_request.reload).to be_paused
-      expect(flash[:alert]).to eq("Add your weekly hours before switching a request on. Others book your requests into them.")
     end
   end
 end

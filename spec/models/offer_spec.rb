@@ -5,56 +5,100 @@ RSpec.describe Offer, type: :model do
   # end
   it_behaves_like "activity generatable", :offer
 
-  describe "scopes" do
-    describe ".future" do
-      subject(:future) { described_class.future }
+  describe "application answers" do
+    it "requires a goal, how often and how long" do
+      offer = build(:offer, goal: "", how_often: nil, how_long: nil)
 
-      let!(:past_offer) { create(:offer, period: past_period, pair_request: past_period.periodable) }
-      let!(:future_offer) { create(:offer, period: period, pair_request: period.periodable) }
-      let(:past_period) { create(:period, start_at: 1.minute.from_now) }
-      let(:period) { create(:period, start_at: 3.minutes.from_now) }
-
-      it "returns only offers with future periods" do
-        travel 2.minutes do
-          expect(future).to contain_exactly(future_offer)
-        end
-      end
+      expect(offer).not_to be_valid
+      expect(offer.errors.attribute_names).to include(:goal, :how_often, :how_long)
     end
-  end
 
-  describe "its period" do
-    it "is its own, not one of the request's" do
+    it "only accepts the listed options" do
+      offer = build(:offer, how_often: "daily", how_long: "forever")
+
+      expect(offer).not_to be_valid
+      expect(offer.errors.attribute_names).to include(:how_often, :how_long)
+    end
+
+    it "requires the applicant to have a level" do
+      offer = build(:offer, offerer: create(:user, level: nil))
+
+      expect(offer).not_to be_valid
+      expect(offer.errors[:level]).to be_present
+    end
+
+    it "leaves old applications without answers valid" do
       offer = create(:offer)
+      offer.update_columns(goal: nil, how_often: nil, how_long: nil)
 
-      expect(offer.period.periodable).to eq(offer)
-      expect(offer.period.end_at - offer.period.start_at).to eq(offer.pair_request.duration.minutes)
+      expect(offer.reload).to be_valid
+      expect(offer.how_often_label).to be_nil
+    end
+
+    it "gives readable labels" do
+      offer = build(:offer, how_often: "twice_a_week", how_long: "open_ended")
+
+      expect([offer.how_often_label, offer.how_long_label]).to eq(["Twice a week", "Open-ended"])
     end
   end
 
-  describe "booking a slot" do
-    let(:pair_request) { create(:pair_request, duration: 60) }
-    let(:slot) { PairRequests::BookableSlots.call(pair_request).first }
+  it "starts its thread with the application's message" do
+    offer = create(:offer, message: "Hello there")
 
-    def book(start_at)
-      build(:offer, pair_request:, with_period: false).tap { |offer| offer.build_period(start_at:) }
+    expect(offer.messages.map { |m| [m.sender, m.body] }).to eq([[offer.offerer, "Hello there"]])
+    expect(offer.reload.last_message_at).to be_present
+  end
+
+  it "refuses an application message too long for a thread" do
+    expect(build(:offer, message: "x" * (Message::MAX_LENGTH + 1))).not_to be_valid
+  end
+
+  it "doesn't need a time" do
+    expect(build(:offer)).to be_valid
+    expect(create(:offer).period).to be_nil
+  end
+
+  it "keeps an old application's time" do
+    offer = create(:offer, with_old_period: true)
+
+    expect(offer.reload.period.periodable).to eq(offer)
+  end
+
+  describe "its clock, which starts when someone applies" do
+    let(:offer) { create(:offer) }
+
+    it "reminds the poster after 24 hours" do
+      expect(offer.reminder_at).to eq(offer.created_at + 24.hours)
     end
 
-    it "accepts one of the request's bookable slots" do
-      expect(book(slot.start_at).save(context: :booking)).to be(true)
+    it "is overdue after 72 hours with no answer" do
+      expect(offer.expires_at).to eq(offer.created_at + 72.hours)
+
+      travel_to(offer.created_at + 72.hours - 1.minute) { expect(offer).not_to be_overdue }
+      travel_to(offer.created_at + 72.hours + 1.second) { expect(offer).to be_overdue }
     end
 
-    it "rejects a time that isn't a bookable slot" do
-      offer = book(slot.start_at + 10.minutes)
+    it "stops when the poster replies" do
+      offer.post_message(offer.poster, "Hi")
 
-      expect(offer.save(context: :booking)).to be(false)
-      expect(offer.errors[:period]).to include("isn't one of this request's open slots")
+      expect(offer).not_to be_unanswered
+      travel_to(offer.expires_at + 1.day) { expect(offer).not_to be_overdue }
     end
 
-    it "needs a slot" do
-      offer = build(:offer, pair_request:, with_period: false)
+    it "stops when either person ends it" do
+      offer.not_a_match!(by: offer.offerer)
 
-      expect(offer.save(context: :booking)).to be(false)
-      expect(offer.errors[:period]).to be_present
+      expect(offer).not_to be_unanswered
+    end
+
+    it "treats an application accepted the old way as answered" do
+      expect(create(:offer, :accepted)).not_to be_unanswered
+    end
+
+    it "ignores an old application's time" do
+      old = create(:offer, with_old_period: true)
+
+      travel_to(old.period.start_at + 1.hour) { expect(old).not_to be_overdue }
     end
   end
 

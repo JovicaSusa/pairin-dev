@@ -6,6 +6,35 @@ RSpec.describe "Profiles", type: :request do
   before { sign_in(user) }
 
   describe "PATCH /profiles/:id" do
+    it "saves with country, language and level left blank, as the form sends them" do
+      user.update_columns(country: nil, language: nil, level: nil)
+
+      patch profile_path(user), params: { name: "Ada", country: "", language: "", level: "", github_url: "github.com/ada" }
+
+      expect(response).to redirect_to(profile_path(user.id))
+      expect(user.reload).to have_attributes(name: "Ada", country: nil, language: nil, level: nil, github_url: "https://github.com/ada")
+    end
+
+    it "still refuses a made-up country" do
+      patch profile_path(user), params: { country: "Atlantis" }
+
+      expect(user.reload.country).to be_nil
+      expect(session[:inertia_errors]).to include(:country)
+    end
+
+    it "saves a GitHub link" do
+      patch profile_path(user), params: { github_url: "https://github.com/ada" }
+
+      expect(user.reload.github_url).to eq("https://github.com/ada")
+    end
+
+    it "refuses a link that isn't to GitHub" do
+      patch profile_path(user), params: { github_url: "https://evil.example/ada" }
+
+      expect(user.reload.github_url).to be_nil
+      expect(session[:inertia_errors]).to include(:github_url)
+    end
+
     it "updates the profile but never the date of birth" do
       patch profile_path(user), params: { name: "Ada", date_of_birth: "2015-01-01" }
 

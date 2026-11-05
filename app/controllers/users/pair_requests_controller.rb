@@ -1,17 +1,18 @@
 class Users::PairRequestsController < ApplicationController
   include Authenticated
   include Alba::Inertia::Controller
+  include SearchCards
 
   before_action :set_and_authorize_own_pair_request, only: [:pause, :resume]
-  before_action :require_weekly_hours, only: [:new, :create]
 
   def index
     @pair_requests = current_user.pair_requests
-      .includes(:tags, :sessions, accepted_offer: :offerer)
+      .includes(:tags, :sessions, :partnership, accepted_offer: :offerer)
       .order(created_at: :desc)
 
     render inertia: 'Users/PairRequests/Index', props: {
-      pairRequests: PairRequestResource.new(@pair_requests)
+      pairRequests: PairRequestResource.new(@pair_requests),
+      matches: PairRequests::Matches.call(@pair_requests.first).map { |match| search_card(match) }
     }
   end
 
@@ -19,7 +20,8 @@ class Users::PairRequestsController < ApplicationController
     @pair_request = current_user.pair_requests.build
     
     render inertia: 'Users/PairRequests/New', props: {
-      tags: TagResource.new(Tag.select(:id, :name))
+      tags: TagResource.new(Tag.select(:id, :name)),
+      commitments: PairRequest::COMMITMENTS.map { |value, label| { value:, label: } }
     }
   end
 
@@ -27,7 +29,7 @@ class Users::PairRequestsController < ApplicationController
     @pair_request = current_user.pair_requests.build(pair_request_params)
 
     if @pair_request.save
-      redirect_to users_pair_requests_path, notice: "Request posted! Good luck"
+      redirect_to users_pair_requests_path, notice: "Partner search posted! Good luck"
     else
       redirect_back_or_to new_users_pair_request_path, inertia: { errors: @pair_request.errors.to_hash(true) }
     end
@@ -47,24 +49,18 @@ class Users::PairRequestsController < ApplicationController
 
   def pause
     @pair_request.switch_off!
-    redirect_to users_pair_requests_path, notice: "Request switched off. It's hidden from others until you switch it back on."
+    redirect_to users_pair_requests_path, notice: "Partner search switched off. It's hidden from others until you switch it back on."
   end
 
   def resume
     if @pair_request.switch_on!
-      redirect_to users_pair_requests_path, notice: "Request switched on. Others can see it and send offers again."
+      redirect_to users_pair_requests_path, notice: "Partner search switched on. Others can see it and apply again."
     else
-      redirect_to users_pair_requests_path, alert: "Add your weekly hours before switching a request on. Others book your requests into them."
+      redirect_to users_pair_requests_path, alert: "This partner search has found its partner, so it stays off."
     end
   end
 
   private
-
-  def require_weekly_hours
-    return if current_user.availability_windows.exists?
-
-    redirect_to availability_path, alert: "Add your weekly hours first. Others book your requests into them."
-  end
 
   def set_and_authorize_own_pair_request
     @pair_request = current_user.pair_requests.find(params[:id])
@@ -81,7 +77,7 @@ class Users::PairRequestsController < ApplicationController
       .permit(
         :subject,
         :description,
-        :duration,
+        :commitment,
         taggings_attributes: [:_destroy, tag_attributes: [:name]]
       )
   end

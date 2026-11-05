@@ -50,12 +50,14 @@ env:
   clear:
     RAILS_SERVE_STATIC_FILES: true
     RAILS_LOG_TO_STDOUT: true
+    SEND_SUGGESTION_EMAILS: true
   secret:
     - RAILS_MASTER_KEY
     - POSTGRES_URL
     - KAMAL_REGISTRY_PASSWORD
     - MAILJET_API_KEY
     - MAILJET_SECRET_KEY
+    - HONEYBADGER_API_KEY
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.

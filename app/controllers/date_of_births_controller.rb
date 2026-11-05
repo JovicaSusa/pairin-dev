@@ -29,7 +29,7 @@ class DateOfBirthsController < ApplicationController
       # Only this field: an older, half-filled profile mustn't block them here.
       current_user.save!(validate: false)
 
-      redirect_to pair_requests_path
+      redirect_to current_user.needs_onboarding? ? onboarding_path : pair_requests_path
     end
   end
 

@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
+  get "health" => "health#show"
 
   # Defines the root path route ("/")
   root "home#index"
@@ -36,9 +37,7 @@ Rails.application.routes.draw do
 
   resources :pair_requests, only: [:index] do
     scope module: 'pair_requests' do
-      resources :offers, only: [:index, :new, :create] do
-        post "accept", on: :member
-      end
+      resources :offers, only: [:index, :new, :create]
     end
 
     get :search, on: :collection
@@ -50,14 +49,46 @@ Rails.application.routes.draw do
       patch :pause, on: :member
       patch :resume, on: :member
     end
-    resources :offers, only: [:index]
+  end
+
+  resource :onboarding, only: [:show, :create] do
+    post :skip
+  end
+
+  resources :partners, only: [:index, :show, :update], controller: "partnerships" do
+    post :end_partnership, on: :member
+  end
+
+  resources :conversations, only: [:index, :show] do
+    post :not_a_match, on: :member
+    post :block, on: :member
+    post :report, on: :member
+    post :propose, on: :member
+    post :accept_proposal, on: :member
+    post :decline_proposal, on: :member
+    resources :messages, only: [:create], module: :conversations
   end
 
   resources :activities, only: [:index]
 
-  # No-login offer confirmation, reached from the offer-received email.
-  get "offers/confirm/:token", to: "offer_confirmations#show", as: :offer_confirmation
-  post "offers/confirm/:token", to: "offer_confirmations#create"
+  # Emails sent before replies needed sign-in linked here.
+  get "offers/confirm/:token", to: redirect("/conversations")
+
+  # A partner search's shareable link, readable with no account.
+  get "s/:token", to: "public_searches#show", as: :public_search
+  get "s/:token/apply", to: "public_searches#apply", as: :public_search_apply
+
+  # No-login Yes/No, reached from the weekly check-in email.
+  get "check-ins/:token", to: "check_ins#show", as: :check_in
+  post "check-ins/:token", to: "check_ins#create"
+
+  # No-login "Pause this search", reached from the emails about a search.
+  get "requests/pause/:token", to: "request_pauses#show", as: :request_pause
+  post "requests/pause/:token", to: "request_pauses#create"
+
+  # No-login unsubscribe from an optional email's footer and mail app.
+  get "unsubscribe/:category/:token", to: "unsubscribes#show", as: :unsubscribe
+  post "unsubscribe/:category/:token", to: "unsubscribes#create"
 
   # No-login "Turn it back on", reached from the request-paused email.
   get "requests/resume/:token", to: "request_resumptions#show", as: :request_resumption

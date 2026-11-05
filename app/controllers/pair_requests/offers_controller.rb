@@ -2,18 +2,22 @@ class PairRequests::OffersController < ApplicationController
   include Authenticated
   include Alba::Inertia::Controller
 
+  SWITCHED_OFF = "This partner search is switched off and isn't taking applications right now."
+
   before_action :reject_switched_off_request, only: [:new, :create]
+  before_action :enforce_application_limit, only: :create
 
   def index
     @pair_request = current_user.pair_requests.find_by(id: params[:pair_request_id])
 
     authorize @pair_request, policy_class: PairRequests::OfferPolicy
 
-    @offers = @pair_request.offers.joins(:period).includes(:offerer, :period, pair_request: :offers).order("offers.accepted_at, periods.start_at desc")
+    @offers = @pair_request.offers.includes(:offerer, :period).order("offers.accepted_at, offers.created_at desc")
     
     render inertia: 'PairRequests/Offers/Index', props: {
       offers: ReceivedOfferResource.new(@offers),
-      pairRequestId: @pair_request.id
+      pairRequestId: @pair_request.id,
+      commitmentLabel: @pair_request.commitment_label
     }
   end
 
@@ -23,55 +27,80 @@ class PairRequests::OffersController < ApplicationController
     authorize @offer, :create?, policy_class: PairRequests::OfferPolicy
 
     render inertia: 'PairRequests/Offers/New', props: {
-      pairRequestId: @pair_request.id,
-      timezone: current_user.timezone,
-      slots: @pair_request.bookable_slots.map { |slot|
-        { start_at: slot.start_at.utc.iso8601, end_at: slot.end_at.utc.iso8601 }
-      }
+      pairRequest: @pair_request.as_json(
+        only: [:id, :subject, :description],
+        methods: [:commitment_label],
+        include: { user: { only: [:name] } }
+      ),
+      applicationOptions: Offer.form_options,
+      needsLevel: current_user.level.blank?,
+      viaShareLink: params[:via] == "share"
     }
   end
 
   def create
-    @offer = @pair_request.offers.build(message: offer_params[:message], offerer: current_user)
-    @offer.build_period(start_at: offer_params[:start_at].presence)
+    @offer = @pair_request.offers.build(offer_params.merge(offerer: current_user))
 
     authorize @offer, policy_class: PairRequests::OfferPolicy
 
-    if @offer.save(context: :booking)
-      OfferMailer.with(offer: @offer).offer_received_email.deliver_later
-      OfferExpiryJob.set(wait_until: @offer.period.start_at).perform_later(@offer)
-      if (remind_at = @offer.reminder_at)
-        OfferReminderJob.set(wait_until: remind_at).perform_later(@offer)
-      end
+    # Asked once, on the form, when their profile has no level. Saved without
+    # the profile's other rules: a half-filled profile mustn't block applying.
+    current_user.level = params.dig(:offer, :level).presence if current_user.level.blank?
 
-      redirect_to pair_requests_path, notice: "Offer sent! We've emailed the poster, and you'll get an email when they accept. If they don't respond before your chosen time, the offer expires."
-    else
-      redirect_to new_pair_request_offer_path(@pair_request), inertia: { errors: @offer.errors.to_hash(true) }
+    # Under the search's lock, so it can't slip in while a partnership closes the search.
+    saved = @pair_request.with_lock do
+      next :closed if @pair_request.paused?
+
+      @offer.save && current_user.save!(validate: false)
     end
-  end
 
-  def accept
-    offer = Offer.find(params[:id])
+    if saved == :closed
+      redirect_to pair_requests_path, alert: SWITCHED_OFF
+    elsif saved
+      OfferMailer.with(offer: @offer).offer_received_email.deliver_later
+      OfferExpiryJob.set(wait_until: @offer.expires_at).perform_later(@offer)
+      OfferReminderJob.set(wait_until: @offer.reminder_at).perform_later(@offer)
 
-    authorize offer, policy_class: PairRequests::OfferPolicy
-
-    Offers::Accept
-      .call(offer)
-      .either(
-        -> (success) { redirect_to pair_request_offers_path(offer.pair_request_id), notice: "You just scheduled yourself a new pairing session. Happy pairin!" },
-        -> (failure) { redirect_to pair_request_offers_path(offer.pair_request_id), alert: "Could not accept offer." }
-      )
+      after_applying notice: "Application sent! We've emailed the poster."
+    elsif @offer.errors.of_kind?(:pair_request_id, :taken)
+      redirect_to pair_requests_path, alert: "You've already applied to this partner search."
+    else
+      redirect_back_or_to new_pair_request_offer_path(@pair_request), inertia: { errors: @offer.errors.to_hash(true) }
+    end
   end
 
   private
 
-  def reject_switched_off_request
-    @pair_request = PairRequest.find(params[:pair_request_id])
-
-    if @pair_request.paused?
-      redirect_to pair_requests_path, alert: "This request is switched off and isn't taking offers right now."
+  # From the list's drawer they go back to the same filtered list; from the
+  # full form page they go to the list.
+  def after_applying(notice:)
+    if came_from_the_list?
+      redirect_back_or_to pair_requests_path, notice:
+    else
+      redirect_to pair_requests_path, notice:
     end
   end
 
-  def offer_params = params.require(:offer).permit(:message, :start_at)
+  def came_from_the_list?
+    URI.parse(request.referer.to_s).path == pair_requests_path
+  rescue URI::InvalidURIError
+    false
+  end
+
+  def enforce_application_limit
+    return unless current_user.application_limit_reached?
+
+    redirect_back_or_to pair_requests_path, alert: "New accounts can send #{User::NEW_ACCOUNT_APPLICATIONS_PER_DAY} applications a day, and you've reached that for now. Please try again tomorrow."
+  end
+
+  def reject_switched_off_request
+    @pair_request = PairRequest.find(params[:pair_request_id])
+
+    # A block or a different age group gets the same answer, so neither gives itself away.
+    if @pair_request.paused? || current_user.blocked_with?(@pair_request.user) || !current_user.same_age_group?(@pair_request.user)
+      redirect_to pair_requests_path, alert: SWITCHED_OFF
+    end
+  end
+
+  def offer_params = params.require(:offer).permit(:message, :goal, :how_often, :how_long, :via_share_link)
 end

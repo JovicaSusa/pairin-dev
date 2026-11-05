@@ -13,10 +13,10 @@ RSpec.describe "generates expected activites", type: :system do
 
       fill_in "Subject", with: "AAA"
       fill_in "Description", with: "BBB"
-      fill_in "Duration", with: 45
 
       perform_enqueued_jobs do
-        click_button "Create Pair request"
+        click_button "Post partner search"
+        expect(page).to have_content("Partner search posted")
       end
 
       visit activities_path
@@ -26,37 +26,21 @@ RSpec.describe "generates expected activites", type: :system do
     end
   end
 
-  context "when pair request offer accepted" do
-    let(:pair_request) { create(:pair_request, user: current_user) }
-    let!(:offer) { create(:offer, pair_request:) }
-
-    it "displays expected activity" do
-      visit users_pair_requests_path
-
-      within("#pair_requests") { click_link "See applications" }
-
-      perform_enqueued_jobs do
-        click_button "Accept"
-      end
-
-      visit activities_path
-
-      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
-      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.content"))
-    end
-  end
-
   context "when offer sent" do
     let!(:pair_request) { create(:pair_request) }
 
     it "creates expected activity" do
       visit pair_requests_path
 
-      click_link "Apply"
-      fill_in "Message", with: "Let's hack!"
+      click_button "Apply"
+      fill_in "What do you want to get out of this?", with: "Finish a course"
+      select_option!("How often can you pair?", "Twice a week")
+      select_option!("How long can you commit?", "A few weeks")
+      fill_in "Your message to the poster", with: "Let's hack!"
 
       perform_enqueued_jobs do
-        click_button "Apply"
+        click_button "Send application"
+        expect(page).to have_content("We've emailed the poster")
       end
 
       visit activities_path
@@ -70,15 +54,14 @@ RSpec.describe "generates expected activites", type: :system do
     before do
       perform_enqueued_jobs do
         Activity.suppress { offer.save! }
-        Offers::Accept.call(offer)
+        offer.update!(accepted_at: Time.current)
       end
     end
 
     it "displays expected activities" do
       visit activities_path
 
-      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
-      expect(page).to have_one_of_the_texts(I18n.t("activities.session_scheduled.content"))
+      expect(page).not_to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
       expect(page).to have_one_of_the_texts(I18n.t("activities.offer_accepted.titles"))
       expect(page).to have_one_of_the_texts(I18n.t("activities.offer_accepted.content"))
     end

@@ -1,13 +1,13 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import {
   Search,
   ClipboardList,
   FilePlus2,
   Inbox,
-  Send,
   Rss,
-  CalendarClock,
+  MessagesSquare,
+  Users,
   Clock,
   ChevronDown,
   LogOut,
@@ -19,19 +19,19 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import logoImg from "@/assets/images/logo.svg";
 
 const NAV_ITEMS = [
-  { href: "/pair_requests", label: "Search", icon: Search },
+  { href: "/pair_requests", label: "Find a partner", icon: Search },
+  { href: "/conversations", label: "Conversations", icon: MessagesSquare },
+  { href: "/partners", label: "Partners", icon: Users },
   { href: "/activities", label: "Feed", icon: Rss },
-  { href: "/sessions", label: "Sessions", icon: CalendarClock },
   { href: "/availability", label: "Availability", icon: Clock },
 ];
 
 const PAIR_REQUEST_SUBMENU = [
   { href: "/users/pair_requests/new", label: "New", icon: FilePlus2 },
   { href: "/users/pair_requests", label: "Opened", icon: Inbox },
-  { href: "/users/offers", label: "Applied", icon: Send },
 ];
 
-function NavLink({ href, label, icon: Icon, active, small = false, onClick }) {
+function NavLink({ href, label, icon: Icon, active, small = false, onClick, count = 0 }) {
   return (
     <Link
       href={href}
@@ -46,14 +46,23 @@ function NavLink({ href, label, icon: Icon, active, small = false, onClick }) {
     >
       {Icon && <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={2.25} />}
       <span className="truncate">{label}</span>
+      {count > 0 && (
+        <span aria-label={`${count} unread`} className="ml-auto shrink-0 rounded-full border-2 border-black bg-orange px-1.5 text-xs text-black">
+          {count}
+        </span>
+      )}
     </Link>
   );
 }
 
 function NavContent({ currentPath, currentUser, onNavigate }) {
+  const { unreadMessages } = usePage().props;
   const cleanPath = currentPath.split("?")[0];
-  const isActive = (path) => cleanPath === path;
-  const isPairRequestSubmenuActive = () => PAIR_REQUEST_SUBMENU.some((item) => item.href === cleanPath);
+  // A search's applications belong to the poster's searches, not to finding a partner.
+  const isApplicationsPage = /^\/pair_requests\/\d+\/offers$/.test(cleanPath);
+  const isActive = (path) =>
+    cleanPath === path || (path !== "/pair_requests" && cleanPath.startsWith(`${path}/`)) || (path === "/pair_requests" && cleanPath.startsWith("/pair_requests/") && !isApplicationsPage);
+  const isPairRequestSubmenuActive = () => isApplicationsPage || PAIR_REQUEST_SUBMENU.some((item) => item.href === cleanPath);
   const isProfileActive = () => cleanPath === `/profiles/${currentUser.id}`;
 
   return (
@@ -73,12 +82,12 @@ function NavContent({ currentPath, currentUser, onNavigate }) {
                 type="button"
                 className={`group flex w-full items-center gap-3 rounded-xl border-2 px-3 py-2.5 font-headline font-bold text-sm transition-all ${
                   isPairRequestSubmenuActive()
-                    ? "border-black bg-purple/10 text-purple"
+                    ? "border-black bg-purple/10 text-black"
                     : "border-transparent text-black hover:border-black hover:bg-yellow-50 hover:translate-x-[1px] hover:translate-y-[1px]"
                 }`}
               >
                 <ClipboardList className="h-[18px] w-[18px] shrink-0" strokeWidth={2.25} />
-                <span className="flex-1 text-left truncate">Pair Requests</span>
+                <span className="flex-1 text-left truncate">Partner searches</span>
                 <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
               </button>
             </CollapsibleTrigger>
@@ -91,9 +100,10 @@ function NavContent({ currentPath, currentUser, onNavigate }) {
             </CollapsibleContent>
           </Collapsible>
 
-          <NavLink {...NAV_ITEMS[1]} active={isActive(NAV_ITEMS[1].href)} onClick={onNavigate} />
+          <NavLink {...NAV_ITEMS[1]} active={isActive(NAV_ITEMS[1].href)} onClick={onNavigate} count={unreadMessages} />
           <NavLink {...NAV_ITEMS[2]} active={isActive(NAV_ITEMS[2].href)} onClick={onNavigate} />
           <NavLink {...NAV_ITEMS[3]} active={isActive(NAV_ITEMS[3].href)} onClick={onNavigate} />
+          <NavLink {...NAV_ITEMS[4]} active={isActive(NAV_ITEMS[4].href)} onClick={onNavigate} />
         </div>
       </nav>
 
@@ -109,13 +119,13 @@ function NavContent({ currentPath, currentUser, onNavigate }) {
         >
           <Avatar className="h-9 w-9 shrink-0 border-2 border-black">
             <AvatarImage src={currentUser.image_url} alt={currentUser.name} />
-            <AvatarFallback className="bg-orange text-white font-display font-bold">
+            <AvatarFallback className="bg-orange text-black font-display font-bold">
               {currentUser.name?.[0]}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="truncate font-headline font-bold text-sm leading-tight">{currentUser.name || "Your profile"}</p>
-            <span className={`text-xs ${isProfileActive() ? "text-white/70" : "text-black/50"}`}>View profile</span>
+            <span className={`text-xs ${isProfileActive() ? "text-white/70" : "text-black/65"}`}>View profile</span>
           </div>
         </Link>
 
@@ -124,7 +134,7 @@ function NavContent({ currentPath, currentUser, onNavigate }) {
           method="delete"
           as="button"
           onClick={onNavigate}
-          className="mt-1 flex w-full items-center gap-3 rounded-xl border-2 border-transparent px-3 py-2 font-headline font-bold text-sm text-black/60 transition-all hover:border-black hover:bg-red/10 hover:text-red"
+          className="mt-1 flex w-full items-center gap-3 rounded-xl border-2 border-transparent px-3 py-2 font-headline font-bold text-sm text-black/65 transition-all hover:border-black hover:bg-red/10 hover:text-red"
         >
           <LogOut className="h-[18px] w-[18px] shrink-0" strokeWidth={2.25} />
           Log out

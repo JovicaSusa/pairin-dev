@@ -6,8 +6,8 @@ RSpec.describe OfferExpiryJob, type: :job do
 
   def perform = described_class.perform_now(offer)
 
-  context "when the offer's slot started without an answer" do
-    before { travel_to(offer.period.start_at) }
+  context "when an application went 72 hours without an answer" do
+    before { travel_to(offer.expires_at) }
 
     it "switches the request off and tells the poster" do
       expect { perform }
@@ -25,11 +25,22 @@ RSpec.describe OfferExpiryJob, type: :job do
       end
 
       it "apologises to everyone with an offer on the request" do
-        later_offer = create(:offer, pair_request:, period: create(:period, periodable: pair_request, start_at: 2.days.from_now, end_at: 2.days.from_now + 1.hour))
+        later_offer = create(:offer, pair_request:)
 
         expect { perform }
           .to have_enqueued_mail(OfferMailer, :offer_expired_email).with(params: { offer: }, args: []).once
           .and have_enqueued_mail(OfferMailer, :offer_expired_email).with(params: { offer: later_offer }, args: []).once
+      end
+
+      it "doesn't apologise to someone already talking to the poster" do
+        talking = create(:offer, pair_request:)
+        talking.post_message(pair_request.user, "Great to meet you")
+
+        expect { perform }
+          .to have_enqueued_mail(OfferMailer, :offer_expired_email).with(params: { offer: }, args: []).once
+
+        expect(offer.reload.expiry_notified_at).to be_present
+        expect(talking.reload.expiry_notified_at).to be_nil
       end
 
       it "apologises to nobody when it doesn't switch the request off" do
@@ -39,14 +50,32 @@ RSpec.describe OfferExpiryJob, type: :job do
       end
 
       it "doesn't email an offerer twice when the request is paused again after a resume" do
-        later_offer = create(:offer, pair_request:, period: create(:period, periodable: pair_request, start_at: 2.days.from_now, end_at: 2.days.from_now + 1.hour))
+        later_offer = create(:offer, pair_request:)
         perform
         pair_request.switch_on!
-        travel_to(later_offer.period.start_at)
+        travel_to(later_offer.expires_at)
 
         expect { described_class.perform_now(later_offer) }
           .to have_enqueued_mail(PairRequestMailer, :request_paused_email)
           .and not_have_enqueued_mail(OfferMailer, :offer_expired_email)
+      end
+    end
+
+    context "when the poster replied in time" do
+      before { offer.post_message(offer.poster, "Great to meet you") }
+
+      it "leaves the search on and tells nobody" do
+        expect { perform }.not_to have_enqueued_mail(PairRequestMailer, :request_paused_email)
+        expect(pair_request.reload).not_to be_paused
+      end
+    end
+
+    context "when the conversation was ended" do
+      before { offer.not_a_match!(by: offer.poster) }
+
+      it "leaves the search on and tells nobody" do
+        expect { perform }.not_to have_enqueued_mail(PairRequestMailer, :request_paused_email)
+        expect(pair_request.reload).not_to be_paused
       end
     end
 
@@ -64,7 +93,7 @@ RSpec.describe OfferExpiryJob, type: :job do
     end
 
     it "leaves the request on when the poster accepted another offer" do
-      create(:offer, :accepted, pair_request:, period: offer.period)
+      create(:offer, :accepted, pair_request:)
 
       expect { perform }.not_to have_enqueued_mail(PairRequestMailer, :request_paused_email)
       expect(pair_request.reload).not_to be_paused

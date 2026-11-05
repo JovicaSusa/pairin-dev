@@ -11,7 +11,7 @@ export default function Activities({ activities }) {
       <PageHeader
         eyebrow="Feed"
         title="Activity Feed"
-        description="Updates from your requests, applications, and matches, all in one place."
+        description="Updates from your partner searches and applications, all in one place."
       />
 
       {activities.length > 0 ? (
@@ -26,21 +26,21 @@ export default function Activities({ activities }) {
               </div>
               <div className="min-w-0">
                 <p className="font-bold">{activity.title}</p>
-                <p className="mt-1 text-black/60">{activity.content}</p>
+                <p className="mt-1 text-black/65">{activity.content}</p>
               </div>
             </div>
           ))}
         </div>
       ) : (
         <EmptyState icon={Sparkles} title="Nothing new from the community yet">
-          <p className="mt-1 text-black/50">
+          <p className="mt-1 text-black/65">
             Start by{" "}
             <Link href="/users/pair_requests/new" className="font-bold text-purple underline">
-              creating a pair request
+              starting a partner search
             </Link>{" "}
             or{" "}
             <Link href="/pair_requests" className="font-bold text-purple underline">
-              sending an offer
+              applying to one
             </Link>
             .
           </p>

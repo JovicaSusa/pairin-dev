@@ -1,7 +1,7 @@
 ---
 # For more options, see https://docs.honeybadger.io/lib/ruby/gem-reference/configuration
 
-api_key: 'hbp_pFanXgwIX3flFGNKGX1NPGmvzOlqSg3ZVfVI'
+# The API key comes from the HONEYBADGER_API_KEY environment variable.
 
 # The environment your app is running in.
 env: "<%= Rails.env %>"
@@ -24,6 +24,17 @@ development_environments:
 
 # Enable verbose debug logging (useful for troubleshooting).
 debug: false
+
+# Keep private data out of error reports: what people type into forms, such as
+# chat messages, plus their session and cookies. The privacy policy promises this.
+request:
+  disable_params: true
+  disable_session: true
+  filter_keys:
+    - password
+    - password_confirmation
+    - HTTP_AUTHORIZATION
+    - HTTP_COOKIE
 
 # Enable Honeybadger Insights
 insights:

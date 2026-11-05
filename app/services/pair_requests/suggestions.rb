@@ -1,6 +1,6 @@
 module PairRequests
   # Open requests to suggest to someone whose offer just expired: requests
-  # sharing the dead request's tags first, then the soonest bookable slot.
+  # sharing the dead request's tags first, then the newest.
   class Suggestions
     LIMIT = 3
 
@@ -12,31 +12,23 @@ module PairRequests
     end
 
     def call
-      tag_ids = @dead_request.tags.ids
-      shared_tags = if tag_ids.any?
-        PairRequest.sanitize_sql_array(["COUNT(DISTINCT taggings.tag_id) FILTER (WHERE taggings.tag_id IN (?))", tag_ids])
-      else
-        "0"
-      end
-
       candidates = PairRequest
         .switched_on
-        .where(user_id: AvailabilityWindow.select(:user_id))
+        .visible_to(@offerer)
         .left_joins(:taggings)
         .where.not(id: @dead_request.id)
         .where.not(user_id: @offerer.id)
         .where.not(id: @offerer.offers.select(:pair_request_id))
         .where.not(id: Offer.accepted.select(:pair_request_id))
         .group(:id)
-        .select("pair_requests.*, #{shared_tags} AS shared_tags")
-        .preload(user: :availability_windows)
 
-      # The next slot comes from the poster's weekly hours, so rank in Ruby.
-      candidates
-        .filter_map { |request| (slot = request.bookable_slots.first) && [request, slot] }
-        .sort_by { |request, slot| [-request.shared_tags, slot.start_at, request.id] }
-        .first(LIMIT)
-        .map(&:first)
+      tag_ids = @dead_request.tags.ids
+      if tag_ids.any?
+        shared_tags = PairRequest.sanitize_sql_array(["COUNT(DISTINCT taggings.tag_id) FILTER (WHERE taggings.tag_id IN (?)) DESC", tag_ids])
+        candidates = candidates.order(Arel.sql(shared_tags))
+      end
+
+      candidates.order(created_at: :desc, id: :desc).limit(LIMIT).to_a
     end
   end
 end

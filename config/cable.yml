@@ -1,11 +1,12 @@
+# Postgres LISTEN/NOTIFY: no extra service to run. Signals stay tiny (see
+# ConversationsChannel), well under its 8 KB limit. Moving to Redis later is a
+# change to this file plus the redis gem.
 development:
-  adapter: redis
-  url: redis://localhost:6379/1
+  adapter: postgresql
 
 test:
   adapter: test
 
 production:
-  adapter: redis
-  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
+  adapter: postgresql
   channel_prefix: pairin_production

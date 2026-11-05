@@ -1,19 +1,22 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ClipboardList } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import Card from './Card';
+import SearchCard from '@/pages/PairRequests/Card';
 
-export default function Index({ pairRequests }) {
+export default function Index({ pairRequests, matches = [] }) {
+  const { auth } = usePage().props;
+
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-16 md:px-8">
-      <Head title="Your Requests" />
+      <Head title="Your partner searches" />
 
       <PageHeader
-        eyebrow="Pair Requests"
-        title="Your requests"
-        description="Requests you've opened, and who's applied to work with you."
+        eyebrow="Partner searches"
+        title="Your partner searches"
+        description="Partner searches you've opened, and who's applied."
       />
 
       {pairRequests && pairRequests.length > 0 ? (
@@ -23,11 +26,20 @@ export default function Index({ pairRequests }) {
           ))}
         </div>
       ) : (
-        <EmptyState icon={ClipboardList} title="You haven't opened any requests yet" description="Post what you're working on and let the community come to you.">
+        <EmptyState icon={ClipboardList} title="You haven't opened any partner searches yet" description="Say what you want to learn and let a partner find you.">
           <Button asChild className="mt-2">
-            <Link href="/users/pair_requests/new">Create a request</Link>
+            <Link href="/users/pair_requests/new">Start a partner search</Link>
           </Button>
         </EmptyState>
+      )}
+
+      {matches.length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-4 text-2xl">People looking for the same thing</h2>
+          {matches.map((match) => (
+            <SearchCard key={match.id} pairRequest={match} currentUserId={auth.user.id} onApply={(search) => router.visit(`/pair_requests/${search.id}/offers/new`)} />
+          ))}
+        </section>
       )}
     </div>
   );

@@ -4,10 +4,6 @@ module PairRequests
       record && record.user == user
     end
 
-    def accept?
-      user == record.pair_request.user
-    end
-
     def create?
       record.pair_request.user != user
     end

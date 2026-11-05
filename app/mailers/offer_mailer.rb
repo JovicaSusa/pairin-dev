@@ -1,8 +1,10 @@
 class OfferMailer < ApplicationMailer
+  include Unsubscribable
+
   before_action :set_offer
 
   def offer_received_email
-    mail(to: @poster.email, subject: "#{@offerer_name} wants to pair with you")
+    mail(to: @poster.email, subject: "#{@offerer_name} applied to your partner search")
   end
 
   def offer_reminder_email
@@ -12,8 +14,63 @@ class OfferMailer < ApplicationMailer
   def offer_expired_email
     @poster_name = @poster.name.presence || "The poster"
     @suggestions = PairRequests::Suggestions.call(@offer)
+    allow_unsubscribe(@offer.offerer, "suggestions")
 
     mail(to: @offer.offerer.email, subject: "No answer yet on #{@offer.pair_request.subject}")
+  end
+
+  # To the other partner. It says the partnership ended, never why, or whether
+  # they were blocked.
+  def partnership_ended_email
+    @ended_by = params[:ended_by]
+    @recipient = @offer.other_person(@ended_by)
+
+    mail(to: @recipient.email, subject: "Your partnership with #{@ended_by.display_name} has ended")
+  end
+
+  def search_filled_email
+    @suggestions = PairRequests::Suggestions.call(@offer)
+    allow_unsubscribe(@offer.offerer, "suggestions")
+
+    mail(to: @offer.offerer.email, subject: "An update on #{@offer.pair_request.subject}")
+  end
+
+  def proposal_email
+    @proposer = @offer.proposed_by
+    mail(to: @offer.other_person(@proposer).email, subject: "#{@proposer.display_name} wants to become partners")
+  end
+
+  def proposal_reminder_email
+    @proposer = @offer.proposed_by
+    mail(to: @offer.other_person(@proposer).email, subject: "Reminder: #{@proposer.display_name} wants to become partners")
+  end
+
+  def proposal_accepted_email
+    @accepter = @offer.other_person(params[:recipient])
+    @conversation_url = partner_url(@offer.partnership)
+    mail(to: params[:recipient].email, subject: "You and #{@accepter.display_name} are partners")
+  end
+
+  # Says how many and who from, but not what: the words stay in the app.
+  def unread_messages_email
+    @recipient = params[:recipient]
+    @sender = @offer.other_person(@recipient)
+    @count = @offer.unread_messages_for(@recipient).count
+
+    mail(to: @recipient.email, subject: "#{@sender.display_name} sent you #{@count == 1 ? 'a message' : "#{@count} messages"}")
+  end
+
+  # The applicant was told the poster had gone quiet, so this one's good news.
+  def late_reply_email
+    mail(to: @offer.offerer.email, subject: "#{@poster.display_name} came back and replied")
+  end
+
+  # To whoever didn't end it. The reason they gave stays private.
+  def not_a_match_email
+    @ended_by = @offer.ended_by
+    @recipient = @offer.other_person(@ended_by)
+
+    mail(to: @recipient.email, subject: "#{@ended_by.display_name} has ended your conversation")
   end
 
   private
@@ -22,6 +79,7 @@ class OfferMailer < ApplicationMailer
     @offer = params[:offer]
     @poster = @offer.pair_request.user
     @offerer_name = @offer.offerer_display_name
-    @confirmation_url = offer_confirmation_url(token: @offer.generate_token_for(:poster_confirmation))
+    @conversation_url = conversation_url(@offer)
+    @pause_url = request_pause_url(token: @offer.pair_request.generate_token_for(:pause))
   end
 end

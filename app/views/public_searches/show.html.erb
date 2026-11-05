@@ -1,0 +1,43 @@
+<% content_for :title, "#{@search.subject} - Pairin" %>
+<% poster = @search.user %>
+<% first_name = poster.display_name.split.first %>
+
+<div class="px-6 md:px-16 lg:px-24 py-16 md:py-20 max-w-2xl mx-auto">
+  <a href="<%= root_path %>" class="inline-flex items-center gap-2 font-display text-xl font-extrabold tracking-tight">
+    <%= image_tag "logo.svg", alt: "", class: "h-8 w-8" %>
+    pairin
+  </a>
+
+  <p class="mt-8 text-xs font-bold uppercase tracking-widest text-purple">Looking for a learning partner</p>
+  <h1 class="font-display font-extrabold text-4xl tracking-tight leading-none mt-2 mb-6"><%= @search.subject %></h1>
+
+  <div class="rounded-2xl border-2 border-black bg-white p-6 shadow-[4px_4px_0_0_#000]">
+    <p class="font-bold">
+      <%= first_name %><% if poster.level_titleized %> &middot; <%= poster.level_titleized %><% end %>
+    </p>
+    <p class="mt-3 whitespace-pre-wrap text-black/70"><%= @search.description %></p>
+    <p class="mt-4 text-sm"><span class="font-bold">Commitment:</span> <%= @search.commitment_label %></p>
+    <% if @search.tags.any? %>
+      <p class="mt-2 text-sm"><span class="font-bold">Topics:</span> <%= @search.tags.map(&:name).to_sentence %></p>
+    <% end %>
+  </div>
+
+  <% if current_user == poster %>
+    <p class="mt-8 text-black/70">This is how your partner search looks to people you share it with.</p>
+  <% elsif @search.taking_applications? %>
+    <div class="mt-8">
+      <%= link_to "Apply to #{first_name}", public_search_apply_path(token: params[:token]), rel: "nofollow", class: "inline-block rounded-xl border-2 border-black bg-orange px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none" %>
+    </div>
+    <div class="mt-8 border-t-2 border-black/10 pt-6">
+      <p class="font-bold">How Pairin works</p>
+      <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm text-black/70">
+        <li>Apply and say what you want to get out of it.</li>
+        <li>Talk first, with no commitment.</li>
+        <li>If it's a good fit, become partners and get a shared Workspace.</li>
+      </ol>
+      <% unless user_signed_in? %><p class="mt-3 text-sm text-black/70">It's free, and you'll need an account to apply.</p><% end %>
+    </div>
+  <% else %>
+    <p class="mt-8 text-black/70">This partner search is no longer open. <a href="<%= pair_requests_path %>" class="text-purple font-bold">See who else is looking</a>.</p>
+  <% end %>
+</div>

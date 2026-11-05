@@ -1,4 +1,78 @@
 RSpec.describe User, type: :model do
+  describe "deleting an account" do
+    let(:user) { create(:user) }
+    let(:other) { create(:user) }
+
+    it "deletes conversations on either side, including what the other person wrote" do
+      as_poster = create(:offer, pair_request: create(:pair_request, user:), offerer: other)
+      as_applicant = create(:offer, pair_request: create(:pair_request, user: other), offerer: user)
+      as_poster.post_message(user, "Mine")
+      as_poster.post_message(other, "Theirs")
+      as_applicant.post_message(other, "Theirs too")
+      unrelated = create(:offer, pair_request: create(:pair_request, user: other))
+
+      user.destroy!
+
+      expect(Offer.where(id: [as_poster.id, as_applicant.id])).to be_empty
+      expect(Message.where(offer_id: [as_poster.id, as_applicant.id])).to be_empty
+      expect(unrelated.reload.messages).to be_present
+      expect(other.reload.pair_requests.count).to eq(2)
+    end
+
+    it "works for a conversation they ended, a block and an old session" do
+      offer = create(:offer, pair_request: create(:pair_request, user:), offerer: other)
+      offer.not_a_match!(by: user)
+      user.block!(other)
+      create(:session, sessionable: user.pair_requests.first).participations.create!(participant: user, role: Participation::ROLE_INITIATOR)
+      user.activities.create!(title: "Hi", content: "There")
+
+      expect { user.destroy! }.to change(User, :count).by(-1)
+      expect(Block.count).to eq(0)
+    end
+
+    it "also clears the other side of a conversation that person ended" do
+      offer = create(:offer, pair_request: create(:pair_request, user:), offerer: other)
+      offer.not_a_match!(by: other)
+
+      other.destroy!
+
+      expect(Offer.where(id: offer.id)).to be_empty
+    end
+  end
+
+  describe "github_url" do
+    it "is optional, and blank is saved as nothing" do
+      expect(build(:user, github_url: nil)).to be_valid
+      expect(build(:user, github_url: "  ").github_url).to be_nil
+    end
+
+    it "accepts a github.com link" do
+      expect(build(:user, github_url: "https://github.com/ada")).to be_valid
+      expect(build(:user, github_url: "https://www.github.com/ada")).to be_valid
+    end
+
+    it "adds https when it's left off" do
+      expect(build(:user, github_url: " github.com/ada ").github_url).to eq("https://github.com/ada")
+    end
+
+    it "refuses anything that isn't a link to someone on github.com" do
+      [
+        "javascript:alert(1)",
+        "https://evil.example/ada",
+        "https://github.com.evil.example/ada",
+        "https://github.com",
+        "https://github.com/",
+        "ftp://github.com/ada",
+        "not a link"
+      ].each do |url|
+        user = build(:user, github_url: url)
+
+        expect(user).not_to be_valid, "expected #{url} to be refused"
+        expect(user.errors[:github_url]).to be_present
+      end
+    end
+  end
+
   describe ".old_enough?" do
     let(:today) { Date.new(2026, 11, 2) }
 

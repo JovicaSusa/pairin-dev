@@ -12,7 +12,7 @@ RSpec.describe DeleteSuspendedAccountsJob, type: :job do
     search = create(:pair_request, user:)
     their_offer = create(:offer, offerer: user)
     offer_on_their_search = create(:offer, pair_request: search)
-    window = user.availability_windows.first
+    window = create(:availability_window, user:)
     create(:session, sessionable: search).participations.create!(participant: user, role: Participation::ROLE_INITIATOR)
     user.activities.create!(title: "Hi", content: "There")
     poster_of_their_offer = their_offer.pair_request

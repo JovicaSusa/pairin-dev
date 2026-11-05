@@ -1,6 +1,7 @@
 import MainNav from "@/components/MainNav";
 import { Toaster } from "@/components/ui/sonner";
 import { useFlash } from "@/hooks/use-flash";
+import { useLiveConversations } from "@/hooks/use-live-conversations";
 import { usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 
@@ -8,6 +9,7 @@ export default function AppLayout({ children }) {
   const { url, props } = usePage();
   const currentUser = props.auth?.user;
   useFlash();
+  useLiveConversations(currentUser?.id);
 
   useEffect(() => {
     const observer = new MutationObserver(() => {

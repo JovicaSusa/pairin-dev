@@ -3,48 +3,219 @@ class Offer < ApplicationRecord
 
   belongs_to :offerer, class_name: "User"
   belongs_to :pair_request
-  # The slot this offer booked. Requests don't own slots; they're cut from the
-  # poster's weekly hours (PairRequests::BookableSlots).
+  belongs_to :ended_by, class_name: "User", optional: true
+  belongs_to :proposed_by, class_name: "User", optional: true
+  has_one :partnership, dependent: :destroy
+  has_many :messages, dependent: :destroy
+  # History only: applications used to book a time. New ones have no period.
   has_one :period, as: :periodable, dependent: :destroy, inverse_of: :periodable, autosave: true
 
-  validates :message, presence: true
+  HOW_OFTEN = {
+    "once_a_week" => "About once a week",
+    "twice_a_week" => "Twice a week",
+    "more" => "More than twice a week"
+  }.freeze
+
+  # Old applications have no answers, so these stay optional on them.
+  enum :how_often, HOW_OFTEN.keys.index_with(&:itself), prefix: true, validate: { allow_nil: true }
+  enum :how_long, PairRequest::COMMITMENTS.keys.index_with(&:itself), prefix: true, validate: { allow_nil: true }
+
+  validates :message, presence: true, length: { maximum: Message::MAX_LENGTH }
+  validates :goal, :how_often, :how_long, presence: true, on: :create
+  validate :offerer_has_a_level, on: :create
+  validate :both_people_in_the_same_age_group, on: :create
   validates :pair_request_id, uniqueness: { scope: :offerer_id }
-  validates :period, presence: true
-  # Run when an offerer books (save(context: :booking)), not on every save:
-  # the open slots change as time passes and the poster gets sessions.
-  validate :period_is_a_bookable_slot, on: :booking
 
-  delegate :duration, to: :pair_request
+  UNREAD_EMAIL_AFTER = 15.minutes
+  PROPOSAL_REMINDER_AFTER = 3.days
+  REMIND_AFTER = 24.hours
+  ANSWER_WITHIN = 72.hours
 
-  # Signed token for the poster's no-login confirmation link. What the link
-  # still allows (accept, already matched, slot passed) follows the offer's state.
-  generates_token_for :poster_confirmation, expires_in: 60.days
+  # The application's message starts its thread.
+  after_create { messages.create!(sender: offerer, body: message) }
 
-  scope :future, -> { joins(:period).merge(Period.future) }
   scope :accepted, -> { where.not(accepted_at: nil) }
+  scope :between, ->(a, b) {
+    joins(:pair_request).where(
+      "(offers.offerer_id = :a AND pair_requests.user_id = :b) OR (offers.offerer_id = :b AND pair_requests.user_id = :a)",
+      a: a.id, b: b.id
+    )
+  }
+  scope :involving, ->(user) { joins(:pair_request).where("offers.offerer_id = :id OR pair_requests.user_id = :id", id: user.id) }
 
   def accepted?
     accepted_at?
   end
 
-  def pending?
-    status == "PENDING"
+  # The clock on an application runs until the poster replies or either person
+  # ends it. Old applications accepted the old way count as answered too.
+  def unanswered?
+    !replied_at? && !ended? && !accepted?
   end
 
-  # When to remind the poster: 24h after the offer, or 3h before the slot if
-  # that's sooner. Nil when the slot is too close for a reminder to help.
-  def reminder_at
-    at = [created_at + 24.hours, period.start_at - 3.hours].min
+  # The poster has gone past the deadline, so a reply now is a late one.
+  def overdue?
+    unanswered? && expires_at <= Time.current
+  end
 
-    at if at > Time.current
+  def poster
+    pair_request.user
+  end
+
+  def other_person(user)
+    user == offerer ? poster : offerer
+  end
+
+  # The poster's first reply opens the chat. It isn't a commitment.
+  def chat_open?
+    replied_at? && !ended?
+  end
+
+  # A chat also ends the day one of two under-18s turns 18, because a chat can't
+  # exist between an under-18 and an adult. Someone whose age isn't known yet
+  # doesn't trigger this.
+  def ended?
+    ended_at? || across_age_groups?
+  end
+
+  def across_age_groups?
+    offerer.age_group.present? && poster.age_group.present? && offerer.age_group != poster.age_group
+  end
+
+  # The applicant has said their piece until the poster replies.
+  def can_message?(user)
+    return false if ended?
+
+    user == poster || (user == offerer && replied_at?)
+  end
+
+  # Under a lock, so two first replies, or a reply and "Not a match", can't cross.
+  # Returns the message, unsaved with errors if the body was refused, or nil
+  # if this person can't write here.
+  def post_message(sender, body)
+    with_lock do
+      next unless can_message?(sender)
+
+      messages.create(sender:, body:).tap do |message|
+        update_columns(replied_at: message.created_at) if message.persisted? && sender == poster && !replied_at?
+      end
+    end
+  end
+
+  # Returns false if it had already ended.
+  def not_a_match!(by:, reason: nil)
+    with_lock do
+      next false if ended_at?
+
+      update_columns(ended_at: Time.current, ended_by_id: by.id, end_reason: reason.presence)
+      true
+    end
+  end
+
+  def partners?
+    partnership.present?
+  end
+
+  def proposal_pending?
+    proposed_at?
+  end
+
+  def can_propose?
+    chat_open? && !partners? && !proposal_pending? && !pair_request.partnership
+  end
+
+  # Returns :proposed or :accepted, or nil if it can't happen. If the other
+  # person proposed at the same moment, they both want this, so it's accepted.
+  def propose_partnership!(by:)
+    with_search_locked do
+      next accept_proposal(by:) && :accepted if proposal_pending? && proposed_by_id != by.id
+      next unless can_propose?
+
+      update_columns(proposed_at: Time.current, proposed_by_id: by.id, proposal_declined_at: nil)
+      :proposed
+    end
+  end
+
+  # Returns the partnership, or nil if it can't happen.
+  def accept_proposal!(by:)
+    with_search_locked { accept_proposal(by:) }
+  end
+
+  # The chat stays open, and either person can propose again.
+  def decline_proposal!(by:)
+    with_lock do
+      next false unless proposal_pending? && proposed_by_id != by.id
+
+      update_columns(proposed_at: nil, proposal_declined_at: Time.current)
+      true
+    end
+  end
+
+  def conversation_status_for(user)
+    return "Ended" if ended?
+    return "Partners" if partners?
+    return "Talking" if replied_at?
+
+    user == poster ? "Reply" : "Sent"
+  end
+
+  def mark_read_by!(user)
+    update_columns(read_column_for(user) => Time.current)
+  end
+
+  def unread_messages_for(user)
+    read_at = public_send(read_column_for(user))
+    unread = messages.where.not(sender: user)
+
+    read_at ? unread.where("messages.created_at > ?", read_at) : unread
+  end
+
+  # One email per stretch of unread: none until they've read since the last one,
+  # and not before the oldest unread message has waited long enough.
+  def unread_email_due_for?(user)
+    return false if ended?
+
+    emailed_at = public_send(emailed_column_for(user))
+    read_at = public_send(read_column_for(user))
+    return false if emailed_at && (read_at.nil? || emailed_at > read_at)
+
+    oldest_unread = unread_messages_for(user).minimum(:created_at)
+    oldest_unread.present? && oldest_unread <= UNREAD_EMAIL_AFTER.ago
+  end
+
+  def mark_unread_emailed_to!(user)
+    update_columns(emailed_column_for(user) => Time.current)
+  end
+
+  def how_often_label
+    HOW_OFTEN[how_often]
+  end
+
+  def how_long_label
+    PairRequest::COMMITMENTS[how_long]
+  end
+
+  # What the application form offers, for its dropdowns.
+  def self.form_options
+    to_options = ->(labels) { labels.map { |value, label| { value:, label: } } }
+
+    {
+      howOften: to_options.call(HOW_OFTEN),
+      howLong: to_options.call(PairRequest::COMMITMENTS),
+      levels: to_options.call(User::LEVELS.index_with(&:titleize))
+    }
+  end
+
+  def reminder_at
+    created_at + REMIND_AFTER
+  end
+
+  def expires_at
+    created_at + ANSWER_WITHIN
   end
 
   def offerer_display_name
-    offerer.name.presence || "A Pairin member"
-  end
-
-  def expired?
-    period.start_at < Time.current
+    offerer.display_name
   end
 
   def status
@@ -52,8 +223,6 @@ class Offer < ApplicationRecord
       "ACCEPTED"
     elsif pair_request.has_accepted_offer?
       "ACCEPTED OTHER"
-    elsif expired?
-      "EXPIRED"
     else
       "PENDING"
     end
@@ -61,12 +230,42 @@ class Offer < ApplicationRecord
 
   private
 
-  # The chosen period drives the session time and the expiry job, so it must be
-  # a slot the request is actually offering right now.
-  def period_is_a_bookable_slot
-    return if period.nil? || pair_request.nil?
+  # The search first, then the offer. Forming a partnership goes on to lock the
+  # search's other offers, so any other order could deadlock with a second accept.
+  def with_search_locked
+    transaction do
+      pair_request.lock!
+      lock!
+      yield
+    end
+  end
 
-    bookable = PairRequests::BookableSlots.call(pair_request).any? { |slot| slot.start_at == period.start_at }
-    errors.add(:period, "isn't one of this request's open slots") unless bookable
+  # Only one of a search's chats can become the partnership.
+  def accept_proposal(by:)
+    return unless chat_open? && proposal_pending? && proposed_by_id != by.id
+    return if pair_request.partnership
+
+    update_columns(proposed_at: nil)
+    create_partnership!(pair_request:)
+  end
+
+  def read_column_for(user)
+    user == offerer ? :offerer_read_at : :poster_read_at
+  end
+
+  def emailed_column_for(user)
+    user == offerer ? :offerer_emailed_at : :poster_emailed_at
+  end
+
+  # A chat can't exist between an under-18 and an adult.
+  def both_people_in_the_same_age_group
+    return if offerer.nil? || pair_request.nil?
+
+    errors.add(:base, "This partner search isn't available") unless offerer.same_age_group?(pair_request.user)
+  end
+
+  # Their level comes from their profile. The form asks once when it's blank.
+  def offerer_has_a_level
+    errors.add(:level, "can't be blank") unless User::LEVELS.include?(offerer&.level)
   end
 end

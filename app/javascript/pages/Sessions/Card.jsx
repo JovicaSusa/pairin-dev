@@ -16,11 +16,11 @@ export default function SessionCard({ session }) {
         <div className="flex items-center gap-3">
           <Avatar className="h-11 w-11 border-2 border-black">
             <AvatarImage src={session.other_participant.image_url} alt={session.other_participant.name} />
-            <AvatarFallback className="bg-orange text-white font-bold">{session.other_participant.name?.[0]}</AvatarFallback>
+            <AvatarFallback className="bg-orange text-black font-bold">{session.other_participant.name?.[0]}</AvatarFallback>
           </Avatar>
           <div>
             <p className="font-bold text-sm">{session.other_participant.name}</p>
-            <span className="text-xs text-black/50">
+            <span className="text-xs text-black/65">
               {session.other_participant.profession}
               {session.other_participant.profession && " · "}
               {session.other_participant.level}
@@ -32,7 +32,7 @@ export default function SessionCard({ session }) {
           <Badge variant="neutral" className="rounded-full text-xs">
             {formatShort(session.start_at)}
           </Badge>
-          <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
+          <ArrowRight className="h-3 w-3 shrink-0 text-black/65" />
           <Badge variant="neutral" className="rounded-full text-xs">
             {formatShort(session.end_at)}
           </Badge>
@@ -63,7 +63,7 @@ export default function SessionCard({ session }) {
               </a>
             </Button>
           ) : (
-            <p className="text-sm font-semibold text-black/50">
+            <p className="text-sm font-semibold text-black/65">
               Waiting for {session.holder_name} to provide the link
             </p>
           )

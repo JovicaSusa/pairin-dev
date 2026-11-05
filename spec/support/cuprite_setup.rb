@@ -14,8 +14,10 @@ RSpec.configure do |config|
       js_errors: true,
       headless: %w[0 false].exclude?(ENV["HEADLESS"]),
       slowmo: ENV["SLOWMO"]&.to_f,
-      process_timeout: 15,
-      timeout: 10,
+      process_timeout: 60,
+      timeout: 30,
+      # PostHog loads from the internet, and a page waiting on it fails with a timeout.
+      url_blacklist: [/posthog\.com/],
       browser_options: ENV["DOCKER"] ? { "no-sandbox" => nil } : {}
     })
   end

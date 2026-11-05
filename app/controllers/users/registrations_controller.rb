@@ -29,6 +29,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
 
     super
+    return unless resource.persisted?
+
+    # Someone who can't apply to it, such as a 17-year-old, isn't sent back to its form.
+    session.delete("user_return_to") if session.delete(:shared_search_token) && resource.signup_pair_request.nil?
   end
 
   # GET /resource/edit
@@ -58,6 +62,16 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # protected
 
   # If you have extra params to permit, append them to the sanitizer.
+  # Set on the server from the session, so it can't be sent in the form.
+  def build_resource(hash = {})
+    super
+    token = session[:shared_search_token]
+    return unless action_name == "create" && token.present?
+
+    search = PairRequest.find_by(share_token: token)
+    resource.signup_pair_request = search if search && resource.same_age_group?(search.user)
+  end
+
   def configure_sign_up_params
     devise_parameter_sanitizer.permit(:sign_up, keys: [:timezone, :date_of_birth])
   end

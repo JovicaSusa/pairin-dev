@@ -1,17 +1,36 @@
                 <blockquote style="margin: 24px 0; padding-left: 16px; border-left: 4px solid #7B5FF1; line-height: 24px">
                   <%= offer.message %>
                 </blockquote>
+                <% if offer.goal.present? %>
+                  <p style="margin: 0 0 8px; line-height: 24px"><span style="font-weight: 600">Their goal:</span> <%= offer.goal %></p>
+                  <p style="margin: 0 0 8px; line-height: 24px"><span style="font-weight: 600">How often:</span> <%= offer.how_often_label %></p>
+                  <p style="margin: 0 0 8px; line-height: 24px"><span style="font-weight: 600">How long:</span> <%= offer.how_long_label %> (you're looking for: <%= offer.pair_request.commitment_label %>)</p>
+                  <% if offer.offerer.profile_for_others[:level] %>
+                    <p style="margin: 0 0 8px; line-height: 24px"><span style="font-weight: 600">Level:</span> <%= offer.offerer.profile_for_others[:level] %></p>
+                  <% end %>
+                <% end %>
+                <% if offer.period %>
                 <p style="margin: 0; line-height: 24px">
                   <span style="font-weight: 600">Time:</span>
                   <%= offer.period.start_at.in_time_zone(poster.timezone).to_fs(:short) %>
                   – <%= offer.period.end_at.in_time_zone(poster.timezone).strftime("%H:%M") %>
                   (<%= poster.timezone %>)
                 </p>
+                <% end %>
+                <% if offer.offerer.profile_for_others[:github_url].present? %>
+                  <p style="margin: 8px 0 0; line-height: 24px">
+                    <span style="font-weight: 600">GitHub:</span>
+                    <a href="<%= offer.offerer.github_url %>" style="color: #4338ca"><%= offer.offerer.github_url %></a>
+                  </p>
+                <% end %>
                 <p style="margin: 32px 0; text-align: center">
-                  <a href="<%= confirmation_url %>" style="display: inline-block; border: 2px solid #000001; border-radius: 12px; background-color: #FF8B37; padding: 12px 24px; font-weight: 600; color: #000001; text-decoration: none">
-                    See the offer
+                  <a href="<%= conversation_url %>" style="display: inline-block; border: 2px solid #000001; border-radius: 12px; background-color: #FF8B37; padding: 12px 24px; font-weight: 600; color: #000001; text-decoration: none">
+                    Read and reply
                   </a>
                 </p>
                 <p style="margin: 0; font-size: 14px; line-height: 20px; color: #475569">
-                  You can accept from that page without logging in. Accept before the offered time starts.
+                  You'll sign in first if you need to. Replying isn't a commitment: it just starts the conversation.
+                </p>
+                <p style="margin: 16px 0 0; font-size: 14px; line-height: 20px; color: #475569">
+                  Not looking any more? <a href="<%= pause_url %>" style="color: #475569">Pause this search</a>
                 </p>

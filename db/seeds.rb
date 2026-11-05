@@ -12,9 +12,9 @@ if Rails.env.development?
   timezones = ["Europe/Berlin", "Europe/London", "America/New_York", "Asia/Tokyo", "UTC"]
 
   posters = Array.new(20) { Faker::Internet.email }.map do |email|
-    user = User.create!(email: email, confirmed_at: Time.zone.now, password: "Password33*", timezone: timezones.sample, date_of_birth: Faker::Date.birthday(min_age: 18, max_age: 60))
+    user = User.create!(email: email, confirmed_at: Time.zone.now, password: "Password33*", timezone: timezones.sample, level: User::LEVELS.sample, date_of_birth: Faker::Date.birthday(min_age: 18, max_age: 60))
 
-    # Weekly hours: three evenings a week, long enough for the longest seeded call.
+    # Weekly hours: three evenings a week.
     [1, 2, 3, 4, 5, 6, 7].sample(3).each do |weekday|
       user.availability_windows.create!(weekday:, start_minute: 18 * 60, end_minute: 21 * 60)
     end
@@ -23,7 +23,7 @@ if Rails.env.development?
       user.pair_requests.create!(
         subject: Faker::ProgrammingLanguage.name,
         description: Faker::Hacker.say_something_smart,
-        duration: [30, 45, 60, 90, 120, 150].sample
+        commitment: PairRequest::COMMITMENTS.keys.sample
       )
     end
 
@@ -34,17 +34,19 @@ if Rails.env.development?
     pr1, pr2 = poster.pair_requests
     offerers = posters.excluding(poster).sample(10)
 
-    # Each offer books its own slot from the poster's weekly hours.
     { pr1 => offerers.first(5), pr2 => offerers.last(5) }.each do |pair_request, request_offerers|
-      request_offerers.zip(pair_request.bookable_slots.sample(request_offerers.size)).each do |offerer, slot|
-        next unless slot
-
-        offer = pair_request.offers.build(offerer:, message: Faker::Hacker.say_something_smart)
-        offer.build_period(start_at: slot.start_at)
-        offer.save!(context: :booking)
+      request_offerers.each do |offerer|
+        pair_request.offers.create!(
+          offerer:,
+          message: Faker::Hacker.say_something_smart,
+          goal: Faker::Hacker.say_something_smart,
+          how_often: Offer::HOW_OFTEN.keys.sample,
+          how_long: PairRequest::COMMITMENTS.keys.sample
+        )
       end
     end
 
-    Offers::Accept.call(pr1.offers.first) if pr1.offers.any?
+    # One conversation already under way on each poster's first search.
+    pr1.offers.first&.post_message(poster, Faker::Hacker.say_something_smart)
   end
 end

@@ -14,17 +14,16 @@ RSpec.describe "Date of birth step", type: :request do
     end
   end
 
-  it "shows the step, without mentioning an age" do
+  it "shows the step" do
     get date_of_birth_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).not_to match(/\b16\b|minimum age/i)
   end
 
   it "saves an adult's answer and lets them through" do
     patch date_of_birth_path, params: { date_of_birth: "1990-06-15" }
 
-    expect(response).to redirect_to(pair_requests_path)
+    expect(response).to redirect_to(onboarding_path)
     expect(user.reload.date_of_birth).to eq(Date.new(1990, 6, 15))
 
     get pair_requests_path

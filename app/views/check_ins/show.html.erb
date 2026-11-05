@@ -1,0 +1,32 @@
+<% content_for :title, "Weekly check-in - Pairin" %>
+
+<div class="px-6 md:px-16 lg:px-24 py-16 md:py-20 max-w-2xl mx-auto">
+  <a href="<%= root_path %>" class="text-sm font-bold text-purple hover:underline">&larr; Back to Pairin</a>
+
+  <h1 class="font-display font-extrabold text-4xl tracking-tight leading-none mt-6 mb-6">
+    <% if @check_in.answered? %>
+      Thanks, got it
+    <% else %>
+      Did you two work together this week?
+    <% end %>
+  </h1>
+
+  <% if @check_in.answered? %>
+    <p class="text-gray-700">
+      You said <strong><%= @check_in.worked_together? ? "yes" : "no" %></strong> for this week.
+    </p>
+  <% elsif @answer %>
+    <%= button_to "Confirm: #{@answer.capitalize}", check_in_path(token: params[:token]), params: { answer: @answer },
+          class: "rounded-xl border-2 border-black bg-orange px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none" %>
+    <p class="mt-4 text-sm">
+      <a href="<%= check_in_path(token: params[:token]) %>" class="font-bold text-purple">Choose the other answer</a>
+    </p>
+  <% else %>
+    <div class="flex gap-3">
+      <%= button_to "Yes", check_in_path(token: params[:token]), params: { answer: "yes" },
+            class: "rounded-xl border-2 border-black bg-orange px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none" %>
+      <%= button_to "No", check_in_path(token: params[:token]), params: { answer: "no" },
+            class: "rounded-xl border-2 border-black bg-white px-6 py-3 font-bold shadow-[4px_4px_0_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none" %>
+    </div>
+  <% end %>
+</div>

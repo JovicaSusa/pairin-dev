@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm, Link, router } from '@inertiajs/react';
-import { Inbox, CheckCircle2, Power, EyeOff } from "lucide-react";
+import { Inbox, CheckCircle2, Power, EyeOff, Share2 } from "lucide-react";
 import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,35 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
+const TAG_COLORS = ["bg-purple text-white", "bg-orange text-black", "bg-green text-black"];
+
+function ShareLink({ path }) {
+  const url = `${window.location.origin}${path}`;
+  const [copied, setCopied] = useState(false);
+
+  const copy = async (e) => {
+    const field = e.currentTarget.previousElementSibling;
+    field.select();
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // No clipboard access, such as on plain http: the link is selected to copy by hand.
+      return;
+    }
+    setCopied(true);
+  };
+
+  return (
+    <div className="mt-4 rounded-xl border-2 border-black bg-yellow-50 p-3">
+      <Label htmlFor={`share_${path}`} className="mb-1 block">Send this to someone who might be a good partner</Label>
+      <div className="flex gap-2">
+        <Input id={`share_${path}`} readOnly value={url} onFocus={(e) => e.target.select()} className="bg-white" />
+        <Button type="button" size="sm" onClick={copy}>{copied ? "Copied" : "Copy"}</Button>
+      </div>
+      <p className="mt-1 text-xs text-black/65">Anyone with this link can read this search and apply. It isn't listed on search engines.</p>
+    </div>
+  );
+}
 
 export default function UserPairRequestCard({ request }) {
   const { data, setData, patch, processing } = useForm({
@@ -27,6 +55,7 @@ export default function UserPairRequestCard({ request }) {
   };
 
   const [toggling, setToggling] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   const toggleOnOff = () => {
     router.patch(`/users/pair_requests/${request.id}/${request.paused ? 'resume' : 'pause'}`, {}, {
@@ -45,6 +74,12 @@ export default function UserPairRequestCard({ request }) {
             <Power className="h-4 w-4" />
             {request.paused ? 'Switch on' : 'Switch off'}
           </Button>
+          {request.share_path && (
+            <Button type="button" variant="neutral" size="sm" aria-expanded={sharing} onClick={() => setSharing(!sharing)}>
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+          )}
           <Button asChild variant="neutral" size="sm">
             <Link href={`/pair_requests/${request.id}/offers`}>
               <Inbox className="h-4 w-4" />
@@ -54,14 +89,18 @@ export default function UserPairRequestCard({ request }) {
         </div>
       </div>
 
+      {sharing && request.share_path && <ShareLink path={request.share_path} />}
+
+      <Badge className="mt-3 rounded-full border-black bg-green text-xs text-black">Partner · {request.commitment_label}</Badge>
+
       {request.paused && (
-        <Badge variant="neutral" className="mt-3 rounded-full">
+        <Badge variant="neutral" className="ml-2 mt-3 rounded-full">
           <EyeOff className="h-3.5 w-3.5" />
           Off: hidden from others
         </Badge>
       )}
 
-      <ExpandableText className="mt-3 leading-relaxed text-black/60">{request.description}</ExpandableText>
+      <ExpandableText className="mt-3 leading-relaxed text-black/65">{request.description}</ExpandableText>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {request.tags?.map((tag, i) => (
@@ -82,11 +121,11 @@ export default function UserPairRequestCard({ request }) {
             <div className="flex items-center gap-3">
               <Avatar className="h-11 w-11 shrink-0 border-2 border-black">
                 <AvatarImage src={request.accepted_offer.offerer_image} alt={request.accepted_offer.offerer_name} />
-                <AvatarFallback className="bg-orange text-white font-bold">{request.accepted_offer.offerer_name?.[0]}</AvatarFallback>
+                <AvatarFallback className="bg-orange text-black font-bold">{request.accepted_offer.offerer_name?.[0]}</AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-bold text-sm">{request.accepted_offer.offerer_name}</p>
-                <span className="text-xs text-black/50">
+                <span className="text-xs text-black/65">
                   {request.accepted_offer.offerer_profession}
                   {request.accepted_offer.offerer_profession && " · "}
                   {request.accepted_offer.offerer_level}
@@ -100,7 +139,7 @@ export default function UserPairRequestCard({ request }) {
                   <Badge variant="neutral" className="rounded-full text-xs">
                     {formatShort(s.start_at)}
                   </Badge>
-                  <span className="text-black/30">→</span>
+                  <span className="text-black/65">→</span>
                   <Badge variant="neutral" className="rounded-full text-xs">
                     {formatShort(s.end_at)}
                   </Badge>
@@ -109,7 +148,7 @@ export default function UserPairRequestCard({ request }) {
             </div>
           </div>
 
-          <form onSubmit={submitCallLink} className="mt-4 flex flex-col items-stretch gap-2 md:flex-row md:items-end">
+          {request.sessions.length > 0 && <form onSubmit={submitCallLink} className="mt-4 flex flex-col items-stretch gap-2 md:flex-row md:items-end">
             <div className="flex flex-1 flex-col">
               <Label htmlFor="pair_request_sessions_attributes_0_call_link" className="mb-1">Call link</Label>
               <Input
@@ -128,7 +167,7 @@ export default function UserPairRequestCard({ request }) {
             <Button disabled={processing} className="md:w-32">
               {processing ? '...' : 'Add'}
             </Button>
-          </form>
+          </form>}
         </div>
       )}
     </div>
