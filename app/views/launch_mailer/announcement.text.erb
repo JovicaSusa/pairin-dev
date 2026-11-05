@@ -1,0 +1,28 @@
+Hi<%= " #{@user.name.split.first}" if @user.name.present? %>,
+
+You signed up for Pairin a while ago, and I'd guess it didn't do much for you. That's on me: it asked you to book a call with a stranger before you'd exchanged a word.
+
+So I've changed it. You post what you want to learn, someone applies, and you talk in the app first. If it's a good fit, you both say yes and get a shared Workspace to keep going in. If it isn't, nobody's the worse for it. No time slots, no intro calls.
+
+<% if @paused_searches.size == 1 -%>
+I've switched off your old search, "<%= @paused_searches.first.subject %>", so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch it back on:
+<% elsif @paused_searches.size > 1 -%>
+I've switched off your old searches, so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch one back on:
+<% elsif @has_on_search -%>
+Your search is still on, so there's nothing you need to do. You can see it here:
+<% else -%>
+If you still want someone to learn with, posting a search takes about a minute:
+<% end -%>
+<%= @action_url %>
+
+<% if @user.date_of_birth.blank? -%>
+The first time you sign in, we'll ask for your date of birth. It's a one-time step.
+
+<% end -%>
+If it's not for you, that's fine too. And if you try it and something's off, reply to this email. I read them.
+
+Jovica
+
+--
+You're getting this because you signed up for Pairin.
+Unsubscribe from announcements: <%= @unsubscribe_url %>
