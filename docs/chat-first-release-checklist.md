@@ -10,6 +10,13 @@ Merging `chat-first` to `main` deploys it, so do these in order.
 - [ ] The homepage no longer advertises "Go live" and instant matching.
 - [ ] Terms and privacy no longer mention retros and Session Summaries, and their "Last updated" date is the day you merge.
 - [ ] The launch email (#152) is written and approved.
+- [ ] Replace the Honeybadger API key, because the old one is public in this repo's history. Do this just before merging, because production stops reporting errors from the moment the old key is revoked until the deploy finishes. Generate a new key in Honeybadger, then run this and paste it when asked:
+
+  ```
+  gh secret set HONEYBADGER_API_KEY
+  ```
+
+  Also add `HONEYBADGER_API_KEY` to your shell's environment if you run `kamal` commands locally.
 - [ ] Back up the database:
 
   ```
@@ -45,7 +52,14 @@ Merging `chat-first` to `main` deploys it, so do these in order.
 ## Straight after
 
 - [ ] Sign in with two accounts and go through the whole flow on production: post, apply, reply, live chat, partners, Workspace.
-- [ ] Check that `/jobs` lists `delete_suspended_accounts` and `send_weekly_check_ins` as recurring.
+- [ ] Sign in to `/jobs`, and check that it lists `delete_suspended_accounts` and `send_weekly_check_ins` as recurring.
+- [ ] Send a test error from production, and check that it appears in Honeybadger and that the alert email reaches you:
+
+  ```
+  bundle exec kamal app exec --reuse --roles=web 'bin/rails runner "Honeybadger.notify(%q(Production test error)); Honeybadger.flush"'
+  ```
+
+- [ ] Point Honeybadger's uptime monitor at `https://pairin.dev/health`, and check that it reports the site as up.
 - [ ] Request a password reset on production. Check that it reaches the inbox with no warning, the logo shows, the link starts with `https://pairin.dev/`, and the button opens the page to choose a new password.
 - [ ] Send yourself a copy of the launch email, and read it in your inbox. Use the address of a user on production. Check that the logo shows, and try a non-Gmail address too if you have one:
 
