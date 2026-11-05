@@ -75,7 +75,7 @@ export default function Availability({ timezone, windows, weekdays }) {
           <Button type="submit" className="md:w-40">Save timezone</Button>
         </div>
         {suggestDetected && zone === detected && (
-          <p className="mt-2 text-sm text-black/60">Detected from your browser. Save it if it's right.</p>
+          <p className="mt-2 text-sm text-black/65">Detected from your browser. Save it if it's right.</p>
         )}
         {errors?.timezone && <p className="mt-2 text-sm font-bold text-red">{errors.timezone}</p>}
       </form>

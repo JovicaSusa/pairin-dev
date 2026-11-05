@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
+const TAG_COLORS = ["bg-purple text-white", "bg-orange text-black", "bg-green text-black"];
 
 function ShareLink({ path }) {
   const url = `${window.location.origin}${path}`;
@@ -34,7 +34,7 @@ function ShareLink({ path }) {
         <Input id={`share_${path}`} readOnly value={url} onFocus={(e) => e.target.select()} className="bg-white" />
         <Button type="button" size="sm" onClick={copy}>{copied ? "Copied" : "Copy"}</Button>
       </div>
-      <p className="mt-1 text-xs text-black/50">Anyone with this link can read this search and apply. It isn't listed on search engines.</p>
+      <p className="mt-1 text-xs text-black/65">Anyone with this link can read this search and apply. It isn't listed on search engines.</p>
     </div>
   );
 }
@@ -100,7 +100,7 @@ export default function UserPairRequestCard({ request }) {
         </Badge>
       )}
 
-      <ExpandableText className="mt-3 leading-relaxed text-black/60">{request.description}</ExpandableText>
+      <ExpandableText className="mt-3 leading-relaxed text-black/65">{request.description}</ExpandableText>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {request.tags?.map((tag, i) => (
@@ -121,11 +121,11 @@ export default function UserPairRequestCard({ request }) {
             <div className="flex items-center gap-3">
               <Avatar className="h-11 w-11 shrink-0 border-2 border-black">
                 <AvatarImage src={request.accepted_offer.offerer_image} alt={request.accepted_offer.offerer_name} />
-                <AvatarFallback className="bg-orange text-white font-bold">{request.accepted_offer.offerer_name?.[0]}</AvatarFallback>
+                <AvatarFallback className="bg-orange text-black font-bold">{request.accepted_offer.offerer_name?.[0]}</AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-bold text-sm">{request.accepted_offer.offerer_name}</p>
-                <span className="text-xs text-black/50">
+                <span className="text-xs text-black/65">
                   {request.accepted_offer.offerer_profession}
                   {request.accepted_offer.offerer_profession && " · "}
                   {request.accepted_offer.offerer_level}
@@ -139,7 +139,7 @@ export default function UserPairRequestCard({ request }) {
                   <Badge variant="neutral" className="rounded-full text-xs">
                     {formatShort(s.start_at)}
                   </Badge>
-                  <span className="text-black/30">→</span>
+                  <span className="text-black/65">→</span>
                   <Badge variant="neutral" className="rounded-full text-xs">
                     {formatShort(s.end_at)}
                   </Badge>

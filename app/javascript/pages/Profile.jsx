@@ -36,13 +36,13 @@ export default function Profile({ user, countries, languages, levels }) {
             <div className="flex flex-col items-center pb-10 pt-10 text-center md:pt-14">
               <Avatar className="h-28 w-28 rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <AvatarImage src={previewUrl} alt={user.name} className="object-cover" />
-                <AvatarFallback className="rounded-2xl bg-orange text-3xl font-bold text-white">
+                <AvatarFallback className="rounded-2xl bg-orange text-3xl font-bold text-black">
                   {user.name?.[0]}
                 </AvatarFallback>
               </Avatar>
 
               <h1 className="mt-4 text-3xl">{user.name || "Your profile"}</h1>
-              {user.profession && <p className="mt-1 text-black/50">{user.profession}</p>}
+              {user.profession && <p className="mt-1 text-black/65">{user.profession}</p>}
 
               <div className="mt-4">
                 <Collapsible key={user.image_url}>
@@ -89,12 +89,12 @@ export default function Profile({ user, countries, languages, levels }) {
               </div>
 
               <div>
-                <Label htmlFor="github_url" className="block mb-1">GitHub link <span className="font-normal text-black/50">(optional)</span></Label>
+                <Label htmlFor="github_url" className="block mb-1">GitHub link <span className="font-normal text-black/65">(optional)</span></Label>
                 <Input id="github_url" name="github_url" defaultValue={user.github_url || ""} placeholder="https://github.com/your-name" />
                 {errors.github_url ? (
                   <div className="text-red font-bold mt-1 text-sm">{errors.github_url}</div>
                 ) : (
-                  <p className="mt-1 text-xs text-black/50">Shown to people whose partner searches you apply to.</p>
+                  <p className="mt-1 text-xs text-black/65">Shown to people whose partner searches you apply to.</p>
                 )}
               </div>
 

@@ -29,6 +29,12 @@ RSpec.describe "Shareable partner search links", type: :request do
       expect(response.body).to include("Python buddy", "Work through a course", "Open-ended", "python", "Maya", "Competent", "Apply to Maya")
     end
 
+    it "explains how Pairin works" do
+      get public_search_path(token:)
+
+      expect(response.body).to include("How Pairin works", "Talk first, with no commitment.", "logo")
+    end
+
     it "shows nothing else about the poster" do
       get public_search_path(token:)
 

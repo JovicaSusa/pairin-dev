@@ -26,14 +26,14 @@ export default function Activities({ activities }) {
               </div>
               <div className="min-w-0">
                 <p className="font-bold">{activity.title}</p>
-                <p className="mt-1 text-black/60">{activity.content}</p>
+                <p className="mt-1 text-black/65">{activity.content}</p>
               </div>
             </div>
           ))}
         </div>
       ) : (
         <EmptyState icon={Sparkles} title="Nothing new from the community yet">
-          <p className="mt-1 text-black/50">
+          <p className="mt-1 text-black/65">
             Start by{" "}
             <Link href="/users/pair_requests/new" className="font-bold text-purple underline">
               starting a partner search

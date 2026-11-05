@@ -112,7 +112,7 @@ function TopicCombobox({ tags, value, onChange }) {
           ))}
         </ul>
       )}
-      <p className="mt-2 text-sm text-black/50">Can't find it? Type it and add it.</p>
+      <p className="mt-2 text-sm text-black/65">Can't find it? Type it and add it.</p>
     </div>
   );
 }
@@ -256,7 +256,7 @@ export default function Onboarding({ tags, levels, commitments, weekdays, level,
 
       <div className="mb-6 flex items-center justify-between gap-4">
         <Progress value={((step + 1) / steps.length) * 100} className="flex-1" aria-label={`Step ${step + 1} of ${steps.length}`} />
-        <button type="button" onClick={() => router.post("/onboarding/skip")} className="shrink-0 text-xs font-bold text-black/50 hover:text-black">
+        <button type="button" onClick={() => router.post("/onboarding/skip")} className="inline-flex min-h-11 shrink-0 items-center text-xs font-bold text-black/65 hover:text-black">
           Skip setup
         </button>
       </div>
@@ -270,7 +270,7 @@ export default function Onboarding({ tags, levels, commitments, weekdays, level,
         <Button type="button" variant="neutral" disabled={step === 0} onClick={() => setStep(step - 1)}>Back</Button>
         <div className="flex items-center gap-3">
           {current.skippable && !last && (
-            <button type="button" onClick={() => setStep(step + 1)} className="text-sm font-bold text-black/50 hover:text-black">Skip this</button>
+            <button type="button" onClick={() => setStep(step + 1)} className="inline-flex min-h-11 items-center text-sm font-bold text-black/65 hover:text-black">Skip this</button>
           )}
           <Button type="button" disabled={processing || (!current.skippable && !current.ready)} onClick={next}>
             {last ? (processing ? "Finding..." : "Find me a partner") : "Next"}

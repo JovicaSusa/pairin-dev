@@ -27,11 +27,11 @@ export default function FilterForm({ tags, commitments, userLevels, languages, f
 
       <div className="grid grid-cols-1 gap-4">
       <div>
-        <Label htmlFor="tags_name_eq" className="block mb-1">
+        <Label htmlFor="filter_tags" className="block mb-1">
           Tags
         </Label>
         <Select value={form.tags_name_eq} onValueChange={(val) => handleSelectChange("tags_name_eq", val)}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="filter_tags" className="w-full">
             <SelectValue placeholder="Select tag" />
           </SelectTrigger>
           <SelectContent>
@@ -43,9 +43,9 @@ export default function FilterForm({ tags, commitments, userLevels, languages, f
       </div>
 
       <div>
-        <Label className="block mb-1">Commitment</Label>
+        <Label htmlFor="filter_commitment" className="block mb-1">Commitment</Label>
         <Select value={form.commitment_eq} onValueChange={(val) => handleSelectChange("commitment_eq", val)}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="filter_commitment" className="w-full">
             <SelectValue placeholder="Select commitment" />
           </SelectTrigger>
           <SelectContent>
@@ -57,11 +57,11 @@ export default function FilterForm({ tags, commitments, userLevels, languages, f
       </div>
 
       <div>
-        <Label htmlFor="user_level_eq" className="block mb-1">
+        <Label htmlFor="filter_level" className="block mb-1">
           User level
         </Label>
         <Select value={form.user_level_eq} onValueChange={(val) => handleSelectChange("user_level_eq", val)}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="filter_level" className="w-full">
             <SelectValue placeholder="Select level" />
           </SelectTrigger>
           <SelectContent>
@@ -73,11 +73,11 @@ export default function FilterForm({ tags, commitments, userLevels, languages, f
       </div>
 
       <div>
-        <Label htmlFor="user_language_eq" className="block mb-1">
+        <Label htmlFor="filter_language" className="block mb-1">
           User language
         </Label>
         <Select value={form.user_language_eq} onValueChange={(val) => handleSelectChange("user_language_eq", val)}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger id="filter_language" className="w-full">
             <SelectValue placeholder="Select language" />
           </SelectTrigger>
           <SelectContent>
@@ -92,7 +92,7 @@ export default function FilterForm({ tags, commitments, userLevels, languages, f
 
       <div className="flex justify-end">
         <Button type="submit" size="lg">
-          Search
+          Show results
         </Button>
       </div>
     </form>

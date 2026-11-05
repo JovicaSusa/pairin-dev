@@ -12,7 +12,7 @@ module.exports = {
       colors: {
         // brand colors (used directly in layout/semantic contexts)
         orange: "#FF8B37",
-        purple: "#7B5FF1",
+        purple: "#7354EE",
         green: "#55D087",
         red: "#F1495F",
         // neobrutalism token colors (consumed by installed components)

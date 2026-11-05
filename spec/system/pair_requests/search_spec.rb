@@ -20,7 +20,7 @@ RSpec.describe "search pair requests", type: :system, js: true do
       select_option!("Select level", "Novice")
       select_option!("Select language", "English")
 
-      click_button "Search"
+      click_button "Show results"
 
       expect(page).to have_content("Test")
     end

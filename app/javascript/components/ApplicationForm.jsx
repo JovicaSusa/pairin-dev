@@ -62,13 +62,13 @@ export default function ApplicationForm({ pairRequest, options, needsLevel, onSu
       <Choice id="application_how_often" label="How often can you pair?" options={options.howOften} {...field("how_often")} />
       <div>
         <Choice id="application_how_long" label="How long can you commit?" options={options.howLong} {...field("how_long")} />
-        <p className="mt-1 text-xs text-black/50">{posterName} is looking for: {pairRequest.commitment_label}</p>
+        <p className="mt-1 text-xs text-black/65">{posterName} is looking for: {pairRequest.commitment_label}</p>
       </div>
 
       {needsLevel && (
         <div>
           <Choice id="application_level" label="Your level" options={options.levels} {...field("level")} />
-          <p className="mt-1 text-xs text-black/50">We'll save this to your profile, so we only ask once.</p>
+          <p className="mt-1 text-xs text-black/65">We'll save this to your profile, so we only ask once.</p>
         </div>
       )}
 

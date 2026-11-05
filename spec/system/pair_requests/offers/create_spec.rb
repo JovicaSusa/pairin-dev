@@ -80,6 +80,39 @@ RSpec.describe "apply to a partner search", type: :system do
     expect(page).not_to have_css('[role="dialog"]')
   end
 
+  it "keeps keyboard focus inside the drawer, and returns it afterwards" do
+    visit pair_requests_path
+    apply = find_button("Apply")
+    apply.click
+
+    20.times do
+      find("body").send_keys(:tab)
+      expect(page.evaluate_script("!!document.activeElement.closest('[role=dialog]')")).to be(true)
+    end
+
+    click_button "Close"
+
+    expect(page).not_to have_css('[role="dialog"]')
+    expect(page.evaluate_script("document.activeElement.textContent")).to eq("Apply")
+  end
+
+  it "names the filters for screen readers" do
+    visit pair_requests_path
+
+    expect(page).to have_css("label[for='filter_tags']", text: "Tags")
+    expect(page).to have_css("button#filter_commitment")
+    expect(page.evaluate_script("document.querySelector('#filter_level').labels.length")).to eq(1)
+  end
+
+  it "lines the filter panel up with the first card" do
+    visit pair_requests_path
+
+    panel = page.evaluate_script("document.querySelector('aside.rounded-2xl').getBoundingClientRect().top")
+    card = page.evaluate_script("document.querySelector('h3').closest('.rounded-2xl').getBoundingClientRect().top")
+
+    expect((panel - card).abs).to be <= 1
+  end
+
   it "closes the drawer without applying" do
     visit pair_requests_path
 

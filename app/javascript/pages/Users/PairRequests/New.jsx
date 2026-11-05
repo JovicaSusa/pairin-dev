@@ -98,12 +98,12 @@ export default function New({ tags, commitments }) {
 
         <div className="mt-8">
           <div>
-            <h4 className="mb-3 font-headline text-sm font-bold uppercase tracking-widest text-black/50">Tags</h4>
+            <h4 className="mb-3 font-headline text-sm font-bold uppercase tracking-widest text-black/65">Tags</h4>
 
             <div className="flex flex-col gap-3">
               {data.taggings_attributes.map((tagging, index) => (
                 <div key={index} className="rounded-xl border-2 border-black bg-white p-3">
-                  <Label className="mb-1 block text-black/50">
+                  <Label className="mb-1 block text-black/65">
                     Tag <span className="text-xs font-normal">(select or type new)</span>
                   </Label>
 

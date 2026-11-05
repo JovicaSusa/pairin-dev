@@ -93,6 +93,17 @@ RSpec.describe "workspaces", type: :system do
       expect(Partnership.last.end_reason).to eq("Different goals")
     end
 
+    it "keeps the chat box in view on a phone without scrolling" do
+      visit partner_path(Partnership.last)
+      page.driver.resize(390, 800)
+      sleep 0.2
+
+      bottom = page.evaluate_script("document.querySelector('textarea[aria-label=\"Write a message\"]').getBoundingClientRect().bottom")
+
+      expect(bottom).to be <= 800
+      expect(page.evaluate_script("document.documentElement.scrollWidth - window.innerWidth")).to be <= 0
+    end
+
     it "shows when the next check-in goes out, then a marker for each week" do
       visit partner_path(Partnership.last)
       expect(page).to have_content("The next check-in email goes out on")

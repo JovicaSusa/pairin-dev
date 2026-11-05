@@ -22,7 +22,7 @@ export default function Index({ pairRequests, filterOptions, filters, applicatio
       <Head title="Partner searches" />
 
       <PageHeader
-        eyebrow="Search"
+        eyebrow="Find a partner"
         title="Partner searches"
         description="Find someone to learn with, talk first, then decide."
         action={
@@ -56,15 +56,15 @@ export default function Index({ pairRequests, filterOptions, filters, applicatio
         />
       </aside>
 
-      <div className="relative flex min-w-0 flex-col gap-6">
+      <div className="relative flex min-w-0 flex-col">
         <InfiniteScroll
           data="pairRequests"
           loading={() => (
-            <div className="flex justify-center py-8 font-bold text-black/50">Loading more...</div>
+            <div className="flex justify-center py-8 font-bold text-black/65">Loading more...</div>
           )}
           next={({ hasMore }) =>
             !hasMore && pairRequests.length > 0 ? (
-              <div className="flex justify-center py-8 text-black/40">No more partner searches</div>
+              <div className="flex justify-center py-8 text-black/65">No more partner searches</div>
             ) : null
           }
         >
