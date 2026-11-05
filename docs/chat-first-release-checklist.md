@@ -45,4 +45,15 @@ Merging `chat-first` to `main` deploys it, so do these in order.
 
 - [ ] Sign in with two accounts and go through the whole flow on production: post, apply, reply, live chat, partners, Workspace.
 - [ ] Check that `/jobs` lists `delete_suspended_accounts` and `send_weekly_check_ins` as recurring.
-- [ ] Only then send the launch email (#152).
+- [ ] Send yourself a copy of the launch email, and read it in your inbox:
+
+  ```
+  bundle exec kamal app exec --reuse --roles=web 'bin/rails release:send_launch_email TEST_EMAIL=you@example.com'
+  ```
+
+- [ ] Only then see who would get it, and send it. `APPLY=1` is the step that can't be undone:
+
+  ```
+  bundle exec kamal app exec --reuse --roles=web 'bin/rails release:send_launch_email'
+  bundle exec kamal app exec --reuse --roles=web 'bin/rails release:send_launch_email APPLY=1'
+  ```

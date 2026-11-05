@@ -4,7 +4,7 @@ class OfferMailer < ApplicationMailer
   before_action :set_offer
 
   def offer_received_email
-    mail(to: @poster.email, subject: "#{@offerer_name} wants to pair with you")
+    mail(to: @poster.email, subject: "#{@offerer_name} applied to your partner search")
   end
 
   def offer_reminder_email

@@ -29,4 +29,27 @@ namespace :release do
       puts "\nNothing changed. Add APPLY=1 to close these."
     end
   end
+
+  desc "Send the launch email. Reports only, unless APPLY=1. TEST_EMAIL=you@example.com sends one copy to that account only."
+  task send_launch_email: :environment do
+    task = Release::SendLaunchEmail.new
+
+    if (email = ENV["TEST_EMAIL"].presence)
+      user = User.find_by(email:) || abort("No user with the email #{email}")
+      LaunchMailer.with(user:).announcement.deliver_later
+      puts "Queued a test copy to #{email}. Nobody is marked as sent."
+      next
+    end
+
+    puts "Will receive it:      #{task.recipients.count}"
+    puts "Opted out:            #{task.opted_out_count}"
+    puts "Already sent to:      #{task.sent_count}"
+
+    if ENV["APPLY"] == "1"
+      task.send_all
+      puts "\nQueued. Sent to so far: #{task.sent_count}"
+    else
+      puts "\nNothing sent. Add APPLY=1 to send."
+    end
+  end
 end
