@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   mount MissionControl::Jobs::Engine, at: "/jobs"
   # Registrations without destroy: deleting an account is by request, as the privacy policy says.
-  devise_for :users, skip: [:registrations]
+  devise_for :users, skip: [:registrations], controllers: { sessions: "users/sessions" }
   devise_scope :user do
     get "users/cancel", to: "users/registrations#cancel", as: :cancel_user_registration
     get "users/sign_up", to: "users/registrations#new", as: :new_user_registration
