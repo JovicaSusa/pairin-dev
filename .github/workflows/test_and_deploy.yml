@@ -87,4 +87,5 @@ jobs:
           MAILJET_SECRET_KEY: ${{ secrets.MAILJET_SECRET_KEY }}
           MISSION_CONTROL_NAME: ${{ secrets.MISSION_CONTROL_NAME }}
           MISSION_CONTROL_PASSWORD: ${{ secrets.MISSION_CONTROL_PASSWORD }}
+          HONEYBADGER_API_KEY: ${{ secrets.HONEYBADGER_API_KEY }}
         run: bundle exec kamal deploy --version=$VERSION
