@@ -38,4 +38,10 @@ RSpec.describe "Legal pages", type: :request do
 
     expect(response.body).to include("they share a private Workspace", "only we see it", "using the link in the email")
   end
+
+  it "names the error tracker and what it leaves out" do
+    get privacy_path
+
+    expect(response.body).to include("Honeybadger", "not to include what you type into forms")
+  end
 end
