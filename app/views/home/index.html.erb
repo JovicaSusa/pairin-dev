@@ -9,6 +9,7 @@
   { q: "Is Pairin free?", a: "Yes. Pairin is free during its beta." },
   { q: "How do I find a partner?", a: "Post a partner search, or browse other people's searches and apply. Once you've signed in, you can filter by tag, commitment, level and language." },
   { q: "Do I have to book a session or a call?", a: "No. There are no time slots and no intro calls. You talk in the app first, then the two of you decide how and when to work together." },
+  { q: "What's in a Workspace?", a: "It's private to the two of you, with your chat, an optional shared goal, how long you each committed to, and a weekly check-in." },
   { q: "What if it isn't a good fit?", a: "Either of you can choose Not a match, which ends the chat. You can also block or report someone if you need to." },
   { q: "What can I learn?", a: "Any language or stack, at any level, whether you're self-taught, a student or a working developer picking up something new." },
   { q: "Is there a minimum age?", a: "Yes, you need to be at least 16. People under 18 only see and talk to others under 18." },
@@ -203,23 +204,89 @@
   </ol>
 </section>
 
-<%# WHAT HELPS IT LAST %>
-<section class="px-6 md:px-16 lg:px-24 py-16 md:py-24 bg-white border-b-4 border-black">
+<%# WORKSPACE — what you get after committing. Mirrors the real page; the people are made up, so it's labelled. %>
+<section id="workspace" class="px-6 md:px-16 lg:px-24 py-16 md:py-24 grid md:grid-cols-2 gap-12 md:gap-20 items-center bg-white border-b-4 border-black">
+  <div>
+    <span class="text-xs font-bold text-purple uppercase tracking-widest block mb-3">The Workspace</span>
+    <h2 class="font-display font-extrabold text-4xl md:text-5xl tracking-tight leading-none mb-5">
+      A private place for the two of you
+    </h2>
+    <p class="text-gray-600 leading-relaxed text-base mb-6 max-w-md">
+      Once you both say yes, you get a Workspace to keep going in. It's where a good first chat turns into a habit.
+    </p>
+    <ul class="flex flex-col gap-4 max-w-md list-none">
+      <% [
+        ["Your chat carries on", "Everything you've said so far stays in one place, and you pick up where you left off."],
+        ["A shared goal, if you want one", "Write down what you're working towards. Either of you can change it."],
+        ["A weekly check-in", "Once a week, we email to ask whether you worked together. It takes one click, and either answer is fine."],
+        ["A clear commitment", "See how long each of you signed up for, so nobody has to guess."],
+      ].each do |title, body| %>
+        <li class="border-l-4 border-orange pl-4">
+          <h3 class="font-display font-bold text-base text-black mb-1 leading-snug"><%= title %></h3>
+          <p class="text-gray-600 text-sm leading-relaxed"><%= body %></p>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <div class="relative" role="img" aria-label="Example Workspace for two partners: a shared goal, their chat, a tick for each week they worked together, and how long each of them committed to.">
+    <div class="absolute -top-3 right-2 bg-yellow-50 text-black text-xs font-bold px-3 py-1.5 rounded-md border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-10">
+      Example
+    </div>
+
+    <div class="bg-yellow-50 border-2 border-black rounded-2xl p-4 md:p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col gap-4">
+      <div>
+        <p class="text-xs font-bold text-purple uppercase tracking-widest">Workspace</p>
+        <p class="font-display font-extrabold text-2xl text-black leading-tight">You and Sara</p>
+      </div>
+
+      <div class="bg-purple text-white border-2 border-black rounded-xl px-4 py-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+        <p class="text-xs font-bold uppercase tracking-wide">Working towards</p>
+        <p class="font-bold">Ship a small CLI in Rust</p>
+      </div>
+
+      <div class="bg-white border-2 border-black rounded-xl p-4 flex flex-col gap-2">
+        <p class="font-bold text-sm text-black">Chat</p>
+        <p class="self-start max-w-[85%] bg-yellow-50 border-2 border-black rounded-lg px-3 py-2 text-sm text-gray-700">I got the argument parsing working.</p>
+        <p class="self-end max-w-[85%] bg-orange border-2 border-black rounded-lg px-3 py-2 text-sm text-black">Nice. Same time on Thursday?</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-white border-2 border-black rounded-xl p-4">
+          <p class="font-bold text-sm text-black mb-2">Check-ins</p>
+          <div class="flex gap-1">
+            <% [["W1", true], ["W2", true], ["W3", false]].each do |week, worked| %>
+              <span class="flex-1 text-center rounded-md border-2 border-black py-1 text-xs font-bold text-black <%= worked ? "bg-green" : "bg-white" %>"><%= week %><%= " ✓" if worked %></span>
+            <% end %>
+          </div>
+        </div>
+        <div class="bg-white border-2 border-black rounded-xl p-4">
+          <p class="font-bold text-sm text-black mb-2">Committed to</p>
+          <p class="text-sm text-black">You: 1&ndash;3 months</p>
+          <p class="text-sm text-black">Sara: 1&ndash;3 months</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# THE REST %>
+<section class="px-6 md:px-16 lg:px-24 py-16 md:py-24 bg-yellow-50 border-b-4 border-black">
   <div class="mb-10">
-    <span class="text-xs font-bold text-purple uppercase tracking-widest block mb-3">After you commit</span>
+    <span class="text-xs font-bold text-purple uppercase tracking-widest block mb-3">Also built in</span>
     <h2 class="font-display font-extrabold text-4xl md:text-5xl tracking-tight leading-none">
-      Built to keep you going
+      A few other things
     </h2>
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
     <% [
-      { title: "A weekly check-in", body: "Once a week, we ask whether you worked together. It takes one click, and either answer is fine." },
-      { title: "A shared goal", body: "Write down what you're working towards, if that helps. It's optional." },
+      { title: "Find the right people", body: "Filter searches by tag, commitment, level and language." },
       { title: "A link to invite someone", body: "Know someone who'd be a good fit? Send them a link to your search, even if they aren't on Pairin yet." },
+      { title: "An easy way out", body: "Either of you can end a partnership. We'll tell your partner kindly, and the Workspace stays readable." },
       { title: "You stay in control", body: "Block or report someone if you need to, and unsubscribe from the emails you don't want." },
     ].each do |feature| %>
-      <div class="bg-yellow-50 border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      <div class="bg-white border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <h3 class="font-display font-bold text-base text-black mb-2 leading-snug"><%= feature[:title] %></h3>
         <p class="text-gray-600 text-sm leading-relaxed"><%= feature[:body] %></p>
       </div>
@@ -228,7 +295,7 @@
 </section>
 
 <%# FAQ %>
-<section id="faq" class="px-6 md:px-16 lg:px-24 py-16 md:py-24 bg-yellow-50 border-b-4 border-black">
+<section id="faq" class="px-6 md:px-16 lg:px-24 py-16 md:py-24 bg-white border-b-4 border-black">
   <div class="mb-10">
     <span class="text-xs font-bold text-purple uppercase tracking-widest block mb-3">FAQ</span>
     <h2 class="font-display font-extrabold text-4xl md:text-5xl tracking-tight leading-none">
@@ -238,7 +305,7 @@
 
   <div class="flex flex-col gap-4 max-w-2xl">
     <% faqs.each do |faq| %>
-      <details class="group bg-white border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+      <details class="group bg-yellow-50 border-2 border-black rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
         <summary class="font-display font-bold text-base text-black cursor-pointer list-none flex items-center justify-between gap-4">
           <%= faq[:q] %>
           <span class="text-xl leading-none group-open:rotate-45 transition-transform" aria-hidden="true">+</span>

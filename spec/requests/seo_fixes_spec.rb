@@ -12,7 +12,7 @@ RSpec.describe "SEO fixes", type: :request do
   it "describes the chat-first flow, not the old live and scheduled sessions" do
     get "/"
 
-    expect(response.body).to include("Talk first, then commit", "Is there a minimum age?")
+    expect(response.body).to include("Talk first, then commit", "A private place for the two of you", "Is there a minimum age?")
     expect(response.body).not_to match(/go live|instant|live now|retro|right now|pair in minutes|in real-time/i)
   end
 
