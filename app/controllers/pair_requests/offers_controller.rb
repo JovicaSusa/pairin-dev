@@ -33,7 +33,8 @@ class PairRequests::OffersController < ApplicationController
         include: { user: { only: [:name] } }
       ),
       applicationOptions: Offer.form_options,
-      needsLevel: current_user.level.blank?
+      needsLevel: current_user.level.blank?,
+      viaShareLink: params[:via] == "share"
     }
   end
 
@@ -101,5 +102,5 @@ class PairRequests::OffersController < ApplicationController
     end
   end
 
-  def offer_params = params.require(:offer).permit(:message, :goal, :how_often, :how_long)
+  def offer_params = params.require(:offer).permit(:message, :goal, :how_often, :how_long, :via_share_link)
 end

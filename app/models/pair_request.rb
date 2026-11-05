@@ -1,6 +1,9 @@
 class PairRequest < ApplicationRecord
   include ActivityGeneratable
 
+  # The random part of the shareable link, so searches can't be found by guessing.
+  has_secure_token :share_token, length: 24
+
   belongs_to :user
   has_many :offers, dependent: :destroy
   has_one :partnership, dependent: :destroy
@@ -47,6 +50,24 @@ class PairRequest < ApplicationRecord
 
   def commitment_label
     COMMITMENTS.fetch(commitment)
+  end
+
+  # Only adults have a public page, whatever the state of the search. Someone
+  # whose age we don't know yet can't be seen by anyone, so they don't either.
+  def shareable?
+    user.adult?
+  end
+
+  # A signed-in person outside the poster's age group, or blocked either way,
+  # can't see this search anywhere, including through its link.
+  def visible_through_link_to?(viewer)
+    return true if viewer.nil? || viewer == user
+
+    viewer.same_age_group?(user) && !viewer.blocked_with?(user)
+  end
+
+  def taking_applications?
+    partnership.nil? && !paused?
   end
 
   # Off requests are hidden from others and can't receive offers.

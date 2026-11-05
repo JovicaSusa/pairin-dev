@@ -1,6 +1,11 @@
 class PairRequestResource < ApplicationResource
   attributes :id, :subject, :description, :commitment_label
 
+  # Only while it can be applied to, and never for under-18s.
+  attribute :share_path do |pair_request|
+    "/s/#{pair_request.share_token}" if pair_request.taking_applications? && pair_request.shareable?
+  end
+
   attribute :paused do |pair_request|
     pair_request.paused?
   end

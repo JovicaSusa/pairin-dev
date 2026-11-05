@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_04_270000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_04_280000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -90,6 +90,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_270000) do
     t.datetime "proposed_at"
     t.bigint "proposed_by_id"
     t.datetime "proposal_declined_at"
+    t.boolean "via_share_link", default: false, null: false
     t.index ["ended_by_id"], name: "index_offers_on_ended_by_id"
     t.index ["last_message_at"], name: "index_offers_on_last_message_at"
     t.index ["offerer_id", "pair_request_id"], name: "index_offers_on_offerer_id_and_pair_request_id", unique: true
@@ -106,6 +107,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_270000) do
     t.datetime "updated_at", null: false
     t.datetime "paused_at"
     t.string "commitment", default: "one_to_three_months", null: false
+    t.string "share_token", null: false
+    t.index ["share_token"], name: "index_pair_requests_on_share_token", unique: true
     t.index ["user_id"], name: "index_pair_requests_on_user_id"
   end
 
@@ -196,12 +199,15 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_270000) do
     t.datetime "onboarding_skipped_at"
     t.datetime "suggestions_opted_out_at"
     t.datetime "announcements_opted_out_at"
+    t.bigint "signup_pair_request_id"
+    t.datetime "signup_search_taken_at"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["country"], name: "index_users_on_country"
     t.index ["date_of_birth"], name: "index_users_on_date_of_birth"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["language"], name: "index_users_on_language"
     t.index ["programming_since"], name: "index_users_on_programming_since"
+    t.index ["signup_pair_request_id"], name: "index_users_on_signup_pair_request_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["suspended_at"], name: "index_users_on_suspended_at"
   end
@@ -224,4 +230,5 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_04_270000) do
   add_foreign_key "pair_requests", "users"
   add_foreign_key "participations", "users", column: "participant_id"
   add_foreign_key "taggings", "tags"
+  add_foreign_key "users", "pair_requests", column: "signup_pair_request_id", on_delete: :nullify
 end
