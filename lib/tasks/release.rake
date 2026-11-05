@@ -30,7 +30,7 @@ namespace :release do
     end
   end
 
-  desc "Send the launch email. Reports only, unless APPLY=1. TEST_EMAIL=you@example.com sends one copy to that account only."
+  desc "Send the launch email. Reports only, unless APPLY=1. LIMIT=50 sends one batch. TEST_EMAIL=you@example.com sends one copy to that account only."
   task send_launch_email: :environment do
     task = Release::SendLaunchEmail.new
 
@@ -41,13 +41,21 @@ namespace :release do
       next
     end
 
+    limit = ENV["LIMIT"].presence&.then do |value|
+      number = Integer(value, exception: false)
+      abort "LIMIT must be a whole number above 0, not #{value}" unless number&.positive?
+      number
+    end
+
     puts "Will receive it:      #{task.recipients.count}"
+    puts "This batch:           #{[ limit, task.recipients.count ].min}" if limit
     puts "Opted out:            #{task.opted_out_count}"
     puts "Already sent to:      #{task.sent_count}"
 
     if ENV["APPLY"] == "1"
-      task.send_all
+      task.send_all(limit:)
       puts "\nQueued. Sent to so far: #{task.sent_count}"
+      puts "Still to send: #{task.recipients.count}"
     else
       puts "\nNothing sent. Add APPLY=1 to send."
     end

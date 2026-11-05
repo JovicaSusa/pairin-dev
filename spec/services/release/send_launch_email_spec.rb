@@ -38,6 +38,24 @@ RSpec.describe Release::SendLaunchEmail, type: :unit do
     end
   end
 
+  describe "sending in batches" do
+    let!(:users) { create_list(:user, 3) }
+
+    it "sends only as many as the limit, and marks only those" do
+      expect { task.send_all(limit: 2) }.to have_enqueued_mail(LaunchMailer, :announcement).twice
+
+      expect(task.sent_count).to eq(2)
+      expect(task.recipients.count).to eq(1)
+    end
+
+    it "reaches the rest on the next run, without repeating anyone" do
+      task.send_all(limit: 2)
+
+      expect { task.send_all(limit: 2) }.to have_enqueued_mail(LaunchMailer, :announcement).once
+      expect(task.recipients).to be_empty
+    end
+  end
+
   describe "the email" do
     let(:user) { create(:user, name: "Maya Jones", email: "maya@example.com") }
     let(:mail) { LaunchMailer.with(user:).announcement }
@@ -117,10 +135,11 @@ RSpec.describe Release::SendLaunchEmail, type: :unit do
       Rake::Task["release:send_launch_email"].tap(&:reenable)
     end
 
-    def with_env(apply: nil, test_email: nil)
+    def with_env(apply: nil, test_email: nil, limit: nil)
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with("APPLY").and_return(apply)
       allow(ENV).to receive(:[]).with("TEST_EMAIL").and_return(test_email)
+      allow(ENV).to receive(:[]).with("LIMIT").and_return(limit)
     end
 
     let!(:user) { create(:user, email: "someone@example.com") }
@@ -138,6 +157,31 @@ RSpec.describe Release::SendLaunchEmail, type: :unit do
 
       expect { expect { rake_task.invoke }.to output(/Sent to so far: 1/).to_stdout }
         .to have_enqueued_mail(LaunchMailer, :announcement).once
+    end
+
+    it "sends only a batch with LIMIT, and says how many are left" do
+      create_list(:user, 2)
+      with_env(apply: "1", limit: "2")
+
+      expect { expect { rake_task.invoke }.to output(/Sent to so far: 2.*Still to send: 1/m).to_stdout }
+        .to have_enqueued_mail(LaunchMailer, :announcement).twice
+    end
+
+    it "reports the batch size without sending when LIMIT comes without APPLY" do
+      create_list(:user, 2)
+      with_env(limit: "2")
+
+      expect { expect { rake_task.invoke }.to output(/This batch:\s+2.*Nothing sent/m).to_stdout }
+        .not_to have_enqueued_mail(LaunchMailer, :announcement)
+    end
+
+    %w[0 -5 abc 1.5].each do |bad|
+      it "refuses LIMIT=#{bad} and sends nothing" do
+        with_env(apply: "1", limit: bad)
+
+        expect { expect { rake_task.invoke }.to raise_error(SystemExit).and output(/LIMIT/).to_stderr }
+          .not_to have_enqueued_mail(LaunchMailer, :announcement)
+      end
     end
 
     it "sends a test copy to one person, without marking them" do
