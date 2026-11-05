@@ -24,9 +24,9 @@ export default function Index({ partnerships }) {
                 <Face person={p.partner} />
                 <div className="min-w-0 flex-1">
                   <p className="font-bold">{p.partner.name}</p>
-                  <p className="truncate text-sm text-black/50">{p.goal ?? p.subject}</p>
+                  <p className="truncate text-sm text-black/65">{p.goal ?? p.subject}</p>
                 </div>
-                {p.ended && <Badge className="rounded-full border-black bg-black/10 text-xs text-black/60">Ended</Badge>}
+                {p.ended && <Badge className="rounded-full border-black bg-black/10 text-xs text-black/65">Ended</Badge>}
               </Link>
             </li>
           ))}

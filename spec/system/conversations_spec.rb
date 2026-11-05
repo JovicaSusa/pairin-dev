@@ -109,6 +109,65 @@ RSpec.describe "conversations", type: :system do
     expect(page).to have_content("Hi Lena")
   end
 
+  it "sends on Enter, and starts a new line on Shift+Enter" do
+    offer.post_message(poster, "Great to meet you")
+    sign_in(poster)
+    visit conversation_path(offer)
+
+    field = find("textarea[aria-label='Write a message']")
+    field.send_keys("First line", [:shift, :enter], "Second line")
+    expect(field.value).to eq("First line\nSecond line")
+
+    field.send_keys(:enter)
+
+    expect(page).to have_content("Second line")
+    expect(page).to have_field("Write a message", with: "")
+    expect(offer.messages.last.body).to eq("First line\nSecond line")
+  end
+
+  it "doesn't send an empty message on Enter" do
+    offer.post_message(poster, "Great to meet you")
+    sign_in(poster)
+    visit conversation_path(offer)
+
+    expect { find("textarea[aria-label='Write a message']").send_keys(:enter); sleep 0.3 }.not_to change(Message, :count)
+  end
+
+  it "shows initials for someone with no photo" do
+    sign_in(poster)
+    visit conversations_path
+
+    within("a[href='/conversations/#{offer.id}']") do
+      expect(page).to have_content("S")
+      expect(page).not_to have_css("img")
+    end
+  end
+
+  it "highlights the right sidebar item on a search's applications" do
+    sign_in(poster)
+    visit pair_request_offers_path(search)
+
+    expect(page).to have_button("Partner searches", class: "bg-purple/10")
+    expect(page).not_to have_css("a.bg-purple", text: "Find a partner")
+
+    visit pair_requests_path
+    expect(page).to have_css("a.bg-purple", text: "Find a partner")
+  end
+
+  it "keeps the closing message at full strength in an ended chat" do
+    other = create(:offer, pair_request: search, offerer: create(:user, name: "Lena"))
+    other.post_message(poster, "Hi Lena")
+    offer.post_message(poster, "Great to meet you")
+    offer.propose_partnership!(by: applicant)
+    offer.accept_proposal!(by: poster)
+    sign_in(other.offerer)
+    visit conversation_path(other)
+
+    closing = find("p", text: Partnership::CLOSING_MESSAGE, match: :first)
+    expect(page.evaluate_script("getComputedStyle(arguments[0].parentElement).opacity", closing)).to eq("1")
+    expect(page).to have_css(".opacity-70", text: "Hi Lena")
+  end
+
   it "reports someone from the thread" do
     sign_in(poster)
     visit conversation_path(offer)

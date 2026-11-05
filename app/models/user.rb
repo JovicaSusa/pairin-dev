@@ -176,7 +176,8 @@ class User < ApplicationRecord
   def profile_for_others
     return { name: display_name, image_url: nil, profession: nil, level: nil, github_url: nil } if minor?
 
-    { name: display_name, image_url:, profession:, level: level_titleized, github_url: }
+    # No photo means initials on the page, not the default logo for everyone.
+    { name: display_name, image_url: (image_url if image), profession:, level: level_titleized, github_url: }
   end
 
   scope :suspended_past_grace_period, -> { where(suspended_at: ..SUSPENSION_GRACE_PERIOD.ago) }

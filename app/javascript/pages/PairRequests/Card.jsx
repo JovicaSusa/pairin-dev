@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-const TAG_COLORS = ["bg-purple text-white", "bg-orange text-white", "bg-green text-black"];
+const TAG_COLORS = ["bg-purple text-white", "bg-orange text-black", "bg-green text-black"];
 
 export default function PairRequestCard({ pairRequest, currentUserId, onApply }) {
   const alreadyOffered = pairRequest.offers
@@ -18,7 +18,7 @@ export default function PairRequestCard({ pairRequest, currentUserId, onApply })
         <Badge className="w-fit shrink-0 rounded-full border-black bg-green text-xs text-black">Partner · {pairRequest.commitment_label}</Badge>
       </div>
 
-      <ExpandableText className="mt-3 leading-relaxed text-black/60">{pairRequest.description}</ExpandableText>
+      <ExpandableText className="mt-3 leading-relaxed text-black/65">{pairRequest.description}</ExpandableText>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {pairRequest.tags.map((tag, i) => (
@@ -32,11 +32,11 @@ export default function PairRequestCard({ pairRequest, currentUserId, onApply })
         <div className="flex items-center gap-3">
           <Avatar className="h-11 w-11 border-2 border-black">
             <AvatarImage src={pairRequest.user.image_url} alt={pairRequest.user.name} />
-            <AvatarFallback className="bg-orange text-white font-bold">{pairRequest.user.name?.[0]}</AvatarFallback>
+            <AvatarFallback className="bg-orange text-black font-bold">{pairRequest.user.name?.[0]}</AvatarFallback>
           </Avatar>
           <div>
             <p className="font-bold text-sm">{pairRequest.user.name}</p>
-            <span className="text-xs text-black/50">
+            <span className="text-xs text-black/65">
               {pairRequest.user.profession}
               {pairRequest.user.profession && pairRequest.user.level && " · "}
               {pairRequest.user.level}
@@ -45,7 +45,7 @@ export default function PairRequestCard({ pairRequest, currentUserId, onApply })
         </div>
 
         {alreadyOffered ? (
-          <span className="text-sm font-bold italic text-black/40">You've already applied</span>
+          <span className="text-sm font-bold italic text-black/65">You've already applied</span>
         ) : (
           <Button onClick={() => onApply(pairRequest)}>Apply</Button>
         )}

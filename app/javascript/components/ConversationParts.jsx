@@ -8,26 +8,30 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+// Small text actions keep their look on phones, but get a full-size tap area.
+export const TAP_AREA = "inline-flex min-h-11 items-center md:min-h-0";
+
 export function Face({ person }) {
   return (
     <Avatar className="h-10 w-10 shrink-0 border-2 border-black">
       <AvatarImage src={person.image_url} alt={person.name} />
-      <AvatarFallback className="bg-orange font-bold text-white">{person.name?.[0]}</AvatarFallback>
+      <AvatarFallback className="bg-orange font-bold text-black">{person.name?.[0]}</AvatarFallback>
     </Avatar>
   );
 }
 
-export function Messages({ messages }) {
+// The older messages fade in an ended chat. A message from Pairin says why, so it never does.
+export function Messages({ messages, dim = false }) {
   return (
     <div className="flex flex-col gap-3">
       {messages.map((m) => m.from_pairin ? (
-        <p key={m.id} className="mx-auto max-w-[85%] text-center text-xs font-bold text-black/50">{m.body}</p>
+        <p key={m.id} className="mx-auto max-w-[85%] text-center text-sm font-bold">{m.body}</p>
       ) : (
-        <div key={m.id} className={`flex flex-col ${m.mine ? "items-end" : "items-start"}`}>
+        <div key={m.id} className={`flex flex-col ${m.mine ? "items-end" : "items-start"} ${dim ? "opacity-70" : ""}`}>
           <p className={`max-w-[85%] whitespace-pre-wrap break-words rounded-2xl border-2 border-black px-3 py-2 text-sm ${m.mine ? "bg-purple text-white" : "bg-white"}`}>
             {m.body}
           </p>
-          <span className="mt-0.5 text-[11px] text-black/40">{formatShort(m.at)}</span>
+          <span className="mt-0.5 text-xs text-black/65">{formatShort(m.at)}</span>
         </div>
       ))}
     </div>
@@ -40,7 +44,15 @@ export function Composer({ conversation }) {
 
   const send = (e) => {
     e.preventDefault();
+    if (processing || !data.message.body.trim()) return;
     post(`/conversations/${conversation.id}/messages`, { preserveScroll: true, onSuccess: () => reset() });
+  };
+
+  // Enter sends and Shift+Enter starts a new line. On a touch keyboard Enter is
+  // the only way to start a new line, and there's a Send button in reach.
+  const onKeyDown = (e) => {
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && !touch) send(e);
   };
 
   return (
@@ -52,6 +64,7 @@ export function Composer({ conversation }) {
           placeholder={firstReply ? `Reply to ${conversation.other.name} to start chatting` : "Write a message"}
           value={data.message.body}
           onChange={(e) => setData("message", { body: e.target.value })}
+          onKeyDown={onKeyDown}
           className="min-h-10 flex-1"
         />
         <Button type="submit" disabled={processing || !data.message.body.trim()} aria-label="Send">
@@ -59,7 +72,7 @@ export function Composer({ conversation }) {
         </Button>
       </div>
       {errors.body && <div className="mt-1 text-sm font-bold text-red">{errors.body}</div>}
-      {firstReply && <p className="mt-1 text-xs text-black/50">Replying isn't a commitment. It just starts the conversation.</p>}
+      {firstReply && <p className="mt-1 text-xs text-black/65">Replying isn't a commitment. It just starts the conversation.</p>}
     </form>
   );
 }
@@ -75,7 +88,7 @@ export function ReportForm({ conversation, onDone }) {
   return (
     <form onSubmit={submit} aria-label="Report" className="border-b-2 border-black bg-yellow-50 p-3">
       <p className="text-sm font-bold">Report {conversation.other.name}</p>
-      <p className="mb-2 text-xs text-black/60">
+      <p className="mb-2 text-xs text-black/65">
         The Pairin team will see your reason and your recent messages here, and may read this chat. {conversation.other.name} won't be told.
       </p>
       <Label htmlFor="report_reason" className="mb-1 block text-xs">What happened?</Label>
@@ -103,7 +116,7 @@ export function BlockConfirmation({ conversation, onCancel, consequence = "This 
   return (
     <div role="group" aria-label="Confirm block" className="border-b-2 border-black bg-yellow-50 p-3">
       <p className="text-sm font-bold">Block {conversation.other.name}?</p>
-      <p className="mb-2 text-xs text-black/60">
+      <p className="mb-2 text-xs text-black/65">
         {consequence} {conversation.other.name} won't be told you blocked them.
       </p>
       <div className="flex gap-2">

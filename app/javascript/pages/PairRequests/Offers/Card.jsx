@@ -16,7 +16,7 @@ export default function OfferCard({ offer }) {
       <div className="flex flex-wrap items-center gap-3">
         <Avatar className="h-11 w-11 shrink-0 border-2 border-black">
           <AvatarImage src={offer.offerer.image_url} alt={offer.offerer.name} />
-          <AvatarFallback className="bg-orange text-white font-bold">{offer.offerer.name?.[0]}</AvatarFallback>
+          <AvatarFallback className="bg-orange text-black font-bold">{offer.offerer.name?.[0]}</AvatarFallback>
         </Avatar>
         <div>
           <p className="font-bold">{offer.offerer.name}</p>
@@ -43,14 +43,14 @@ export default function OfferCard({ offer }) {
             ["Level", offer.offerer.level],
           ].filter(([, value]) => value).map(([label, value]) => (
             <div key={label}>
-              <dt className="text-xs font-bold uppercase tracking-wide text-black/50">{label}</dt>
+              <dt className="text-xs font-bold uppercase tracking-wide text-black/65">{label}</dt>
               <dd className="font-medium">{value}</dd>
             </div>
           ))}
         </dl>
       )}
 
-      <ExpandableText className="mt-4 whitespace-pre-wrap leading-relaxed text-black/60">{offer.message}</ExpandableText>
+      <ExpandableText className="mt-4 whitespace-pre-wrap leading-relaxed text-black/65">{offer.message}</ExpandableText>
 
       <div className="mt-4 flex flex-col gap-4 border-t-2 border-black/10 pt-4 md:flex-row md:items-center md:justify-between">
         {offer.start_at ? (
@@ -58,7 +58,7 @@ export default function OfferCard({ offer }) {
             <Badge variant="neutral" className="rounded-full text-xs">
               {formatShort(offer.start_at)}
             </Badge>
-            <ArrowRight className="h-3 w-3 shrink-0 text-black/30" />
+            <ArrowRight className="h-3 w-3 shrink-0 text-black/65" />
             <Badge variant="neutral" className="rounded-full text-xs">
               {formatShort(offer.end_at)}
             </Badge>

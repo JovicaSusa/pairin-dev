@@ -1,18 +1,18 @@
 import { Head, Link, router, useForm } from "@inertiajs/react";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, Flag, Lock, MessagesSquare, ShieldBan, Users } from "lucide-react";
-import { BlockConfirmation, Composer, Face, Messages, ReportForm } from "@/components/ConversationParts";
+import { BlockConfirmation, Composer, Face, Messages, ReportForm, TAP_AREA } from "@/components/ConversationParts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 const STATUS_STYLES = {
-  Reply: "bg-orange text-white",
+  Reply: "bg-orange text-black",
   Talking: "bg-green text-black",
   Partners: "bg-purple text-white",
   Sent: "bg-white text-black",
-  Ended: "bg-black/10 text-black/60",
+  Ended: "bg-black/10 text-black/65",
 };
 
 function StatusBadge({ status }) {
@@ -24,7 +24,7 @@ function ConversationList({ conversations, activeId }) {
     <>
       <h1 className="border-b-2 border-black p-4 text-xl">Conversations</h1>
       {conversations.length === 0 ? (
-        <p className="p-4 text-sm text-black/50">
+        <p className="p-4 text-sm text-black/65">
           Nothing here yet. <Link href="/pair_requests" className="font-bold text-purple">Find a partner search</Link> to apply to, or start your own.
         </p>
       ) : (
@@ -41,10 +41,10 @@ function ConversationList({ conversations, activeId }) {
                     <span className="truncate">{c.other.name}</span>
                     <StatusBadge status={c.status} />
                   </p>
-                  <p className="flex items-center justify-between gap-2 text-xs text-black/50">
+                  <p className="flex items-center justify-between gap-2 text-xs text-black/65">
                     <span className="truncate">{c.line}</span>
                     {c.unread > 0 && (
-                      <span aria-label={`${c.unread} unread`} className="shrink-0 rounded-full border-2 border-black bg-orange px-1.5 font-bold text-white">
+                      <span aria-label={`${c.unread} unread`} className="shrink-0 rounded-full border-2 border-black bg-orange px-1.5 font-bold text-black">
                         {c.unread}
                       </span>
                     )}
@@ -75,13 +75,13 @@ function ApplicationAnswers({ conversation }) {
       <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
         {rows.map(([label, value]) => (
           <div key={label}>
-            <dt className="text-xs font-bold uppercase tracking-wide text-black/50">{label}</dt>
+            <dt className="text-xs font-bold uppercase tracking-wide text-black/65">{label}</dt>
             <dd className="font-medium">{value}</dd>
           </div>
         ))}
         {isPoster && other.github_url && (
           <div>
-            <dt className="text-xs font-bold uppercase tracking-wide text-black/50">GitHub</dt>
+            <dt className="text-xs font-bold uppercase tracking-wide text-black/65">GitHub</dt>
             <dd>
               <a href={other.github_url} target="_blank" rel="noopener noreferrer" className="font-bold text-purple underline">
                 {other.github_url.replace(/^https?:\/\/(www\.)?/, "")}
@@ -100,7 +100,7 @@ function NotAMatch({ conversation }) {
 
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="mt-2 text-xs font-bold text-black/50 hover:text-black">
+      <button type="button" onClick={() => setOpen(true)} className={`mt-1 text-xs font-bold text-black/65 hover:text-black md:mt-2 ${TAP_AREA}`}>
         Not a match
       </button>
     );
@@ -115,7 +115,7 @@ function NotAMatch({ conversation }) {
       }}
     >
       <p className="text-sm font-bold">End this conversation?</p>
-      <p className="mb-2 text-xs text-black/60">We'll tell {conversation.other.name} kindly. Neither of you can write here afterwards.</p>
+      <p className="mb-2 text-xs text-black/65">We'll tell {conversation.other.name} kindly. Neither of you can write here afterwards.</p>
       <Label htmlFor="not_a_match_reason" className="mb-1 block text-xs">Why? (optional, only we see this)</Label>
       <Textarea id="not_a_match_reason" rows={2} value={data.reason} onChange={(e) => setData("reason", e.target.value)} />
       <div className="mt-2 flex gap-2">
@@ -186,21 +186,21 @@ function Thread({ conversation }) {
     <>
       <header className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-black bg-white p-3">
         <div className="flex min-w-0 items-center gap-3">
-          <Link href="/conversations" aria-label="All conversations" className="md:hidden">
+          <Link href="/conversations" aria-label="All conversations" className="-ml-2 flex h-11 w-11 shrink-0 items-center justify-center md:hidden">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <Face person={other} />
           <div className="min-w-0">
             <p className="font-bold">{other.name}</p>
-            <p className="truncate text-xs text-black/50">{search.subject}</p>
+            <p className="truncate text-xs text-black/65">{search.subject}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setReporting(true)} className="flex items-center gap-1 text-xs font-bold text-black/50 hover:text-black">
+          <button type="button" onClick={() => setReporting(true)} className={`gap-1 text-xs font-bold text-black/65 hover:text-black ${TAP_AREA}`}>
             <Flag className="h-3.5 w-3.5" />
             Report
           </button>
-          <button type="button" onClick={() => setConfirmingBlock(true)} className="flex items-center gap-1 text-xs font-bold text-black/50 hover:text-black">
+          <button type="button" onClick={() => setConfirmingBlock(true)} className={`gap-1 text-xs font-bold text-black/65 hover:text-black ${TAP_AREA}`}>
             <ShieldBan className="h-3.5 w-3.5" />
             Block
           </button>
@@ -216,9 +216,9 @@ function Thread({ conversation }) {
       {reporting && <ReportForm conversation={conversation} onDone={() => setReporting(false)} />}
       {confirmingBlock && <BlockConfirmation conversation={conversation} onCancel={() => setConfirmingBlock(false)} />}
 
-      <div ref={scroller} className={`flex-1 overflow-y-auto p-4 ${ended ? "opacity-70" : ""}`}>
+      <div ref={scroller} className="flex-1 overflow-y-auto p-4">
         {application && !pinned && (
-          <button type="button" onClick={() => setShowApplication(!showApplication)} className="mb-3 text-xs font-bold text-purple underline">
+          <button type="button" onClick={() => setShowApplication(!showApplication)} className={`mb-3 text-xs font-bold text-purple underline ${TAP_AREA}`}>
             {showApplication ? "Hide application" : "Show application"}
           </button>
         )}
@@ -227,7 +227,7 @@ function Thread({ conversation }) {
             <ApplicationAnswers conversation={conversation} />
           </div>
         )}
-        <Messages messages={conversation.messages} />
+        <Messages messages={conversation.messages} dim={ended} />
       </div>
 
       <div className="border-t-2 border-black bg-white p-3">
@@ -236,7 +236,7 @@ function Thread({ conversation }) {
             <Lock className="mt-0.5 h-4 w-4 shrink-0" />
             <span>
               <b>{conversation.search_filled ? "This search has found its partner, so this chat has ended." : conversation.ended_by_viewer ? "You ended this conversation." : "This conversation has ended."}</b> You can still read it.{" "}
-              <Link href="/pair_requests" className="font-bold text-purple underline">See open partner searches</Link>
+              <Link href="/pair_requests" className="font-bold underline">See open partner searches</Link>
             </span>
           </div>
         ) : (
@@ -270,7 +270,7 @@ export default function Index({ conversations, conversation }) {
         {conversation ? (
           <Thread conversation={conversation} />
         ) : (
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 text-black/40">
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 text-black/65">
             <MessagesSquare className="h-8 w-8" />
             <p className="font-bold">Pick a conversation</p>
           </div>
