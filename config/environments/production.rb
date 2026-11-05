@@ -94,4 +94,6 @@ Rails.application.configure do
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
   config.action_mailer.default_url_options = { host: 'pairin.dev', protocol: 'https' }
+  # Emails are read outside the site, so images need the full address.
+  config.action_mailer.asset_host = 'https://pairin.dev'
 end
