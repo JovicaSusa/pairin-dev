@@ -22,6 +22,17 @@ RSpec.describe OfferMailer, type: :mailer do
       expect(body).to include("Competent")
     end
 
+    it "says who applied, in the subject and the heading" do
+      expect(mail.subject).to eq("Ada applied to your partner search")
+      expect(mail.body.encoded).to include("Ada applied to your partner search")
+      expect(mail.body.encoded).not_to include("wants to pair")
+    end
+
+    it "uses a PNG logo, because many inboxes don't show SVG" do
+      expect(mail.body.encoded).to match(/logo-[^"]*\.png"/)
+      expect(mail.body.encoded).not_to include("logo.svg")
+    end
+
     it "is sent to the request's poster" do
       expect(mail.to).to eq(["poster@example.com"])
     end
