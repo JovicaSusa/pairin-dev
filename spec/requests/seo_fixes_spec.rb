@@ -5,9 +5,15 @@ RSpec.describe "SEO fixes", type: :request do
     get "/"
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("A place where")
-    expect(response.body).to include("programmers")
+    expect(response.body).to include("Learn programming with")
     expect(response.body).not_to include('data-page="{')
+  end
+
+  it "describes the chat-first flow, not the old live and scheduled sessions" do
+    get "/"
+
+    expect(response.body).to include("Talk first, then commit", "Is there a minimum age?")
+    expect(response.body).not_to match(/go live|instant|live now|retro|right now|pair in minutes|in real-time/i)
   end
 
   it "includes a canonical tag pointing at the non-www host" do
