@@ -6,6 +6,7 @@ Merging `chat-first` to `main` deploys it, so do these in order.
 
 - [ ] Run the checks in `docs/qa-plans/chat-first-release-qa-plan.md` that need a person.
 - [ ] SPF and DMARC are in place (#153), and `hello@pairin.dev` and `reports@pairin.dev` reach you.
+- [ ] Mailjet click tracking is still off.
 - [ ] The homepage no longer advertises "Go live" and instant matching.
 - [ ] Terms and privacy no longer mention retros and Session Summaries.
 - [ ] The launch email (#152) is written and approved.
@@ -45,15 +46,24 @@ Merging `chat-first` to `main` deploys it, so do these in order.
 
 - [ ] Sign in with two accounts and go through the whole flow on production: post, apply, reply, live chat, partners, Workspace.
 - [ ] Check that `/jobs` lists `delete_suspended_accounts` and `send_weekly_check_ins` as recurring.
-- [ ] Send yourself a copy of the launch email, and read it in your inbox:
+- [ ] Request a password reset on production. Check that it reaches the inbox with no warning, the logo shows, the link starts with `https://pairin.dev/`, and the button opens the page to choose a new password.
+- [ ] Send yourself a copy of the launch email, and read it in your inbox. Use the address of a user on production. Check that the logo shows, and try a non-Gmail address too if you have one:
 
   ```
   bundle exec kamal app exec --reuse --roles=web 'bin/rails release:send_launch_email TEST_EMAIL=you@example.com'
   ```
 
-- [ ] Only then see who would get it, and send it. `APPLY=1` is the step that can't be undone:
+- [ ] See who would get it. This sends nothing:
 
   ```
   bundle exec kamal app exec --reuse --roles=web 'bin/rails release:send_launch_email'
-  bundle exec kamal app exec --reuse --roles=web 'bin/rails release:send_launch_email APPLY=1'
   ```
+
+- [ ] Send a first small batch. `APPLY=1` is the step that can't be undone:
+
+  ```
+  bundle exec kamal app exec --reuse --roles=web 'bin/rails release:send_launch_email APPLY=1 LIMIT=50'
+  ```
+
+- [ ] Wait a few hours, then check Mailjet for bounces, blocks and spam reports. You can't see other people's inboxes, so these numbers and any replies are your signal. If they look bad, stop and find out why.
+- [ ] Repeat with the next batch until `Still to send` is 0. Each run skips anyone already sent to, so nobody gets it twice.
