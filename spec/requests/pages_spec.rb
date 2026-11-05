@@ -17,6 +17,13 @@ RSpec.describe "Legal pages", type: :request do
     expect(response.body).to include("conversation is deleted for both of them")
   end
 
+  it "says in the terms that Pairin only introduces members" do
+    get terms_path
+
+    expect(response.body).to include("Pairin introduces you to other members")
+    expect(response.body).to include("we aren't responsible for what happens between you")
+  end
+
   it "describes the chat-first product, with no retros or sessions left over" do
     [ privacy_path, terms_path ].each do |path|
       get path
