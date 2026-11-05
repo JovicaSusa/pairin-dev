@@ -50,6 +50,10 @@ RSpec.describe Release::SendLaunchEmail, type: :unit do
       expect(mail.subject).to eq("Pairin works differently now")
     end
 
+    it "invites replies, in both versions" do
+      [html, text].each { |body| expect(body.gsub(/\s+/, " ")).to include("just reply. I read every reply.") }
+    end
+
     it "greets by first name, or without one" do
       expect(text).to start_with("Hi Maya,")
 
