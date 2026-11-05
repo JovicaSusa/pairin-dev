@@ -16,6 +16,7 @@ RSpec.describe "generates expected activites", type: :system do
 
       perform_enqueued_jobs do
         click_button "Post partner search"
+        expect(page).to have_content("Partner search posted")
       end
 
       visit activities_path
