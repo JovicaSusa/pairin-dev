@@ -1,7 +1,8 @@
 import { Link, useForm } from "@inertiajs/react";
 import { useState } from "react";
-import { Check, Lock, MessageSquare } from "lucide-react";
+import { CalendarClock, CalendarPlus, Check, Lock, MessageSquare, Video } from "lucide-react";
 import { TAP_AREA } from "@/components/ConversationParts";
+import SessionTime from "@/components/SessionTime";
 import WorkspaceFrame, { Goal } from "@/components/WorkspaceFrame";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -111,6 +112,72 @@ function WeeksTile({ partnership }) {
   );
 }
 
+function NextSessionTile({ partnership }) {
+  const { next, timezone } = partnership.sessions;
+  const sessionsPath = `/partners/${partnership.id}/sessions`;
+
+  return (
+    <div className={`flex flex-col items-start gap-3 p-4 md:col-span-2 md:p-5 ${PANEL} ${next ? "bg-green/20" : "bg-yellow-50"}`}>
+      <span className={`flex items-center gap-1.5 ${TILE_LABEL}`}>
+        <CalendarClock className="h-4 w-4" />
+        Next session
+      </span>
+      {next ? (
+        <>
+          <SessionTime session={next} timeZone={timezone} className="text-lg" />
+          {next.call_link && (
+            <Button asChild size="sm">
+              <a href={next.call_link} target="_blank" rel="noopener noreferrer nofollow">
+                <Video className="h-4 w-4" />
+                Join call
+              </a>
+            </Button>
+          )}
+        </>
+      ) : (
+        <>
+          <span className="text-lg font-bold">Nothing planned yet</span>
+          {!partnership.ended && (
+            <Button asChild size="sm">
+              <Link href={sessionsPath}>
+                <CalendarPlus className="h-4 w-4" />
+                Propose a session
+              </Link>
+            </Button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function SessionsTile({ partnership }) {
+  const { done, confirmed_ahead: ahead, waiting_on_you: waiting } = partnership.sessions;
+
+  return (
+    <Link
+      href={`/partners/${partnership.id}/sessions`}
+      className={`flex flex-col items-start gap-2 bg-white p-4 transition-transform hover:-translate-y-0.5 md:p-5 ${PANEL}`}
+    >
+      <span className={`flex items-center gap-1.5 ${TILE_LABEL}`}>
+        <CalendarClock className="h-4 w-4" />
+        Sessions
+      </span>
+      <span className="flex items-baseline gap-1.5">
+        <span className="text-4xl font-bold leading-none md:text-5xl">{done}</span>
+        <span className="text-sm font-bold">done together</span>
+      </span>
+      <span className="text-sm text-black/65">{ahead} confirmed ahead</span>
+      {waiting > 0 && (
+        <span className="rounded-full border-2 border-black bg-orange px-2 py-0.5 text-xs font-bold">
+          {waiting} waiting for your answer
+        </span>
+      )}
+      <span className="mt-auto text-sm font-bold underline">Open sessions</span>
+    </Link>
+  );
+}
+
 function Commitments({ partnership }) {
   const rows = [
     ["You", partnership.your_commitment],
@@ -150,7 +217,9 @@ export default function Show({ partnership }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 md:gap-6">
+        <NextSessionTile partnership={partnership} />
         <ChatTile partnership={partnership} />
+        <SessionsTile partnership={partnership} />
         <WeeksTile partnership={partnership} />
         <Commitments partnership={partnership} />
         {!partnership.ended && <div className="flex items-end"><EndPartnership partnership={partnership} /></div>}
