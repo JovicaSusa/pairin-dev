@@ -12,8 +12,6 @@ class PairRequestResource < ApplicationResource
 
   many :tags, resource: TagResource
 
-  many :sessions, resource: SessionResource
-
   attribute :accepted_offer do |pair_request|
     offer = pair_request.accepted_offer
     if offer

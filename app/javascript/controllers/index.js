@@ -16,8 +16,6 @@ application.register('reveal', RevealController)
 import DatepickerController from "./datepicker_controller"
 application.register("datepicker", DatepickerController)
 
-import HomeController from "./home_controller"
-application.register("home", HomeController)
 
 import ReadMoreController from "./read_more_controller"
 application.register("read-more", ReadMoreController)
