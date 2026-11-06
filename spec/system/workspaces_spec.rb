@@ -9,7 +9,7 @@ RSpec.describe "workspaces", type: :system do
     offer.propose_partnership!(by: partner)
   end
 
-  it "opens from accepting a proposal, and works as a dashboard" do
+  it "opens from accepting a proposal on an overview, with the chat a tap away" do
     sign_in(poster)
     visit conversation_path(offer)
 
@@ -20,13 +20,39 @@ RSpec.describe "workspaces", type: :system do
     expect(page).to have_content("Finish the course")
     expect(page).to have_content("Open-ended")
     expect(page).to have_content("A few weeks")
+    expect(page).not_to have_field("Write a message")
+
+    click_link "Open chat"
+
+    expect(page).to have_content("Chat with Sam")
     expect(page).to have_content("Hi Maya")
 
     fill_in "Write a message", with: "Let's start Tuesday"
     click_button "Send"
 
     expect(page).to have_content("Let's start Tuesday")
-    expect(page).to have_content("You and Sam")
+    expect(page).to have_content("Chat with Sam")
+
+    click_link "Overview"
+
+    expect(page).to have_content("You: Let's start Tuesday")
+  end
+
+  it "shows new messages on the Chat tile until the chat is opened" do
+    partnership = offer.accept_proposal!(by: poster)
+    offer.mark_read_by!(poster)
+    offer.post_message(partner, "Ready when you are")
+    sign_in(poster)
+
+    visit partner_path(partnership)
+
+    expect(page).to have_content(/1\s+new message\b/)
+    expect(page).to have_content("Sam: Ready when you are")
+
+    click_link "Open chat"
+    click_link "Overview"
+
+    expect(page).to have_content("You're all caught up")
   end
 
   context "with a partnership" do
@@ -71,8 +97,22 @@ RSpec.describe "workspaces", type: :system do
       within('[aria-label="Confirm block"]') { click_button "Block" }
 
       expect(page).to have_content("You ended this partnership.")
-      expect(page).not_to have_field("Write a message")
       expect(page).not_to have_button("Edit")
+
+      click_link "Open chat"
+
+      expect(page).to have_content("You ended this partnership.")
+      expect(page).not_to have_field("Write a message")
+    end
+
+    it "reports from the Chat page" do
+      visit chat_partner_path(Partnership.last)
+
+      click_button "Report"
+      fill_in "What happened?", with: "Rude"
+      click_button "Send report"
+
+      expect(page).to have_content("Thanks for telling us.")
     end
 
     it "ends after asking, and reads as ended" do
@@ -88,13 +128,12 @@ RSpec.describe "workspaces", type: :system do
       within("form", text: "End this partnership?") { click_button "End partnership" }
 
       expect(page).to have_content("You ended this partnership.")
-      expect(page).not_to have_field("Write a message")
       expect(page).not_to have_button("End partnership")
       expect(Partnership.last.end_reason).to eq("Different goals")
     end
 
     it "keeps the chat box in view on a phone without scrolling" do
-      visit partner_path(Partnership.last)
+      visit chat_partner_path(Partnership.last)
       page.driver.resize(390, 800)
       sleep 0.2
 
