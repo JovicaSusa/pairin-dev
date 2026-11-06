@@ -5,6 +5,7 @@ import { BlockConfirmation, Composer, Messages, ReportForm, TAP_AREA } from "@/c
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import WorkspacePrototype from "./WorkspacePrototype"; // PROTOTYPE ONLY
 
 function GoalForm({ partnership, onDone }) {
   const { data, setData, patch, processing, errors } = useForm({ goal: partnership.goal ?? "" });
@@ -158,6 +159,61 @@ export default function Show({ partnership }) {
   useEffect(() => {
     if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
   }, [conversation.messages.length]);
+
+  // PROTOTYPE ONLY: ?variant= swaps in the sessions + resources prototype (#226, #186).
+  if (import.meta.env.DEV && new URLSearchParams(window.location.search).has("variant")) {
+    return (
+      <WorkspacePrototype
+        partnership={partnership}
+        header={<><Head title={`You and ${conversation.other.name}`} />
+
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-x-2 md:mb-5">
+        <div className="min-w-0">
+          <Link href="/partners" className={`gap-1 text-xs font-bold text-black/65 hover:text-black md:mb-2 ${TAP_AREA}`}>
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Partners
+          </Link>
+          <p className="hidden text-xs font-bold uppercase tracking-widest text-purple md:block">Workspace</p>
+          <h1 className="text-2xl md:text-3xl">You and {conversation.other.name}</h1>
+          <p className="mt-1 hidden text-sm text-black/65 md:block">{conversation.search.subject}</p>
+        </div>
+        <span className="flex items-center gap-3 text-xs font-bold text-black/65">
+          <button type="button" onClick={() => setReporting(true)} className={`gap-1 hover:text-black ${TAP_AREA}`}>
+            <Flag className="h-3.5 w-3.5" />
+            Report
+          </button>
+          {!partnership.ended && (
+            <button type="button" onClick={() => setConfirmingBlock(true)} className={`gap-1 hover:text-black ${TAP_AREA}`}>
+              <ShieldBan className="h-3.5 w-3.5" />
+              Block
+            </button>
+          )}
+        </span>
+      </div>
+
+      {(reporting || confirmingBlock) && (
+        <div className="mb-5 overflow-hidden rounded-2xl border-2 border-black">
+          {reporting && <ReportForm conversation={conversation} onDone={() => setReporting(false)} />}
+          {confirmingBlock && (
+            <BlockConfirmation
+              conversation={conversation}
+              onCancel={() => setConfirmingBlock(false)}
+              consequence="This ends your partnership and your conversations, and neither of you will see or apply to the other's partner searches."
+            />
+          )}
+        </div>
+      )}
+
+        </>}
+        goal={<Goal key={partnership.goal ?? ""} partnership={partnership} />}
+        slots={{
+          checkIns: <CheckIns partnership={partnership} />,
+          commitments: <Commitments partnership={partnership} />,
+          end: !partnership.ended && <EndPartnership partnership={partnership} />,
+        }}
+      />
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-16 pt-2 md:px-8 md:pt-8">
