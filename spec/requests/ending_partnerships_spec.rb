@@ -63,6 +63,7 @@ RSpec.describe "Ending a partnership", type: :request do
 
     follow_redirect!
     expect(props["partnership"]).to include("ended" => true, "ended_by_viewer" => true)
+    get chat_partner_path(partnership)
     expect(props.dig("partnership", "conversation", "can_send")).to be(false)
 
     sign_in(partner)

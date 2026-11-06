@@ -96,4 +96,7 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: 'pairin.dev', protocol: 'https' }
   # Emails are read outside the site, so images need the full address.
   config.action_mailer.asset_host = 'https://pairin.dev'
+
+  # PostHog loads only here and in tests, so local browsing doesn't end up in analytics.
+  config.x.posthog_enabled = true
 end

@@ -7,7 +7,7 @@ class Users::PairRequestsController < ApplicationController
 
   def index
     @pair_requests = current_user.pair_requests
-      .includes(:tags, :sessions, :partnership, accepted_offer: :offerer)
+      .includes(:tags, :partnership, accepted_offer: :offerer)
       .order(created_at: :desc)
 
     render inertia: 'Users/PairRequests/Index', props: {
@@ -53,18 +53,6 @@ class Users::PairRequestsController < ApplicationController
     end
   end
 
-  def add_call_link
-    @pair_request = current_user.pair_requests.find(params[:id])
-
-    authorize @pair_request, policy_class: Users::PairRequestPolicy
-
-    if @pair_request.update(add_call_link_params)
-      redirect_to users_pair_requests_path, notice: "Successfully added!"
-    else
-      redirect_back fallback_location: users_pair_requests_path, alert: "Something went wrong."
-    end
-  end
-
   def pause
     @pair_request.switch_off!
     redirect_to users_pair_requests_path, notice: "Partner search switched off. It's hidden from others until you switch it back on."
@@ -91,10 +79,6 @@ class Users::PairRequestsController < ApplicationController
       tags: TagResource.new(Tag.select(:id, :name)),
       commitments: PairRequest::COMMITMENTS.map { |value, label| { value:, label: } }
     }
-  end
-
-  def add_call_link_params
-    params.require(:pair_request).permit(sessions_attributes: [:call_link, :id])
   end
 
   def pair_request_params

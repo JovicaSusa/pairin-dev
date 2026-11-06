@@ -27,7 +27,6 @@ Rails.application.routes.draw do
   # One-time step for accounts with no date of birth.
   resource :date_of_birth, only: [:show, :update]
 
-  resources :sessions, only: [:index, :update]
   resources :profiles, only: [:show, :update]
 
   # Weekly hours and timezone (PATCH /availability updates the timezone).
@@ -45,7 +44,6 @@ Rails.application.routes.draw do
 
   namespace :users do
     resources :pair_requests do
-      patch :add_call_link, on: :member
       patch :pause, on: :member
       patch :resume, on: :member
     end
@@ -57,6 +55,7 @@ Rails.application.routes.draw do
 
   resources :partners, only: [:index, :show, :update], controller: "partnerships" do
     post :end_partnership, on: :member
+    get :chat, on: :member
   end
 
   resources :conversations, only: [:index, :show] do

@@ -6,7 +6,7 @@ RSpec.describe "Date of birth step", type: :request do
   before { sign_in(user) }
 
   it "sends an account with no date of birth to the step, from any page" do
-    [pair_requests_path, sessions_path, profile_path(user), availability_path].each do |path|
+    [pair_requests_path, profile_path(user), availability_path].each do |path|
       sign_in(user)
       get path
 
