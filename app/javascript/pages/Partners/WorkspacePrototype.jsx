@@ -11,10 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+// Round 1 (A–C) still works by URL. The switcher cycles round 2.
 const VARIANTS = [
-  { key: "A", name: "Side cards" },
-  { key: "B", name: "In the chat" },
-  { key: "C", name: "Tabs" },
+  { key: "D", name: "Hub and tiles" },
+  { key: "E", name: "Workspace sidebar" },
+  { key: "F", name: "Previews" },
 ];
 const SCREENS = [
   { key: "full", name: "Every state" },
@@ -362,7 +363,7 @@ function VariantA({ partnership, stub, slots }) {
   return (
     <>
       {callout && (
-        <div className={`mb-3 flex flex-col gap-2 p-3 lg:hidden ${PANEL} ${callout.state === "confirmed" ? "bg-green/20" : "bg-yellow-50"}`}>
+        <div className={`mb-3 flex flex-col gap-2 p-3 lg:hidden ${PANEL} ${callout.state === "confirmed" ? "!bg-green/20" : "!bg-yellow-50"}`}>
           <p className="text-xs font-bold uppercase tracking-wide">{callout.state === "confirmed" ? "Next session" : `${name} proposed a session`}</p>
           <When s={callout} partnerName={name} compact />
           <SessionActions s={callout} stub={stub} ended={ended} />
@@ -423,7 +424,7 @@ function VariantB({ partnership, stub, slots }) {
   return (
     <>
       {/* Pinned bar: the next confirmed session, or what needs an answer. Always above the chat. */}
-      <div className={`mb-3 flex flex-col gap-3 p-3 md:flex-row md:items-center md:justify-between md:p-4 ${PANEL} ${next ? "bg-green/20" : ""}`}>
+      <div className={`mb-3 flex flex-col gap-3 p-3 md:flex-row md:items-center md:justify-between md:p-4 ${PANEL} ${next ? "!bg-green/20" : ""}`}>
         <div className="flex items-start gap-3">
           <Clock className="mt-0.5 h-5 w-5 shrink-0" />
           {next ? (
@@ -544,7 +545,7 @@ function VariantC({ partnership, stub, slots }) {
           <ChatPanel partnership={partnership} />
           <div className="flex flex-col gap-6">
             {stub.sessions.next && (
-              <button type="button" onClick={() => setTab("Sessions")} className={`p-4 text-left ${PANEL} bg-green/20`}>
+              <button type="button" onClick={() => setTab("Sessions")} className={`p-4 text-left ${PANEL} !bg-green/20`}>
                 <p className="text-xs font-bold uppercase tracking-wide">Next session</p>
                 <When s={stub.sessions.next} partnerName={name} compact />
               </button>
@@ -594,16 +595,405 @@ function VariantC({ partnership, stub, slots }) {
   );
 }
 
+// ======================================================================
+// Round 2: the Workspace as its own space. An overview with counts, and
+// Chat, Sessions and Resources as pages of their own. ?page= picks the page.
+// ======================================================================
+
+function usePage() {
+  const [page, setPageState] = useState(() => new URLSearchParams(window.location.search).get("page") ?? "overview");
+  const setPage = (p) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", p);
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}?${params}`);
+    setPageState(p);
+    window.scrollTo(0, 0);
+  };
+  return [page, setPage];
+}
+
+// Stubbed "since you last looked" numbers and the shared activity feed.
+function extrasFor(partnership, stub, screen) {
+  const empty = screen === "empty";
+  const messages = partnership.conversation.messages.filter((m) => !m.from_pairin);
+  const unread = empty ? 0 : Math.min(3, messages.filter((m) => !m.mine).length);
+  const weeks = partnership.weeks.length > 0 ? partnership.weeks : empty ? [] : [
+    { week: 1, worked_together: true }, { week: 2, worked_together: true }, { week: 3, worked_together: false }, { week: 4, worked_together: true },
+  ];
+  const name = partnership.conversation.other.name;
+  const activity = empty ? [] : [
+    { id: 1, when: "2 h ago", icon: CalendarClock, text: `${name} proposed a session for ${when(stub.sessions.upcoming.find((s) => s.state === "proposed" && s.proposedBy === "partner") ?? stub.sessions.upcoming[0] ?? { start: new Date(), minutes: 60 }).day}` },
+    { id: 2, when: "5 h ago", icon: Link2, text: `${name} added guides.rubyonrails.org` },
+    { id: 3, when: "Yesterday", icon: Check, text: "You confirmed Saturday's session" },
+    { id: 4, when: "2 days ago", icon: CalendarClock, text: `${name} cancelled Sunday's session` },
+    { id: 5, when: "Last week", icon: Check, text: "You both said you worked together in week 4" },
+  ];
+  const done = stub.sessions.past.filter((s) => s.state === "past").length;
+  const confirmedAhead = stub.sessions.upcoming.filter((s) => s.state === "confirmed").length;
+  return { unread, weeks, activity, done, confirmedAhead, lastMessage: messages[messages.length - 1], messages };
+}
+
+// The three spaces every round-2 variant shares. Each variant wraps them in its own navigation.
+function SessionsPage({ partnership, stub }) {
+  const name = partnership.conversation.other.name;
+  const { upcoming, past } = stub.sessions;
+  const ended = partnership.ended;
+  const group = (title, list) => list.length > 0 && (
+    <section className="mb-6">
+      <h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-black/65">{title}</h2>
+      <ul className="flex flex-col gap-3">
+        {list.map((s) => {
+          const note = stateNote(s, name);
+          return (
+            <li key={s.id} className={`flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between ${PANEL} ${["declined", "withdrawn", "cancelled", "expired"].includes(s.state) ? "opacity-70 shadow-none" : ""}`}>
+              <div className="flex items-start gap-3">
+                <StateBadge s={s} />
+                <div>
+                  <When s={s} partnerName={name} />
+                  {note && <p className="text-xs text-black/65">{note}</p>}
+                  {s.link && s.state === "confirmed" && <p className="truncate text-xs">{host(s.link)}</p>}
+                </div>
+              </div>
+              <SessionActions s={s} stub={stub} ended={ended} />
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+  return (
+    <div className="grid items-start gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+      {!ended && (
+        <div className={`p-4 lg:sticky lg:top-4 ${PANEL}`}>
+          <p className="mb-3 font-bold">Propose a session</p>
+          <ProposeForm stub={stub} partnerName={name} />
+        </div>
+      )}
+      <div>
+        {upcoming.length + past.length === 0 && <p className="text-black/65">No sessions yet. Propose one and {name} can confirm it.</p>}
+        {group("Upcoming", upcoming)}
+        {group("Past", past)}
+      </div>
+    </div>
+  );
+}
+
+function ResourcesPage({ partnership, stub }) {
+  const name = partnership.conversation.other.name;
+  const ended = partnership.ended;
+  return (
+    <div className="grid items-start gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
+      {!ended && (
+        <div className={`p-4 ${PANEL}`}>
+          <p className="mb-3 font-bold">Add a link</p>
+          <AddLinkForm stub={stub} />
+        </div>
+      )}
+      <div>
+        {stub.resources.length === 0 && <p className="text-black/65">Nothing shared yet. Docs, repos and exercises you both want to keep go here.</p>}
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {stub.resources.map((r) => <li key={r.id} className={`p-4 ${PANEL}`}><ul><ResourceLine r={r} stub={stub} ended={ended} partnerName={name} /></ul></li>)}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function ChatPage({ partnership }) {
+  return <ChatPanel partnership={partnership} className="lg:h-[70vh]" />;
+}
+
+function WeeksStrip({ weeks }) {
+  if (weeks.length === 0) return <p className="text-sm text-black/65">Your first check-in is at the end of week 1.</p>;
+  return (
+    <ul className="flex gap-1">
+      {weeks.map(({ week, worked_together: worked }) => (
+        <li key={week} className={`flex min-w-9 flex-1 items-center justify-center rounded-md border-2 border-black py-1 text-xs font-bold ${worked ? "bg-green" : "bg-white"}`}>W{week}</li>
+      ))}
+    </ul>
+  );
+}
+
+function PageTitle({ children, onBack }) {
+  return (
+    <div className="mb-4 flex items-center gap-3">
+      {onBack && (
+        <button type="button" onClick={onBack} className="inline-flex min-h-11 items-center gap-1 text-sm font-bold text-black/65 hover:text-black md:min-h-0">
+          ← Overview
+        </button>
+      )}
+      <h2 className="text-xl md:text-2xl">{children}</h2>
+    </div>
+  );
+}
+
+// ---------- Variant D: hub and tiles. The overview is the menu. ----------
+
+function Tile({ onClick, className = "", children, label }) {
+  return (
+    <button type="button" onClick={onClick} aria-label={label} className={`flex flex-col items-start gap-2 p-4 text-left transition-transform hover:-translate-y-0.5 md:p-5 ${PANEL} ${className}`}>
+      {children}
+    </button>
+  );
+}
+
+function Big({ n, label }) {
+  return (
+    <span className="flex items-baseline gap-1.5">
+      <span className="text-4xl font-bold leading-none md:text-5xl">{n}</span>
+      <span className="text-sm font-bold text-black/65">{label}</span>
+    </span>
+  );
+}
+
+function VariantD({ partnership, stub, slots, screen }) {
+  const [page, setPage] = usePage();
+  const name = partnership.conversation.other.name;
+  const x = extrasFor(partnership, stub, screen);
+  const { next, waitingOnYou } = stub.sessions;
+  const back = () => setPage("overview");
+
+  if (page === "sessions") return <><PageTitle onBack={back}>Sessions</PageTitle><SessionsPage partnership={partnership} stub={stub} /></>;
+  if (page === "resources") return <><PageTitle onBack={back}>Resources</PageTitle><ResourcesPage partnership={partnership} stub={stub} /></>;
+  if (page === "chat") return <><PageTitle onBack={back}>Chat with {name}</PageTitle><ChatPage partnership={partnership} /></>;
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+      {/* Next session is the hero: it's the thing that keeps a pair going. */}
+      <div className={`flex flex-col gap-3 p-5 md:col-span-2 ${PANEL} ${next ? "!bg-green/20" : "!bg-yellow-50"}`}>
+        <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest"><Clock className="h-4 w-4" />Next session</p>
+        {next ? (
+          <>
+            <When s={next} partnerName={name} />
+            <SessionActions s={next} stub={stub} ended={partnership.ended} />
+          </>
+        ) : (
+          <>
+            <p className="text-lg font-bold">Nothing planned yet.</p>
+            {!partnership.ended && <div><Button size="sm" onClick={() => setPage("sessions")}><CalendarPlus className="h-4 w-4" />Propose a session</Button></div>}
+          </>
+        )}
+      </div>
+
+      <Tile onClick={() => setPage("chat")} label="Open chat" className={x.unread > 0 ? "!bg-purple text-white" : ""}>
+        <span className="text-xs font-bold uppercase tracking-widest">Chat</span>
+        <span className="flex items-baseline gap-1.5"><span className="text-4xl font-bold leading-none md:text-5xl">{x.unread}</span><span className="text-sm font-bold opacity-80">new {x.unread === 1 ? "message" : "messages"}</span></span>
+        {x.lastMessage && <span className="line-clamp-2 text-sm opacity-80">{x.lastMessage.mine ? "You" : name}: {x.lastMessage.body}</span>}
+      </Tile>
+
+      <Tile onClick={() => setPage("sessions")} label="Open sessions">
+        <span className="text-xs font-bold uppercase tracking-widest">Sessions</span>
+        <Big n={x.done} label="done together" />
+        <span className="text-sm text-black/65">{x.confirmedAhead} confirmed ahead</span>
+        {waitingOnYou.length > 0 && <span className="rounded-full border-2 border-black bg-orange px-2 py-0.5 text-xs font-bold">{waitingOnYou.length} waiting for your answer</span>}
+      </Tile>
+
+      <Tile onClick={() => setPage("resources")} label="Open resources">
+        <span className="text-xs font-bold uppercase tracking-widest">Resources</span>
+        <Big n={stub.resources.length} label={stub.resources.length === 1 ? "link" : "links"} />
+        {stub.resources[0] && <span className="truncate text-sm text-black/65">Latest: {host(stub.resources[0].url)}</span>}
+      </Tile>
+
+      <div className={`flex flex-col gap-2 p-4 md:p-5 ${PANEL}`}>
+        <span className="text-xs font-bold uppercase tracking-widest">Weeks together</span>
+        <Big n={x.weeks.filter((w) => w.worked_together).length} label={`of ${x.weeks.length} weeks`} />
+        <WeeksStrip weeks={x.weeks} />
+      </div>
+
+      <div className="md:col-span-2 lg:col-span-3 grid gap-4 md:grid-cols-2 md:gap-6">
+        {slots.commitments}
+        <div className="flex items-end">{slots.end}</div>
+      </div>
+    </div>
+  );
+}
+
+// ---------- Variant E: the Workspace gets its own navigation ----------
+
+function VariantE({ partnership, stub, slots, screen }) {
+  const [page, setPage] = usePage();
+  const name = partnership.conversation.other.name;
+  const x = extrasFor(partnership, stub, screen);
+  const { next, waitingOnYou } = stub.sessions;
+  const nav = [
+    { key: "overview", label: "Overview" },
+    { key: "chat", label: "Chat", count: x.unread },
+    { key: "sessions", label: "Sessions", count: waitingOnYou.length },
+    { key: "resources", label: "Resources", total: stub.resources.length },
+  ];
+
+  const stat = (n, label, go) => (
+    <button type="button" onClick={go} className={`p-4 text-left ${PANEL}`}>
+      <p className="text-3xl font-bold leading-none">{n}</p>
+      <p className="mt-1 text-xs font-bold uppercase tracking-wide text-black/65">{label}</p>
+    </button>
+  );
+
+  const needsYou = [
+    ...waitingOnYou.map((s) => ({ key: `s${s.id}`, node: (
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div><p className="text-xs font-bold uppercase tracking-wide">{name} proposed a session</p><When s={s} partnerName={name} compact /></div>
+        <SessionActions s={s} stub={stub} ended={partnership.ended} />
+      </div>
+    ) })),
+    ...(x.unread > 0 ? [{ key: "msgs", node: (
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm"><b>{x.unread} new messages</b> from {name}</p>
+        <Button size="sm" variant="neutral" onClick={() => setPage("chat")}>Read</Button>
+      </div>
+    ) }] : []),
+  ];
+
+  return (
+    <div className="grid items-start gap-4 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-8">
+      <nav aria-label="Workspace" className="-mx-4 flex gap-1 overflow-x-auto px-4 lg:sticky lg:top-4 lg:mx-0 lg:flex-col lg:px-0">
+        {nav.map((n) => (
+          <button key={n.key} type="button" onClick={() => setPage(n.key)} aria-current={page === n.key ? "page" : undefined}
+            className={`flex shrink-0 items-center justify-between gap-3 rounded-xl border-2 px-3 py-2 text-sm font-bold ${page === n.key ? "border-black bg-purple text-white" : "border-transparent hover:border-black"}`}>
+            {n.label}
+            {n.count > 0 && <span className="rounded-full bg-orange px-1.5 text-xs text-black">{n.count}</span>}
+            {!n.count && n.total > 0 && <span className="text-xs opacity-60">{n.total}</span>}
+          </button>
+        ))}
+      </nav>
+
+      <div className="min-w-0">
+        {page === "chat" && <ChatPage partnership={partnership} />}
+        {page === "sessions" && <SessionsPage partnership={partnership} stub={stub} />}
+        {page === "resources" && <ResourcesPage partnership={partnership} stub={stub} />}
+        {page === "overview" && (
+          <div className="flex flex-col gap-6">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              {stat(x.unread, "New messages", () => setPage("chat"))}
+              {stat(x.done, "Sessions done", () => setPage("sessions"))}
+              {stat(stub.resources.length, "Resources", () => setPage("resources"))}
+              {stat(`${x.weeks.filter((w) => w.worked_together).length}/${x.weeks.length}`, "Weeks together", () => {})}
+            </div>
+
+            <section>
+              <h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-black/65">Needs you</h2>
+              {needsYou.length === 0 ? <p className="text-sm text-black/65">You're all caught up.</p> : (
+                <ul className="flex flex-col gap-3">{needsYou.map((n) => <li key={n.key} className={`p-4 !bg-yellow-50 ${PANEL}`}>{n.node}</li>)}</ul>
+              )}
+            </section>
+
+            <div className="grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_300px]">
+              <section>
+                <h2 className="mb-2 text-xs font-bold uppercase tracking-widest text-black/65">Coming up</h2>
+                <div className={`p-4 ${PANEL} ${next ? "!bg-green/20" : ""}`}>
+                  {next ? <><When s={next} partnerName={name} /><div className="mt-2"><SessionActions s={next} stub={stub} ended={partnership.ended} /></div></> : <p className="text-sm">Nothing planned. <button type="button" className="font-bold underline" onClick={() => setPage("sessions")}>Propose a session</button></p>}
+                </div>
+                <h2 className="mb-2 mt-6 text-xs font-bold uppercase tracking-widest text-black/65">Recent activity</h2>
+                {x.activity.length === 0 ? <p className="text-sm text-black/65">Nothing yet.</p> : (
+                  <ol className="flex flex-col border-l-2 border-black pl-4">
+                    {x.activity.map((a) => (
+                      <li key={a.id} className="relative pb-4 last:pb-0">
+                        <span className="absolute -left-[1.45rem] top-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-black bg-white"><a.icon className="h-3 w-3" /></span>
+                        <p className="text-sm">{a.text}</p>
+                        <p className="text-xs text-black/50">{a.when}</p>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </section>
+              <div className="flex flex-col gap-6">
+                {slots.commitments}
+                {slots.end}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------- Variant F: the overview is a preview of each space ----------
+
+function Section({ title, count, onAll, allLabel = "See all", children, className = "" }) {
+  return (
+    <section className={`flex flex-col p-4 md:p-5 ${PANEL} ${className}`}>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 font-bold">{title}{count != null && <span className="rounded-full border-2 border-black px-2 text-xs">{count}</span>}</h2>
+        {onAll && <button type="button" onClick={onAll} className="inline-flex min-h-11 items-center text-xs font-bold underline md:min-h-0">{allLabel} →</button>}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function VariantF({ partnership, stub, slots, screen }) {
+  const [page, setPage] = usePage();
+  const name = partnership.conversation.other.name;
+  const x = extrasFor(partnership, stub, screen);
+  const { upcoming } = stub.sessions;
+  const live = upcoming.filter((s) => ["proposed", "confirmed"].includes(s.state)).slice(0, 3);
+  const tabs = [["overview", "Overview"], ["chat", "Chat"], ["sessions", "Sessions"], ["resources", "Resources"]];
+
+  return (
+    <>
+      <div className="mb-4 flex gap-4 overflow-x-auto border-b-2 border-black">
+        {tabs.map(([key, label]) => (
+          <button key={key} type="button" onClick={() => setPage(key)} className={`-mb-0.5 shrink-0 border-b-4 px-1 pb-2 text-sm font-bold ${page === key ? "border-purple text-black" : "border-transparent text-black/60 hover:text-black"}`}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {page === "chat" && <ChatPage partnership={partnership} />}
+      {page === "sessions" && <SessionsPage partnership={partnership} stub={stub} />}
+      {page === "resources" && <ResourcesPage partnership={partnership} stub={stub} />}
+      {page === "overview" && (
+        <div className="grid items-start gap-4 md:gap-6 lg:grid-cols-2">
+          <Section title="Chat" count={x.unread > 0 ? `${x.unread} new` : null} onAll={() => setPage("chat")} allLabel="Open chat" className="lg:row-span-2">
+            <div className="max-h-72 overflow-hidden">
+              <Messages messages={partnership.conversation.messages.slice(-4)} dim={partnership.ended} />
+            </div>
+            {partnership.conversation.can_send && <div className="mt-3"><Composer conversation={partnership.conversation} /></div>}
+          </Section>
+
+          <Section title="Sessions" count={`${x.done} done`} onAll={() => setPage("sessions")}>
+            {live.length === 0 ? (
+              <p className="text-sm text-black/65">Nothing planned. {!partnership.ended && <button type="button" className="font-bold underline" onClick={() => setPage("sessions")}>Propose a session</button>}</p>
+            ) : (
+              <ul className="flex flex-col gap-3">
+                {live.map((s) => (
+                  <li key={s.id} className="flex flex-col gap-2 border-t-2 border-black/10 pt-3 first:border-t-0 first:pt-0">
+                    <div className="flex items-start justify-between gap-2"><When s={s} partnerName={name} compact /><StateBadge s={s} /></div>
+                    <SessionActions s={s} stub={stub} ended={partnership.ended} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Section>
+
+          <Section title="Resources" count={stub.resources.length} onAll={() => setPage("resources")}>
+            {stub.resources.length === 0 ? <p className="text-sm text-black/65">No links yet.</p> : (
+              <ul className="flex flex-col gap-3">{stub.resources.slice(0, 3).map((r) => <ResourceLine key={r.id} r={r} stub={stub} ended={partnership.ended} partnerName={name} />)}</ul>
+            )}
+          </Section>
+
+          <Section title="Weeks together" count={`${x.weeks.filter((w) => w.worked_together).length}/${x.weeks.length}`}>
+            <WeeksStrip weeks={x.weeks} />
+          </Section>
+          {slots.commitments}
+          <div>{slots.end}</div>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ---------- switcher host ----------
 
 function Stubbed({ Variant, screen, ...props }) {
   const stub = useWorkspaceStub(screen);
-  return <Variant stub={stub} {...props} />;
+  return <Variant stub={stub} screen={screen} {...props} />;
 }
 
 export default function WorkspacePrototype({ partnership, header, goal, slots }) {
   const params = new URLSearchParams(window.location.search);
-  const variant = params.get("variant") ?? "A";
+  const variant = params.get("variant") ?? "D";
   const screen = params.get("screen") ?? "full";
   const shown = { ...partnership, ended: partnership.ended || screen === "ended", conversation: { ...partnership.conversation, can_send: partnership.conversation.can_send && screen !== "ended" } };
 
@@ -613,7 +1003,7 @@ export default function WorkspacePrototype({ partnership, header, goal, slots })
     router.visit(`${window.location.pathname}?${p}`, { preserveScroll: true, replace: true });
   };
 
-  const Variant = { A: VariantA, B: VariantB, C: VariantC }[variant] ?? VariantA;
+  const Variant = { A: VariantA, B: VariantB, C: VariantC, D: VariantD, E: VariantE, F: VariantF }[variant] ?? VariantD;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-32 pt-2 md:px-8 md:pt-8">
@@ -624,7 +1014,7 @@ export default function WorkspacePrototype({ partnership, header, goal, slots })
       <PrototypeSwitcher
         variants={VARIANTS}
         current={variant}
-        onChange={(v) => go({ variant: v })}
+        onChange={(v) => go({ variant: v, page: "overview" })}
         screens={SCREENS}
         screen={screen}
         onScreen={(s) => go({ screen: s })}
