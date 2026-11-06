@@ -3,7 +3,7 @@ class Users::PairRequestsController < ApplicationController
   include Alba::Inertia::Controller
   include SearchCards
 
-  before_action :set_and_authorize_own_pair_request, only: [:pause, :resume]
+  before_action :set_and_authorize_own_pair_request, only: [:edit, :update, :pause, :resume]
 
   def index
     @pair_requests = current_user.pair_requests
@@ -19,10 +19,28 @@ class Users::PairRequestsController < ApplicationController
   def new
     @pair_request = current_user.pair_requests.build
     
-    render inertia: 'Users/PairRequests/New', props: {
-      tags: TagResource.new(Tag.select(:id, :name)),
-      commitments: PairRequest::COMMITMENTS.map { |value, label| { value:, label: } }
-    }
+    render inertia: 'Users/PairRequests/New', props: form_props
+  end
+
+  def edit
+    render inertia: 'Users/PairRequests/Edit', props: form_props.merge(
+      pairRequest: {
+        id: @pair_request.id,
+        subject: @pair_request.subject,
+        description: @pair_request.description,
+        commitment: @pair_request.commitment,
+        taggings: @pair_request.taggings.includes(:tag).map { |tagging| { id: tagging.id, name: tagging.tag.name } }
+      }
+    )
+  end
+
+  # Offers already sent stay as they are, and the share link doesn't change.
+  def update
+    if @pair_request.update(pair_request_params)
+      redirect_to users_pair_requests_path, notice: "Partner search updated."
+    else
+      redirect_back_or_to edit_users_pair_request_path(@pair_request), inertia: { errors: @pair_request.errors.to_hash(true) }
+    end
   end
 
   def create
@@ -68,6 +86,13 @@ class Users::PairRequestsController < ApplicationController
     authorize @pair_request, policy_class: Users::PairRequestPolicy
   end
 
+  def form_props
+    {
+      tags: TagResource.new(Tag.select(:id, :name)),
+      commitments: PairRequest::COMMITMENTS.map { |value, label| { value:, label: } }
+    }
+  end
+
   def add_call_link_params
     params.require(:pair_request).permit(sessions_attributes: [:call_link, :id])
   end
@@ -78,7 +103,8 @@ class Users::PairRequestsController < ApplicationController
         :subject,
         :description,
         :commitment,
-        taggings_attributes: [:_destroy, tag_attributes: [:name]]
+        # An id from another search's tagging raises RecordNotFound, so it can't be touched.
+        taggings_attributes: [:id, :_destroy, tag_attributes: [:name]]
       )
   end
 end
