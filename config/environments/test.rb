@@ -71,4 +71,7 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   config.active_job.queue_adapter = :test
+
+  # On so specs can check who it's left out for; Cuprite blocks posthog.com, so nothing is sent.
+  config.x.posthog_enabled = true
 end
