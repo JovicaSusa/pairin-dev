@@ -260,6 +260,19 @@ RSpec.describe "Protections for under-18s", type: :request do
       get pair_requests_path
       expect(response.body).to include("posthog.init")
     end
+
+    it "doesn't load it at all where it's switched off, as in development" do
+      Rails.configuration.x.posthog_enabled = false
+      sign_in(adult)
+
+      get root_path
+      expect(response.body).not_to include("posthog")
+
+      get pair_requests_path
+      expect(response.body).not_to include("posthog")
+    ensure
+      Rails.configuration.x.posthog_enabled = true
+    end
   end
 
   describe "the legal pages" do
