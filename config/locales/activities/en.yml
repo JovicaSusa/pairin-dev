@@ -18,29 +18,6 @@ en:
         - Someone wants to learn with you. Take a look at their application.
         - A new application has arrived. Don't keep them waiting!
         - Someone applied to your partner search. Take a moment to read what they wrote.
-    session_scheduled:
-      titles:
-        - Your Session Has Been Scheduled!
-        - It's Official! Your Session Is Set!
-        - Your Upcoming Session is Ready to Go!
-        - The Date is Set for Your Session!
-        - You've Successfully Scheduled a Session!
-        - Mark Your Calendar—Your Session is Coming!
-        - Your Session Is Confirmed and Locked In!
-        - The Session You've Been Waiting for Is Now Scheduled!
-        - Get Ready! Your Session is Booked!
-        - Your Session Has Been Secured!
-      content:
-        - Your session has been scheduled and is confirmed! Be ready for a productive meeting.
-        - Great news! Your session is officially on the calendar. Time to get ready.
-        - Your session is locked in! We'll remind you as the date approaches.
-        - You've successfully scheduled your session. See you there!
-        - Your upcoming session is all set. Prepare for a great experience.
-        - Your session is now officially scheduled! Get ready for a productive meeting.
-        - Your session has been booked! Mark the date and be prepared.
-        - It's official—your session is scheduled! Looking forward to seeing you there.
-        - The session is set! We've reserved your spot, now just get ready for the date.
-        - You're all set for your upcoming session! Don't forget to check the details.
     offer_accepted:
       titles:
         - Great News! Your Application Was Accepted!
