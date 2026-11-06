@@ -63,7 +63,8 @@ RSpec.describe "Shareable partner search links", type: :request do
       get public_search_path(token:)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Apply to A")
+      expect(response.body).to include("A Pairin member", ">Apply<")
+      expect(response.body).not_to include("Apply to A")
     end
 
     it "shows a not-found page for a bad token, and not for a search ID" do
