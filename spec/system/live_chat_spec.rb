@@ -49,6 +49,22 @@ RSpec.describe "live chat", type: :system do
     expect(page).to have_css('[aria-label="1 unread"]')
   end
 
+  it "updates the Workspace's Chat tile live, without marking it read" do
+    offer.propose_partnership!(by: applicant)
+    partnership = offer.accept_proposal!(by: poster)
+    offer.mark_read_by!(applicant)
+    sign_in(applicant)
+    visit partner_path(partnership)
+    expect(page).to have_content("You're all caught up")
+    wait_until_listening
+
+    offer.post_message(poster, "Ping")
+
+    expect(page).to have_content(/1\s+new message\b/)
+    expect(page).to have_content("Maya: Ping")
+    expect(offer.unread_messages_for(applicant).count).to eq(1)
+  end
+
   it "shows a conversation ending live" do
     sign_in(applicant)
     visit conversation_path(offer)

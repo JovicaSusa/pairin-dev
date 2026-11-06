@@ -65,8 +65,11 @@ RSpec.describe "conversations", type: :system do
 
     expect(page).to have_content("You and Sam")
     expect(page).to have_content(/workspace/i)
-    expect(page).to have_field("Write a message")
     expect(offer.reload).to be_partners
+
+    click_link "Open chat"
+
+    expect(page).to have_field("Write a message")
 
     visit conversation_path(offer)
 

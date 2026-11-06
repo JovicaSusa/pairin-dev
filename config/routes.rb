@@ -55,6 +55,7 @@ Rails.application.routes.draw do
 
   resources :partners, only: [:index, :show, :update], controller: "partnerships" do
     post :end_partnership, on: :member
+    get :chat, on: :member
   end
 
   resources :conversations, only: [:index, :show] do
