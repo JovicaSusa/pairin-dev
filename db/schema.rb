@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_05_090000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_06_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -156,6 +156,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_05_090000) do
     t.index ["sessionable_type", "sessionable_id"], name: "index_sessions_on_sessionable"
   end
 
+  create_table "shared_links", force: :cascade do |t|
+    t.bigint "partnership_id", null: false
+    t.bigint "added_by_id", null: false
+    t.string "url", null: false
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["added_by_id"], name: "index_shared_links_on_added_by_id"
+    t.index ["partnership_id"], name: "index_shared_links_on_partnership_id"
+  end
+
   create_table "taggings", force: :cascade do |t|
     t.string "taggable_type", null: false
     t.bigint "taggable_id", null: false
@@ -230,6 +241,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_05_090000) do
   add_foreign_key "offers", "users", column: "offerer_id"
   add_foreign_key "pair_requests", "users"
   add_foreign_key "participations", "users", column: "participant_id"
+  add_foreign_key "shared_links", "partnerships"
+  add_foreign_key "shared_links", "users", column: "added_by_id"
   add_foreign_key "taggings", "tags"
   add_foreign_key "users", "pair_requests", column: "signup_pair_request_id", on_delete: :nullify
 end

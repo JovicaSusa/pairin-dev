@@ -166,4 +166,64 @@ RSpec.describe "workspaces", type: :system do
       expect(page).to have_content("You and Sam")
     end
   end
+
+  describe "resources" do
+    let!(:partnership) { offer.accept_proposal!(by: poster) }
+
+    it "can be added from the overview, shared with the partner and removed" do
+      sign_in(poster)
+      visit partner_path(partnership)
+
+      expect(page).to have_content("No links yet")
+      click_link "Open resources"
+
+      expect(page).to have_content("Nothing shared yet")
+      fill_in "Link", with: "https://www.exercism.org/tracks/python"
+      fill_in "Note (optional)", with: "Do two exercises a week"
+      click_button "Add link"
+
+      expect(page).to have_link("exercism.org", href: "https://www.exercism.org/tracks/python")
+      expect(page).to have_content("Do two exercises a week")
+      expect(page).to have_content("Added by you")
+      expect(page).to have_field("Link", with: "")
+
+      click_link "Overview"
+
+      expect(page).to have_content(/1\s+link\b/)
+      expect(page).to have_content("Latest: exercism.org")
+
+      sign_in(partner)
+      visit partner_resources_path(partnership)
+
+      expect(page).to have_content("Added by Maya")
+      click_button "Remove exercism.org"
+
+      expect(page).to have_content("Nothing shared yet")
+      expect(page).not_to have_link("exercism.org")
+    end
+
+    it "fits a phone, with the form above the list" do
+      partnership.shared_links.create!(added_by: partner, url: "https://github.com/sam/a-really-long-repository-name-that-goes-on/blob/main/README.md")
+      sign_in(poster)
+      page.driver.resize(390, 800)
+      visit partner_resources_path(partnership)
+
+      expect(page).to have_link("github.com")
+      form_bottom = page.evaluate_script("document.querySelector('form').getBoundingClientRect().bottom")
+      list_top = page.evaluate_script("document.querySelector('a[href^=\"https://github.com\"]').closest('li').getBoundingClientRect().top")
+      expect(list_top).to be > form_bottom
+      expect(page.evaluate_script("document.documentElement.scrollWidth - window.innerWidth")).to be <= 0
+    end
+
+    it "stays readable but can't be changed once the partnership ends" do
+      partnership.shared_links.create!(added_by: partner, url: "https://github.com/sam")
+      partnership.end!(by: partner)
+      sign_in(poster)
+      visit partner_resources_path(partnership)
+
+      expect(page).to have_link("github.com")
+      expect(page).not_to have_button("Add link")
+      expect(page).not_to have_button("Remove github.com")
+    end
+  end
 end
