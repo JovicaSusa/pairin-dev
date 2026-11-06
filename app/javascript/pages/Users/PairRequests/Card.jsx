@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
-import { Inbox, CheckCircle2, Power, EyeOff, Share2 } from "lucide-react";
+import { Inbox, CheckCircle2, Power, EyeOff, Share2, Pencil } from "lucide-react";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -65,6 +65,12 @@ export default function UserPairRequestCard({ request }) {
               Share
             </Button>
           )}
+          <Button asChild variant="neutral" size="sm">
+            <Link href={`/users/pair_requests/${request.id}/edit`}>
+              <Pencil className="h-4 w-4" />
+              Edit
+            </Link>
+          </Button>
           <Button asChild variant="neutral" size="sm">
             <Link href={`/pair_requests/${request.id}/offers`}>
               <Inbox className="h-4 w-4" />

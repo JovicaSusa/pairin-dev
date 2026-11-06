@@ -5,5 +5,7 @@ module Users
     end
 
     alias_method :resume?, :pause?
+    alias_method :edit?, :pause?
+    alias_method :update?, :pause?
   end
 end
