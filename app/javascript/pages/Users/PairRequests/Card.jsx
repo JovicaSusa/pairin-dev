@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useForm, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { Inbox, CheckCircle2, Power, EyeOff, Share2 } from "lucide-react";
-import { formatShort } from "@/helpers/date";
 import ExpandableText from "@/components/ExpandableText";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -40,20 +39,6 @@ function ShareLink({ path }) {
 }
 
 export default function UserPairRequestCard({ request }) {
-  const { data, setData, patch, processing } = useForm({
-    pair_request: {
-      sessions_attributes: request.sessions.map(s => ({
-        id: s.id,
-        call_link: s.call_link || ''
-      }))
-    }
-  });
-
-  const submitCallLink = (e) => {
-    e.preventDefault();
-    patch(`/users/pair_requests/${request.id}/add_call_link`);
-  };
-
   const [toggling, setToggling] = useState(false);
   const [sharing, setSharing] = useState(false);
 
@@ -132,42 +117,7 @@ export default function UserPairRequestCard({ request }) {
                 </span>
               </div>
             </div>
-
-            <div className="flex flex-col gap-1 md:items-end">
-              {request.sessions.map(s => (
-                <div key={s.id} className="flex items-center gap-1.5">
-                  <Badge variant="neutral" className="rounded-full text-xs">
-                    {formatShort(s.start_at)}
-                  </Badge>
-                  <span className="text-black/65">→</span>
-                  <Badge variant="neutral" className="rounded-full text-xs">
-                    {formatShort(s.end_at)}
-                  </Badge>
-                </div>
-              ))}
-            </div>
           </div>
-
-          {request.sessions.length > 0 && <form onSubmit={submitCallLink} className="mt-4 flex flex-col items-stretch gap-2 md:flex-row md:items-end">
-            <div className="flex flex-1 flex-col">
-              <Label htmlFor="pair_request_sessions_attributes_0_call_link" className="mb-1">Call link</Label>
-              <Input
-                id="pair_request_sessions_attributes_0_call_link"
-                type="text"
-                value={data.pair_request.sessions_attributes[0]?.call_link}
-                onChange={e => {
-                  const newAttrs = [...data.pair_request.sessions_attributes];
-                  newAttrs[0].call_link = e.target.value;
-                  setData('pair_request', { ...data.pair_request, sessions_attributes: newAttrs });
-                }}
-                placeholder="https://meet.google.com/..."
-                className="bg-white"
-              />
-            </div>
-            <Button disabled={processing} className="md:w-32">
-              {processing ? '...' : 'Add'}
-            </Button>
-          </form>}
         </div>
       )}
     </div>
