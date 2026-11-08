@@ -216,6 +216,50 @@ RSpec.describe "workspaces", type: :system do
       expect(page).to have_content("Maya proposed this")
     end
 
+    it "can be confirmed by the partner, shows as next, and cancelled by either" do
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30))
+      sign_in(partner)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("Maya proposed this")
+      click_button "Confirm"
+
+      expect(page).to have_content("Maya proposed it, you confirmed")
+      expect(page).not_to have_button("Confirm")
+
+      click_link "Overview"
+      expect(page).to have_content("Mon 4 Mar · 12:30–13:30")
+      expect(page).to have_content(/1\s+confirmed ahead/)
+
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("You proposed it, Sam confirmed")
+      click_button "Cancel session"
+      expect(page).to have_content("Cancel this session? We'll tell Sam.")
+      click_button "Yes, cancel it"
+
+      expect(page).to have_content("You cancelled")
+      expect(page).not_to have_button("Cancel session")
+    end
+
+    it "can be declined by the partner or withdrawn by the proposer" do
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30))
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 5, 17, 30), end_at: Time.utc(2030, 3, 5, 18, 30))
+      sign_in(partner)
+      visit partner_sessions_path(partnership)
+
+      within(find("li", text: "Mon 4 Mar")) { click_button "Decline" }
+      expect(page).to have_content("You declined")
+
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("Sam declined")
+      within(find("li", text: "Tue 5 Mar")) { click_button "Withdraw" }
+      expect(page).to have_content("You withdrew this")
+    end
+
     it "says what's wrong with a time in the past" do
       sign_in(poster)
       visit partner_sessions_path(partnership)
@@ -251,14 +295,15 @@ RSpec.describe "workspaces", type: :system do
       expect(page.evaluate_script("document.documentElement.scrollWidth - window.innerWidth")).to be <= 0
     end
 
-    it "stays readable but takes no proposals once the partnership ends" do
+    it "stays readable, cancelled, and takes no proposals once the partnership ends" do
       create(:session, partnership:, proposed_by: partner)
       partnership.end!(by: partner)
       sign_in(poster)
       visit partner_sessions_path(partnership)
 
-      expect(page).to have_content("Sam proposed this")
+      expect(page).to have_content("Cancelled when the partnership ended")
       expect(page).not_to have_button("Propose session")
+      expect(page).not_to have_button("Confirm")
 
       visit partner_path(partnership)
       expect(page).not_to have_link("Propose a session")

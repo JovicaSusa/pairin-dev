@@ -199,4 +199,153 @@ RSpec.describe "Workspace sessions", type: :request do
       expect(flash[:alert]).to eq("This partnership has ended.")
     end
   end
+
+  describe "answering and cancelling" do
+    let!(:session) { create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30), call_link: "https://meet.google.com/x") }
+
+    def mail_body(mail)
+      mail.html_part ? mail.html_part.body.to_s : mail.body.to_s
+    end
+
+    it "doesn't send an email about a change that has since been undone" do
+      sign_in(partner)
+      patch confirm_partner_session_path(partnership, session)
+      patch cancel_partner_session_path(partnership, session)
+
+      perform_enqueued_jobs
+
+      # The confirmation (with its call link) would describe a session that's
+      # now cancelled, so only the cancellation goes out.
+      expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(["Sam cancelled the session on Mon 4 Mar"])
+    end
+
+    it "doesn't send a confirmation once the partnership has ended" do
+      sign_in(partner)
+      patch confirm_partner_session_path(partnership, session)
+      partnership.end!(by: poster)
+
+      perform_enqueued_jobs
+
+      expect(ActionMailer::Base.deliveries.map(&:subject)).not_to include(a_string_including("confirmed"))
+    end
+
+    it "lets the partner confirm, emails the proposer the time in their timezone, and signals them" do
+      sign_in(partner)
+
+      expect { patch confirm_partner_session_path(partnership, session) }.to have_broadcasted_to(poster).from_channel(ConversationsChannel)
+
+      expect(response).to redirect_to(partner_sessions_path(partnership))
+      expect(session.reload).to be_confirmed
+      perform_enqueued_jobs
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to eq(["maya@example.com"])
+      expect(mail.subject).to eq("Sam confirmed your session on Mon 4 Mar")
+      expect(mail_body(mail)).to include("18:30–19:30", "Europe/Berlin", "https://meet.google.com/x")
+    end
+
+    it "lets the partner decline, and emails the proposer" do
+      sign_in(partner)
+
+      perform_enqueued_jobs { patch decline_partner_session_path(partnership, session) }
+
+      expect(session.reload).to be_declined
+      expect(ActionMailer::Base.deliveries.last).to have_attributes(to: ["maya@example.com"], subject: "Sam declined your session on Mon 4 Mar")
+    end
+
+    it "lets the proposer withdraw, and emails the partner" do
+      sign_in(poster)
+
+      perform_enqueued_jobs { patch withdraw_partner_session_path(partnership, session) }
+
+      expect(session.reload).to be_withdrawn
+      expect(ActionMailer::Base.deliveries.last).to have_attributes(to: ["sam@example.com"], subject: "Maya withdrew a session on Mon 4 Mar")
+    end
+
+    it "lets either partner cancel a confirmed session, and emails the other" do
+      session.confirm!(by: partner)
+      sign_in(poster)
+
+      perform_enqueued_jobs { patch cancel_partner_session_path(partnership, session) }
+
+      expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: poster)
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail).to have_attributes(to: ["sam@example.com"], subject: "Maya cancelled the session on Mon 4 Mar")
+      expect(mail_body(mail)).not_to include("https://meet.google.com/x")
+    end
+
+    it "doesn't let the proposer answer their own proposal" do
+      sign_in(poster)
+
+      expect { patch confirm_partner_session_path(partnership, session) }.not_to have_enqueued_mail(SessionMailer)
+
+      expect(session.reload).to be_proposed
+      expect(flash[:alert]).to eq("This session can't be changed any more.")
+    end
+
+    it "says so when the session was already answered" do
+      session.decline!(by: partner)
+      sign_in(partner)
+
+      patch confirm_partner_session_path(partnership, session)
+
+      expect(session.reload).to be_declined
+      expect(flash[:alert]).to eq("This session can't be changed any more.")
+    end
+
+    it "shows each person what they can do, and who cancelled" do
+      sign_in(partner)
+      get partner_sessions_path(partnership)
+      expect(props.dig("partnership", "sessions", "upcoming", 0, "can")).to eq("answer" => true, "withdraw" => false, "cancel" => false)
+
+      sign_in(poster)
+      get partner_sessions_path(partnership)
+      expect(props.dig("partnership", "sessions", "upcoming", 0, "can")).to eq("answer" => false, "withdraw" => true, "cancel" => false)
+
+      session.confirm!(by: partner)
+      session.cancel!(by: partner)
+      get partner_sessions_path(partnership)
+      expect(props.dig("partnership", "sessions", "upcoming", 0)).to include("status" => "cancelled", "cancelled_by" => "partner")
+    end
+
+    %i[confirm decline withdraw cancel].each do |action|
+      it "doesn't let anyone outside the partnership #{action} it" do
+        sign_in(create(:user))
+
+        patch public_send(:"#{action}_partner_session_path", partnership, session)
+
+        expect(response).to have_http_status(:not_found)
+        expect(session.reload).to be_proposed
+      end
+    end
+
+    it "says the partnership has ended, rather than that the session can't change" do
+      partnership.end!(by: poster)
+      sign_in(partner)
+
+      expect { patch confirm_partner_session_path(partnership, session) }.not_to have_enqueued_mail(SessionMailer)
+
+      expect(response).to redirect_to(partner_sessions_path(partnership))
+      expect(flash[:alert]).to eq("This partnership has ended.")
+    end
+
+    it "doesn't reach a session from another partnership" do
+      other_session = create(:session)
+      sign_in(partner)
+
+      patch confirm_partner_session_path(partnership, other_session)
+
+      expect(response).to have_http_status(:not_found)
+      expect(other_session.reload).to be_proposed
+    end
+
+    it "cancels the sessions ahead without emailing about them when the partnership ends" do
+      session.confirm!(by: partner)
+      sign_in(poster)
+
+      perform_enqueued_jobs { post end_partnership_partner_path(partnership) }
+
+      expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: nil)
+      expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(["Your partnership with Maya has ended"])
+    end
+  end
 end

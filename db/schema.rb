@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_06_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_08_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -145,6 +145,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_120000) do
     t.bigint "partnership_id", null: false
     t.bigint "proposed_by_id", null: false
     t.string "status", default: "proposed", null: false
+    t.bigint "cancelled_by_id"
+    t.index ["cancelled_by_id"], name: "index_sessions_on_cancelled_by_id"
     t.index ["partnership_id", "start_at"], name: "index_sessions_on_partnership_id_and_start_at"
     t.index ["partnership_id"], name: "index_sessions_on_partnership_id"
     t.index ["proposed_by_id"], name: "index_sessions_on_proposed_by_id"
@@ -235,6 +237,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_120000) do
   add_foreign_key "offers", "users", column: "offerer_id"
   add_foreign_key "pair_requests", "users"
   add_foreign_key "sessions", "partnerships"
+  add_foreign_key "sessions", "users", column: "cancelled_by_id"
   add_foreign_key "sessions", "users", column: "proposed_by_id"
   add_foreign_key "shared_links", "partnerships"
   add_foreign_key "shared_links", "users", column: "added_by_id"

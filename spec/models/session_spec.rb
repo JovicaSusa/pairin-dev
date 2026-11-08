@@ -68,4 +68,148 @@ RSpec.describe Session do
 
     expect { partnership.destroy! }.to change(described_class, :count).by(-1)
   end
+
+  describe "answering" do
+    let(:other) { partnership.offer.other_person(proposer) }
+    let(:outsider) { create(:user) }
+
+    it "lets only the partner who didn't propose it confirm or decline it" do
+      expect(session.confirm!(by: proposer)).to be(false)
+      expect(session.confirm!(by: outsider)).to be(false)
+      expect(session.reload).to be_proposed
+
+      expect(session.confirm!(by: other)).to be(true)
+      expect(session.reload).to be_confirmed
+    end
+
+    it "lets the other partner decline it" do
+      expect(session.decline!(by: proposer)).to be(false)
+      expect(session.decline!(by: other)).to be(true)
+      expect(session.reload).to be_declined
+    end
+
+    it "lets only the proposer withdraw it" do
+      expect(session.withdraw!(by: other)).to be(false)
+      expect(session.withdraw!(by: proposer)).to be(true)
+      expect(session.reload).to be_withdrawn
+    end
+
+    it "doesn't let anyone outside the partnership decline or withdraw it" do
+      expect(session.decline!(by: outsider)).to be(false)
+      expect(session.withdraw!(by: outsider)).to be(false)
+      expect(session.reload).to be_proposed
+    end
+
+    it "can't confirm or decline a proposal that was withdrawn" do
+      session.withdraw!(by: proposer)
+
+      expect(session.confirm!(by: other)).to be(false)
+      expect(session.decline!(by: other)).to be(false)
+      expect(session.reload).to be_withdrawn
+    end
+
+    it "takes only one answer" do
+      session.decline!(by: other)
+
+      expect(session.confirm!(by: other)).to be(false)
+      expect(session.withdraw!(by: proposer)).to be(false)
+      expect(session.reload).to be_declined
+    end
+
+    it "can't confirm an expired proposal" do
+      session.update_columns(start_at: 1.minute.ago, end_at: 59.minutes.from_now)
+
+      expect(session.confirm!(by: other)).to be(false)
+      expect(session.decline!(by: other)).to be(false)
+      expect(session.withdraw!(by: proposer)).to be(false)
+      expect(session.reload).to be_expired
+    end
+
+    it "can't answer or withdraw once the partnership has ended" do
+      partnership.update_columns(ended_at: Time.current, ended_by_id: proposer.id)
+
+      expect(session.confirm!(by: other)).to be(false)
+      expect(session.decline!(by: other)).to be(false)
+      expect(session.withdraw!(by: proposer)).to be(false)
+      expect(session.reload).to be_proposed
+    end
+  end
+
+  describe "cancelling" do
+    let(:other) { partnership.offer.other_person(proposer) }
+
+    before { session.confirm!(by: other) }
+
+    it "lets either partner cancel a confirmed session before it starts, and remembers who" do
+      expect(session.cancel!(by: create(:user))).to be(false)
+
+      expect(session.cancel!(by: proposer)).to be(true)
+      expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: proposer)
+    end
+
+    it "works for the partner who confirmed it too" do
+      expect(session.cancel!(by: other)).to be(true)
+      expect(session.reload.cancelled_by).to eq(other)
+    end
+
+    it "can't cancel one that has started" do
+      session.update_columns(start_at: 1.minute.ago, end_at: 59.minutes.from_now)
+
+      expect(session.cancel!(by: proposer)).to be(false)
+      expect(session.reload).to be_confirmed
+    end
+
+    it "can't cancel one that was only proposed" do
+      proposal = create(:session, partnership:, proposed_by: proposer, start_at: 3.days.from_now.change(min: 0))
+
+      expect(proposal.cancel!(by: other)).to be(false)
+    end
+
+    it "can't withdraw a confirmed session, only cancel it" do
+      expect(session.withdraw!(by: proposer)).to be(false)
+      expect(session.reload).to be_confirmed
+    end
+
+    it "can't confirm, decline or cancel again once it's cancelled" do
+      session.cancel!(by: proposer)
+
+      expect(session.confirm!(by: other)).to be(false)
+      expect(session.decline!(by: other)).to be(false)
+      expect(session.cancel!(by: other)).to be(false)
+      expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: proposer)
+    end
+
+    it "can't cancel once the partnership has ended" do
+      partnership.update_columns(ended_at: Time.current, ended_by_id: proposer.id)
+
+      expect(session.cancel!(by: proposer)).to be(false)
+      expect(session.cancel!(by: other)).to be(false)
+      expect(session.reload).to be_confirmed
+    end
+  end
+
+  describe "when the partnership ends" do
+    it "cancels the sessions still ahead, without saying who" do
+      other = partnership.offer.other_person(proposer)
+      confirmed = create(:session, partnership:, proposed_by: proposer, start_at: 3.days.from_now.change(min: 0))
+      confirmed.confirm!(by: other)
+      done = create(:session, partnership:, proposed_by: proposer, start_at: 4.days.from_now.change(min: 0))
+      done.confirm!(by: other)
+      done.update_columns(start_at: 2.days.ago, end_at: 2.days.ago + 1.hour)
+      declined = create(:session, partnership:, proposed_by: proposer, start_at: 5.days.from_now.change(min: 0))
+      declined.decline!(by: other)
+      under_way = create(:session, partnership:, proposed_by: proposer, start_at: 6.days.from_now.change(min: 0))
+      under_way.confirm!(by: other)
+      under_way.update_columns(start_at: 10.minutes.ago, end_at: 50.minutes.from_now)
+
+      partnership.end!(by: other)
+
+      expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: nil)
+      expect(confirmed.reload).to have_attributes(status: "cancelled", cancelled_by: nil)
+      expect(done.reload).to be_confirmed
+      expect(declined.reload).to be_declined
+      # Already started, so it may well be happening: left as it was.
+      expect(under_way.reload).to be_confirmed
+    end
+  end
 end

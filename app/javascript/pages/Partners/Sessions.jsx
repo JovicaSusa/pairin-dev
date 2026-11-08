@@ -1,4 +1,6 @@
-import { useForm } from "@inertiajs/react";
+import { router, useForm } from "@inertiajs/react";
+import { useState } from "react";
+import { Check } from "lucide-react";
 import SessionTime, { isoDay, zoneLabel } from "@/components/SessionTime";
 import WorkspaceFrame from "@/components/WorkspaceFrame";
 import { Button } from "@/components/ui/button";
@@ -13,6 +15,7 @@ const BADGE = {
   confirmed: ["Confirmed", "bg-green"],
   done: ["Done", "bg-white"],
   declined: ["Declined", "bg-black/5 text-black/65"],
+  withdrawn: ["Withdrawn", "bg-black/5 text-black/65"],
   cancelled: ["Cancelled", "bg-black/5 text-black/65"],
   expired: ["Expired", "bg-black/5 text-black/65"],
 };
@@ -83,8 +86,58 @@ function note(session, name, past) {
   if (session.status === "proposed") return session.mine ? `Waiting for ${name} to answer` : `${name} proposed this`;
   if (session.status === "expired") return "Nobody answered before it started";
   if (session.status === "declined") return session.mine ? `${name} declined` : "You declined";
-  if (session.status === "cancelled") return "Cancelled";
+  if (session.status === "withdrawn") return session.mine ? "You withdrew this" : `${name} withdrew this`;
+  if (session.status === "cancelled") {
+    if (session.cancelled_by === "you") return "You cancelled";
+    if (session.cancelled_by === "partner") return `${name} cancelled`;
+    return "Cancelled when the partnership ended";
+  }
   if (session.status === "confirmed" && !past) return session.mine ? `You proposed it, ${name} confirmed` : `${name} proposed it, you confirmed`;
+  return null;
+}
+
+function SessionActions({ session, partnership }) {
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const { can } = session;
+  const act = (action) => router.patch(
+    `/partners/${partnership.id}/sessions/${session.id}/${action}`,
+    {},
+    { preserveScroll: true, onStart: () => setBusy(true), onFinish: () => setBusy(false) },
+  );
+
+  if (can.answer) {
+    return (
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" disabled={busy} onClick={() => act("confirm")}>
+          <Check className="h-4 w-4" />
+          Confirm
+        </Button>
+        <Button size="sm" variant="neutral" disabled={busy} onClick={() => act("decline")}>Decline</Button>
+      </div>
+    );
+  }
+
+  if (can.withdraw) {
+    return <Button size="sm" variant="neutral" disabled={busy} onClick={() => act("withdraw")}>Withdraw</Button>;
+  }
+
+  if (can.cancel) {
+    if (!confirmingCancel) {
+      return <Button size="sm" variant="neutral" onClick={() => setConfirmingCancel(true)}>Cancel session</Button>;
+    }
+
+    return (
+      <div className="flex flex-col gap-2 rounded-xl border-2 border-black bg-yellow-50 p-3">
+        <p className="text-sm font-bold">Cancel this session? We'll tell {partnership.conversation.other.name}.</p>
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" disabled={busy} onClick={() => act("cancel")}>Yes, cancel it</Button>
+          <Button size="sm" variant="neutral" onClick={() => setConfirmingCancel(false)}>Keep it</Button>
+        </div>
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -92,7 +145,7 @@ function SessionCard({ session, partnership, past }) {
   const name = partnership.conversation.other.name;
   const state = past && session.status === "confirmed" ? "done" : session.status;
   const [label, style] = BADGE[state];
-  const faded = ["declined", "cancelled", "expired"].includes(state);
+  const faded = ["declined", "withdrawn", "cancelled", "expired"].includes(state);
   const text = note(session, name, past);
 
   return (
@@ -106,6 +159,9 @@ function SessionCard({ session, partnership, past }) {
             {session.call_link.replace(/^https?:\/\//, "")}
           </a>
         )}
+        <div className="mt-3 empty:hidden">
+          <SessionActions session={session} partnership={partnership} />
+        </div>
       </div>
     </li>
   );

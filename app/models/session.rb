@@ -1,6 +1,8 @@
-# A time two partners plan to work together. One partner proposes it, and the
-# other answers. Times are stored in UTC and entered and shown in each person's
-# own timezone.
+# A time two partners plan to work together. One partner proposes it; the other
+# confirms or declines it, or the proposer withdraws it before then. Either can
+# cancel a confirmed one before it starts, and ending the partnership cancels
+# the rest. Times are stored in UTC and entered and shown in each person's own
+# timezone.
 class Session < ApplicationRecord
   LENGTHS = [30, 45, 60, 90, 120].freeze
   CALL_LINK_MAX_LENGTH = 2000
@@ -9,8 +11,16 @@ class Session < ApplicationRecord
 
   belongs_to :partnership
   belongs_to :proposed_by, class_name: "User"
+  # Nobody when ending the partnership cancelled it.
+  belongs_to :cancelled_by, class_name: "User", optional: true
 
-  enum :status, { proposed: "proposed", confirmed: "confirmed", declined: "declined", cancelled: "cancelled" }, validate: true
+  enum :status, {
+    proposed: "proposed",
+    confirmed: "confirmed",
+    declined: "declined",
+    withdrawn: "withdrawn",
+    cancelled: "cancelled"
+  }, validate: true
 
   normalizes :call_link, with: ->(link) { link.strip.presence }
 
@@ -60,7 +70,49 @@ class Session < ApplicationRecord
     proposed? && start_at.past?
   end
 
+  # Who may answer: the partner who didn't propose it, before it starts.
+  def answerable_by?(user)
+    proposed? && !start_at.past? && user.id != proposed_by_id && partnership.people.include?(user) && !partnership.ended?
+  end
+
+  def withdrawable_by?(user)
+    proposed? && !start_at.past? && user.id == proposed_by_id && !partnership.ended?
+  end
+
+  def cancellable_by?(user)
+    confirmed? && !start_at.past? && partnership.people.include?(user) && !partnership.ended?
+  end
+
+  # Each returns false if the session can't be changed that way any more, say
+  # because the other partner got there first or it has started. Each re-reads
+  # the session under its lock.
+  def confirm!(by:)
+    change!(:confirmed) { answerable_by?(by) }
+  end
+
+  def decline!(by:)
+    change!(:declined) { answerable_by?(by) }
+  end
+
+  def withdraw!(by:)
+    change!(:withdrawn) { withdrawable_by?(by) }
+  end
+
+  def cancel!(by:)
+    change!(:cancelled, cancelled_by: by) { cancellable_by?(by) }
+  end
+
   private
+
+  def change!(status, **attributes)
+    with_lock do
+      partnership.reload
+      next false unless yield
+
+      update!(status:, **attributes)
+      true
+    end
+  end
 
   def starts_in_the_future
     errors.add(:start_at, "must be in the future") if start_at&.past?
