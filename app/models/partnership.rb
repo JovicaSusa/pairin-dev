@@ -39,7 +39,9 @@ class Partnership < ApplicationRecord
       next false if ended_at?
 
       update_columns(ended_at: Time.current, ended_by_id: by.id, end_reason: reason.presence)
-      # Quietly: the partnership-ended email already says it all.
+      # Quietly: the partnership-ended email already says it all. Only sessions
+      # that haven't started: one already under way stays as it was, since it
+      # may well be happening. update_all skips Session callbacks on purpose.
       sessions.where(status: %w[proposed confirmed], start_at: Time.current..)
         .update_all(status: "cancelled", cancelled_by_id: nil, updated_at: Time.current)
       offer.not_a_match!(by:)

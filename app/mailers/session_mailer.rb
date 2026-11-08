@@ -40,7 +40,8 @@ class SessionMailer < ApplicationMailer
   def cancelled_email
     send_about(
       by: params[:by],
-      heading: "#{params[:by].display_name} cancelled your session",
+      # "the", not "your": the other partner may have been the one to propose it.
+      heading: "#{params[:by].display_name} cancelled the session",
       next_step: "You can propose another time in your Workspace."
     )
   end

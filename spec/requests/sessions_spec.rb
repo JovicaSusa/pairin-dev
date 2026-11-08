@@ -247,7 +247,7 @@ RSpec.describe "Workspace sessions", type: :request do
 
       expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: poster)
       mail = ActionMailer::Base.deliveries.last
-      expect(mail).to have_attributes(to: ["sam@example.com"], subject: "Maya cancelled your session on Mon 4 Mar")
+      expect(mail).to have_attributes(to: ["sam@example.com"], subject: "Maya cancelled the session on Mon 4 Mar")
       expect(mail_body(mail)).not_to include("https://meet.google.com/x")
     end
 
