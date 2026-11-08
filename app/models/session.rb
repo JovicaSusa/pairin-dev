@@ -57,8 +57,12 @@ class Session < ApplicationRecord
     partnership.people.each do |user|
       next if user.opted_out_of?("suggestions")
 
-      answer = answers.create!(user:)
-      SessionMailer.with(session: self, answer:).did_it_happen_email.deliver_later
+      # Together, so if queueing the email fails the row goes too, and the
+      # next run asks again rather than skipping this partner for good.
+      transaction do
+        answer = answers.create!(user:)
+        SessionMailer.with(session: self, answer:).did_it_happen_email.deliver_later
+      end
     rescue ActiveRecord::RecordNotUnique
       next
     end

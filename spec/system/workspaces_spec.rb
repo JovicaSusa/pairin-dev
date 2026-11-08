@@ -336,6 +336,18 @@ RSpec.describe "workspaces", type: :system do
       expect(find("li", text: "Tue 3 Mar")[:class]).to include("opacity-70")
       expect(page).to have_content("Didn't happen", count: 2)
     end
+
+    it "says the partners have been asked while nobody has answered yet" do
+      unanswered = create(:session, partnership:, proposed_by: poster, status: "confirmed", start_at: 3.days.from_now.change(min: 0))
+      unanswered.update_columns(start_at: Time.utc(2026, 3, 2, 17, 30), end_at: Time.utc(2026, 3, 2, 18, 30))
+      sign_in(partner)
+      visit partner_sessions_path(partnership)
+
+      within(find("li", text: "Mon 2 Mar")) do
+        expect(page).to have_content("Done")
+        expect(page).to have_content("Did it happen? We've emailed you both to ask")
+      end
+    end
   end
 
   describe "resources" do

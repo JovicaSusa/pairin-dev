@@ -45,6 +45,9 @@ RSpec.describe "Did it happen?", type: :request do
     end
 
     it "doesn't ask about sessions that weren't confirmed" do
+      # The confirmed one becomes cancelled, and a proposal (never answered) is
+      # placed at the same time. A new session can't be created in the past, so
+      # it's created later and then moved.
       session.update_columns(status: "cancelled")
       create(:session, partnership:, proposed_by: poster, start_at: starts + 2.hours).tap { _1.update_columns(start_at: starts, end_at: starts + 1.hour) }
       travel_to starts + 1.hour + 5.minutes
@@ -57,6 +60,33 @@ RSpec.describe "Did it happen?", type: :request do
       travel_to starts + 1.hour + 5.minutes
 
       expect { run_job }.not_to email_sent
+    end
+
+    it "doesn't ask when the chat behind the partnership has ended, even if the partnership row hasn't" do
+      offer.update_columns(ended_at: starts - 1.day)
+      travel_to starts + 1.hour + 5.minutes
+
+      expect { run_job }.not_to email_sent
+      expect(session.answers).to be_empty
+    end
+
+    it "asks again on the next run if sending failed, instead of skipping that partner for good" do
+      travel_to starts + 1.hour + 5.minutes
+      failing = true
+      allow(SessionMailer).to receive(:with).and_wrap_original do |original, **args|
+        message = original.call(**args)
+        if failing
+          failing = false
+          allow(message).to receive(:did_it_happen_email).and_raise(StandardError, "queue down")
+        end
+        message
+      end
+
+      expect { run_job }.to raise_error(StandardError, "queue down")
+      expect(session.answers).to be_empty
+
+      expect { run_job }.to email_sent.twice
+      expect(session.answers.count).to eq(2)
     end
 
     it "doesn't ask about sessions that ended long ago" do

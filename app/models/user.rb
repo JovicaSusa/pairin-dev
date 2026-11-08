@@ -25,6 +25,7 @@ class User < ApplicationRecord
   has_many :activities, foreign_key: :receiver_id, dependent: :destroy, inverse_of: :receiver
   has_many :availability_windows, dependent: :destroy
   has_many :check_ins, dependent: :destroy
+  has_many :session_answers, dependent: :destroy
   has_many :blocks_made, class_name: "Block", foreign_key: :blocker_id, dependent: :destroy, inverse_of: :blocker
   has_many :blocks_received, class_name: "Block", foreign_key: :blocked_id, dependent: :destroy, inverse_of: :blocked
 
