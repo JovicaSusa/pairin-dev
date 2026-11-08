@@ -91,6 +91,102 @@ RSpec.describe "Workspace sessions", type: :request do
     end
   end
 
+  describe "answering and cancelling" do
+    let!(:session) do
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30), call_link: "https://meet.google.com/abc")
+    end
+
+    def last_mail_body
+      mail = ActionMailer::Base.deliveries.last
+      mail.html_part ? mail.html_part.body.to_s : mail.body.to_s
+    end
+
+    it "confirms, emails the proposer the time in their timezone and signals them" do
+      sign_in(partner)
+
+      expect { perform_enqueued_jobs { post confirm_partner_session_path(partnership, session) } }
+        .to have_broadcasted_to(poster).from_channel(ConversationsChannel)
+
+      expect(response).to redirect_to(partner_sessions_path(partnership))
+      expect(session.reload).to be_confirmed
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to eq(["maya@example.com"])
+      expect(mail.subject).to eq("Sam confirmed your session on Mon 4 Mar")
+      expect(last_mail_body).to include("Monday 4 March", "18:30–19:30", "Europe/Berlin", "https://meet.google.com/abc", "/partners/#{partnership.id}/sessions")
+    end
+
+    it "declines and emails the proposer" do
+      sign_in(partner)
+
+      perform_enqueued_jobs { post decline_partner_session_path(partnership, session) }
+
+      expect(session.reload).to be_declined
+      expect(ActionMailer::Base.deliveries.last).to have_attributes(to: ["maya@example.com"], subject: "Sam declined your session on Mon 4 Mar")
+    end
+
+    it "lets the proposer withdraw, and tells the other partner" do
+      sign_in(poster)
+
+      perform_enqueued_jobs { post cancel_partner_session_path(partnership, session) }
+
+      expect(session.reload).to be_cancelled
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail).to have_attributes(to: ["sam@example.com"], subject: "Maya withdrew the session on Mon 4 Mar")
+      expect(last_mail_body).to include("Monday 4 March", "23:00–00:00", "Asia/Kolkata")
+    end
+
+    it "lets either partner cancel a confirmed session, and tells the other one" do
+      session.update_columns(status: "confirmed")
+      sign_in(partner)
+
+      perform_enqueued_jobs { post cancel_partner_session_path(partnership, session) }
+
+      expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: partner)
+      expect(ActionMailer::Base.deliveries.last).to have_attributes(to: ["maya@example.com"], subject: "Sam cancelled your session on Mon 4 Mar")
+    end
+
+    it "refuses an answer that isn't allowed, without emailing anyone" do
+      sign_in(poster)
+
+      expect { post confirm_partner_session_path(partnership, session) }.not_to have_enqueued_mail(SessionMailer)
+
+      expect(response).to redirect_to(partner_sessions_path(partnership))
+      expect(flash[:alert]).to eq("That session can't be changed any more.")
+      expect(session.reload).to be_proposed
+    end
+
+    it "says who cancelled a session on the page" do
+      session.update_columns(status: "cancelled", cancelled_by_id: poster.id)
+      ended_one = create(:session, partnership:, proposed_by: partner, status: "cancelled", start_at: Time.utc(2030, 3, 5, 17, 30))
+      sign_in(partner)
+
+      get partner_sessions_path(partnership)
+
+      upcoming = props.dig("partnership", "sessions", "upcoming")
+      expect(upcoming.find { _1["id"] == session.id }).to include("status" => "cancelled", "cancelled_by" => "partner")
+      expect(upcoming.find { _1["id"] == ended_one.id }).to include("cancelled_by" => nil)
+    end
+
+    it "doesn't let anyone outside the partnership touch it" do
+      sign_in(create(:user))
+
+      post cancel_partner_session_path(partnership, session)
+
+      expect(response).to have_http_status(:not_found)
+      expect(session.reload).to be_proposed
+    end
+
+    it "doesn't find a session through another partnership" do
+      other_session = create(:session)
+      sign_in(partner)
+
+      post confirm_partner_session_path(partnership, other_session)
+
+      expect(response).to have_http_status(:not_found)
+      expect(other_session.reload).to be_proposed
+    end
+  end
+
   describe "the Sessions page" do
     it "lists upcoming sessions soonest first, then past ones, with both timezones" do
       later = create(:session, partnership:, proposed_by: partner, start_at: 3.days.from_now.change(min: 0), call_link: "https://zoom.us/j/1")

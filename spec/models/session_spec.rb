@@ -68,4 +68,118 @@ RSpec.describe Session do
 
     expect { partnership.destroy! }.to change(described_class, :count).by(-1)
   end
+
+  describe "answering and cancelling" do
+    let(:other) { partnership.offer.other_person(proposer) }
+    let(:outsider) { create(:user) }
+
+    def start!(at)
+      session.update_columns(start_at: at, end_at: at + 1.hour)
+    end
+
+    describe "#confirm! and #decline!" do
+      it "lets the partner who didn't propose it answer" do
+        expect(session.confirm!(by: other)).to be(true)
+        expect(session.reload).to be_confirmed
+
+        declined = create(:session, partnership:, proposed_by: proposer)
+        expect(declined.decline!(by: other)).to be(true)
+        expect(declined.reload).to be_declined
+      end
+
+      it "doesn't let the proposer or anyone else answer" do
+        expect(session.confirm!(by: proposer)).to be(false)
+        expect(session.decline!(by: proposer)).to be(false)
+        expect(session.confirm!(by: outsider)).to be(false)
+        expect(session.reload).to be_proposed
+      end
+
+      it "can't answer a proposal that has expired" do
+        start!(1.hour.ago)
+
+        expect(session.confirm!(by: other)).to be(false)
+        expect(session.decline!(by: other)).to be(false)
+        expect(session.reload).to be_proposed
+      end
+
+      it "can't answer twice, or answer a withdrawn proposal" do
+        session.decline!(by: other)
+        expect(session.confirm!(by: other)).to be(false)
+
+        withdrawn = create(:session, partnership:, proposed_by: proposer)
+        withdrawn.cancel!(by: proposer)
+        expect(withdrawn.confirm!(by: other)).to be(false)
+        expect(withdrawn.reload).to be_cancelled
+      end
+    end
+
+    describe "#cancel!" do
+      it "lets the proposer withdraw a proposal, but not the other partner" do
+        expect(session.cancel!(by: other)).to be(false)
+        expect(session.reload).to be_proposed
+
+        expect(session.cancel!(by: proposer)).to be(true)
+        expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: proposer)
+      end
+
+      it "lets either partner cancel a confirmed session before it starts" do
+        session.confirm!(by: other)
+        expect(session.cancel!(by: other)).to be(true)
+        expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: other)
+
+        mine = create(:session, partnership:, proposed_by: proposer)
+        mine.confirm!(by: other)
+        expect(mine.cancel!(by: proposer)).to be(true)
+      end
+
+      it "can't cancel once it has started, or for someone outside the partnership" do
+        session.confirm!(by: other)
+        expect(session.cancel!(by: outsider)).to be(false)
+
+        start!(10.minutes.ago)
+        expect(session.cancel!(by: other)).to be(false)
+        expect(session.reload).to be_confirmed
+      end
+
+      it "can't cancel a declined session" do
+        session.decline!(by: other)
+
+        expect(session.cancel!(by: proposer)).to be(false)
+        expect(session.reload).to be_declined
+      end
+    end
+
+    it "does nothing once the partnership has ended" do
+      confirmed = create(:session, partnership:, proposed_by: proposer)
+      confirmed.confirm!(by: other)
+      partnership.update_columns(ended_at: Time.current)
+
+      expect(session.reload.confirm!(by: other)).to be(false)
+      expect(session.cancel!(by: proposer)).to be(false)
+      expect(confirmed.reload.cancel!(by: other)).to be(false)
+    end
+  end
+
+  describe "ending the partnership" do
+    include ActiveJob::TestHelper
+
+    let(:other) { partnership.offer.other_person(proposer) }
+
+    it "cancels its future sessions without emailing about them" do
+      confirmed = create(:session, partnership:, proposed_by: proposer, start_at: 3.days.from_now.change(min: 0))
+      confirmed.confirm!(by: other)
+      declined = create(:session, partnership:, proposed_by: proposer)
+      declined.decline!(by: other)
+      done = create(:session, partnership:, proposed_by: proposer, status: "confirmed")
+      done.update_columns(start_at: 2.days.ago, end_at: 2.days.ago + 1.hour)
+
+      expect { partnership.end!(by: other) }.not_to have_enqueued_mail(SessionMailer)
+
+      # Nobody in particular cancelled these, so the page can say why.
+      expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: nil)
+      expect(confirmed.reload).to have_attributes(status: "cancelled", cancelled_by: nil)
+      expect(declined.reload).to be_declined
+      expect(done.reload).to be_confirmed
+    end
+  end
 end

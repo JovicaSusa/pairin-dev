@@ -1,4 +1,5 @@
-import { useForm } from "@inertiajs/react";
+import { router, useForm } from "@inertiajs/react";
+import { useState } from "react";
 import SessionTime, { isoDay, zoneLabel } from "@/components/SessionTime";
 import WorkspaceFrame from "@/components/WorkspaceFrame";
 import { Button } from "@/components/ui/button";
@@ -83,9 +84,50 @@ function note(session, name, past) {
   if (session.status === "proposed") return session.mine ? `Waiting for ${name} to answer` : `${name} proposed this`;
   if (session.status === "expired") return "Nobody answered before it started";
   if (session.status === "declined") return session.mine ? `${name} declined` : "You declined";
-  if (session.status === "cancelled") return "Cancelled";
+  if (session.status === "cancelled") {
+    if (session.cancelled_by === "me") return "Cancelled by you";
+    if (session.cancelled_by === "partner") return `Cancelled by ${name}`;
+    return "Cancelled when the partnership ended";
+  }
   if (session.status === "confirmed" && !past) return session.mine ? `You proposed it, ${name} confirmed` : `${name} proposed it, you confirmed`;
   return null;
+}
+
+// What the viewer can do with a session right now. The server checks the same
+// rules; this only decides which buttons to show.
+function actionsFor(session, partnership, past) {
+  if (partnership.ended || past) return [];
+  if (session.status === "proposed") {
+    return session.mine
+      ? [["cancel", "Withdraw", "neutral"]]
+      : [["confirm", "Confirm", "default"], ["decline", "Decline", "neutral"]];
+  }
+  if (session.status === "confirmed") return [["cancel", "Cancel session", "neutral"]];
+  return [];
+}
+
+function SessionActions({ session, partnership, past }) {
+  const [busy, setBusy] = useState(false);
+  const actions = actionsFor(session, partnership, past);
+  if (actions.length === 0) return null;
+
+  const act = (action) => {
+    router.post(`/partners/${partnership.id}/sessions/${session.id}/${action}`, {}, {
+      preserveScroll: true,
+      onStart: () => setBusy(true),
+      onFinish: () => setBusy(false),
+    });
+  };
+
+  return (
+    <div className="mt-2 flex flex-wrap gap-2">
+      {actions.map(([action, label, variant]) => (
+        <Button key={action} type="button" size="sm" variant={variant} disabled={busy} onClick={() => act(action)}>
+          {label}
+        </Button>
+      ))}
+    </div>
+  );
 }
 
 function SessionCard({ session, partnership, past }) {
@@ -106,6 +148,7 @@ function SessionCard({ session, partnership, past }) {
             {session.call_link.replace(/^https?:\/\//, "")}
           </a>
         )}
+        <SessionActions session={session} partnership={partnership} past={past} />
       </div>
     </li>
   );
@@ -124,7 +167,8 @@ function Group({ title, sessions, partnership, past = false }) {
   );
 }
 
-// The Workspace's Sessions page: propose a time, and see every session (#228).
+// The Workspace's Sessions page: propose a time, answer or call off sessions,
+// and see every one of them (#228, #229).
 export default function Sessions({ partnership }) {
   const { upcoming, past } = partnership.sessions;
   const name = partnership.conversation.other.name;

@@ -257,11 +257,50 @@ RSpec.describe "workspaces", type: :system do
       sign_in(poster)
       visit partner_sessions_path(partnership)
 
-      expect(page).to have_content("Sam proposed this")
+      expect(page).to have_content("Cancelled when the partnership ended")
       expect(page).not_to have_button("Propose session")
+      expect(page).not_to have_button("Confirm")
 
       visit partner_path(partnership)
       expect(page).not_to have_link("Propose a session")
+    end
+
+    it "lets the partner confirm a proposal, then cancel it" do
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30))
+      sign_in(partner)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("Maya proposed this")
+      click_button "Confirm"
+
+      expect(page).to have_content("Maya proposed it, you confirmed")
+      expect(page).not_to have_button("Confirm")
+
+      click_button "Cancel session"
+
+      expect(page).to have_content("Cancelled by you")
+      expect(page).not_to have_button("Cancel session")
+      expect(partnership.sessions.sole).to be_cancelled
+    end
+
+    it "lets the partner decline, and the proposer withdraw" do
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30))
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 6, 17, 30), end_at: Time.utc(2030, 3, 6, 18, 30))
+      sign_in(partner)
+      visit partner_sessions_path(partnership)
+
+      within(all("li", text: "Maya proposed this").first) { click_button "Decline" }
+      expect(page).to have_content("You declined")
+
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("Sam declined")
+      expect(page).not_to have_button("Confirm")
+      click_button "Withdraw"
+
+      expect(page).to have_content("Cancelled by you")
+      expect(page).not_to have_button("Withdraw")
     end
   end
 

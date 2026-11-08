@@ -9,6 +9,8 @@ class Session < ApplicationRecord
 
   belongs_to :partnership
   belongs_to :proposed_by, class_name: "User"
+  # Empty when ending the partnership cancelled it.
+  belongs_to :cancelled_by, class_name: "User", optional: true
 
   enum :status, { proposed: "proposed", confirmed: "confirmed", declined: "declined", cancelled: "cancelled" }, validate: true
 
@@ -60,7 +62,32 @@ class Session < ApplicationRecord
     proposed? && start_at.past?
   end
 
+  # The partner who didn't propose it answers, while it's still open. Each
+  # returns whether it changed anything.
+  def confirm!(by:) = answer!(by:, status: "confirmed")
+  def decline!(by:) = answer!(by:, status: "declined")
+
+  # The proposer withdraws a proposal, or either partner calls off a confirmed
+  # session, as long as it hasn't started.
+  def cancel!(by:)
+    change!(by:, status: "cancelled", cancelled_by: by) do
+      (proposed? && by == proposed_by) || confirmed?
+    end
+  end
+
   private
+
+  def answer!(by:, status:)
+    change!(by:, status:) { proposed? && by != proposed_by }
+  end
+
+  # Checked under a row lock, so two clicks can't both win.
+  def change!(by:, **attributes)
+    with_lock do
+      allowed = partnership.people.include?(by) && !partnership.ended? && start_at.future? && yield
+      allowed ? update!(attributes) : false
+    end
+  end
 
   def starts_in_the_future
     errors.add(:start_at, "must be in the future") if start_at&.past?

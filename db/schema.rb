@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_06_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_08_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -95,8 +95,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_120000) do
     t.index ["last_message_at"], name: "index_offers_on_last_message_at"
     t.index ["offerer_id", "pair_request_id"], name: "index_offers_on_offerer_id_and_pair_request_id", unique: true
     t.index ["offerer_id"], name: "index_offers_on_offerer_id"
-    t.index ["proposed_by_id"], name: "index_offers_on_proposed_by_id"
     t.index ["pair_request_id"], name: "index_offers_on_pair_request_id"
+    t.index ["proposed_by_id"], name: "index_offers_on_proposed_by_id"
   end
 
   create_table "pair_requests", force: :cascade do |t|
@@ -145,6 +145,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_120000) do
     t.bigint "partnership_id", null: false
     t.bigint "proposed_by_id", null: false
     t.string "status", default: "proposed", null: false
+    t.bigint "cancelled_by_id"
+    t.index ["cancelled_by_id"], name: "index_sessions_on_cancelled_by_id"
     t.index ["partnership_id", "start_at"], name: "index_sessions_on_partnership_id_and_start_at"
     t.index ["partnership_id"], name: "index_sessions_on_partnership_id"
     t.index ["proposed_by_id"], name: "index_sessions_on_proposed_by_id"
@@ -213,28 +215,29 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_120000) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["language"], name: "index_users_on_language"
     t.index ["programming_since"], name: "index_users_on_programming_since"
-    t.index ["signup_pair_request_id"], name: "index_users_on_signup_pair_request_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["signup_pair_request_id"], name: "index_users_on_signup_pair_request_id"
     t.index ["suspended_at"], name: "index_users_on_suspended_at"
   end
 
   add_foreign_key "activities", "users", column: "receiver_id"
+  add_foreign_key "availability_windows", "users"
   add_foreign_key "blocks", "users", column: "blocked_id"
   add_foreign_key "blocks", "users", column: "blocker_id"
   add_foreign_key "check_ins", "partnerships"
   add_foreign_key "check_ins", "users"
   add_foreign_key "messages", "offers"
   add_foreign_key "messages", "users", column: "sender_id"
+  add_foreign_key "offers", "pair_requests"
   add_foreign_key "offers", "users", column: "ended_by_id"
+  add_foreign_key "offers", "users", column: "offerer_id"
   add_foreign_key "offers", "users", column: "proposed_by_id"
+  add_foreign_key "pair_requests", "users"
   add_foreign_key "partnerships", "offers"
   add_foreign_key "partnerships", "pair_requests"
   add_foreign_key "partnerships", "users", column: "ended_by_id"
-  add_foreign_key "availability_windows", "users"
-  add_foreign_key "offers", "pair_requests"
-  add_foreign_key "offers", "users", column: "offerer_id"
-  add_foreign_key "pair_requests", "users"
   add_foreign_key "sessions", "partnerships"
+  add_foreign_key "sessions", "users", column: "cancelled_by_id"
   add_foreign_key "sessions", "users", column: "proposed_by_id"
   add_foreign_key "shared_links", "partnerships"
   add_foreign_key "shared_links", "users", column: "added_by_id"
