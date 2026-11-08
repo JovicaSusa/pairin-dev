@@ -40,6 +40,7 @@ class PartnershipsController < ApplicationController
         partner_commitment: partnership.commitment_of(offer.other_person(current_user)),
         unread: offer.unread_messages_for(current_user).count,
         sessions: sessions_summary(partnership),
+        resources: resources_summary(partnership),
         last_message: last_message && {
           body: last_message.body.truncate(LAST_MESSAGE_LENGTH),
           mine: last_message.sender_id == current_user.id
@@ -100,5 +101,12 @@ class PartnershipsController < ApplicationController
         call_link: next_session.call_link
       }
     }
+  end
+
+  def resources_summary(partnership)
+    links = partnership.shared_links
+    latest = links.order(:created_at, :id).last
+
+    { count: links.count, latest: latest&.host }
   end
 end

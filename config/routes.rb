@@ -57,6 +57,7 @@ Rails.application.routes.draw do
     post :end_partnership, on: :member
     get :chat, on: :member
     resources :sessions, only: [:index, :create], controller: "partners/sessions"
+    resources :resources, only: [:index, :create, :destroy], controller: "partners/resources"
   end
 
   resources :conversations, only: [:index, :show] do

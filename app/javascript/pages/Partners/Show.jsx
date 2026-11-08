@@ -1,6 +1,6 @@
 import { Link, useForm } from "@inertiajs/react";
 import { useState } from "react";
-import { CalendarClock, CalendarPlus, Check, Lock, MessageSquare, Video } from "lucide-react";
+import { CalendarClock, CalendarPlus, Check, Link2, Lock, MessageSquare, Video } from "lucide-react";
 import { TAP_AREA } from "@/components/ConversationParts";
 import SessionTime from "@/components/SessionTime";
 import WorkspaceFrame, { Goal } from "@/components/WorkspaceFrame";
@@ -178,6 +178,36 @@ function SessionsTile({ partnership }) {
   );
 }
 
+function ResourcesTile({ partnership }) {
+  const { count, latest } = partnership.resources;
+
+  return (
+    <Link
+      href={`/partners/${partnership.id}/resources`}
+      className={`flex flex-col items-start gap-2 bg-white p-4 transition-transform hover:-translate-y-0.5 md:p-5 ${PANEL}`}
+    >
+      <span className={`flex items-center gap-1.5 ${TILE_LABEL}`}>
+        <Link2 className="h-4 w-4" />
+        Resources
+      </span>
+      {count > 0 ? (
+        <span className="flex items-baseline gap-1.5">
+          <span className="text-4xl font-bold leading-none md:text-5xl">{count}</span>
+          <span className="text-sm font-bold">{count === 1 ? "link" : "links"}</span>
+        </span>
+      ) : (
+        <span className="text-lg font-bold">No links yet</span>
+      )}
+      {latest ? (
+        <span className="max-w-full truncate text-sm text-black/65">Latest: {latest}</span>
+      ) : (
+        <span className="text-sm text-black/65">Docs, repos and exercises you both want to keep.</span>
+      )}
+      <span className="mt-auto text-sm font-bold underline">Open resources</span>
+    </Link>
+  );
+}
+
 function Commitments({ partnership }) {
   const rows = [
     ["You", partnership.your_commitment],
@@ -220,6 +250,7 @@ export default function Show({ partnership }) {
         <NextSessionTile partnership={partnership} />
         <ChatTile partnership={partnership} />
         <SessionsTile partnership={partnership} />
+        <ResourcesTile partnership={partnership} />
         <WeeksTile partnership={partnership} />
         <Commitments partnership={partnership} />
         {!partnership.ended && <div className="flex items-end"><EndPartnership partnership={partnership} /></div>}

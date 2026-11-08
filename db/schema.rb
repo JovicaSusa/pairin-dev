@@ -150,6 +150,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_120000) do
     t.index ["proposed_by_id"], name: "index_sessions_on_proposed_by_id"
   end
 
+  create_table "shared_links", force: :cascade do |t|
+    t.bigint "partnership_id", null: false
+    t.bigint "added_by_id", null: false
+    t.string "url", null: false
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["added_by_id"], name: "index_shared_links_on_added_by_id"
+    t.index ["partnership_id"], name: "index_shared_links_on_partnership_id"
+  end
+
   create_table "taggings", force: :cascade do |t|
     t.string "taggable_type", null: false
     t.bigint "taggable_id", null: false
@@ -225,6 +236,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_120000) do
   add_foreign_key "pair_requests", "users"
   add_foreign_key "sessions", "partnerships"
   add_foreign_key "sessions", "users", column: "proposed_by_id"
+  add_foreign_key "shared_links", "partnerships"
+  add_foreign_key "shared_links", "users", column: "added_by_id"
   add_foreign_key "taggings", "tags"
   add_foreign_key "users", "pair_requests", column: "signup_pair_request_id", on_delete: :nullify
 end

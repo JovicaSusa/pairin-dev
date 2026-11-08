@@ -35,3 +35,6 @@ en:
         start_at: "Start"
         end_at: "Length"
         call_link: "Call link"
+      shared_link:
+        url: "Link"
+        note: "Note"
