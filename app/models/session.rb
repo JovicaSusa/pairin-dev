@@ -41,6 +41,30 @@ class Session < ApplicationRecord
   # Completed: at least one partner said it happened.
   scope :completed, -> { where(id: SessionAnswer.where(happened: true).select(:session_id)) }
 
+  # How long before a confirmed session both partners get a reminder (#231).
+  REMIND_BEFORE = 1.hour
+
+  # Reminds both partners of each confirmed session starting within the hour,
+  # unless it was confirmed less than an hour before it starts (they've only
+  # just agreed) or the partnership has ended. No opt-out: both agreed to it.
+  def self.remind_about_upcoming
+    confirmed.where(start_at: Time.current..REMIND_BEFORE.from_now, reminded_at: nil)
+      .where("confirmed_at <= start_at - interval '1 hour'")
+      .joins(:partnership).where(partnerships: { ended_at: nil })
+      .includes(partnership: { offer: [:offerer, { pair_request: :user }] })
+      .find_each(&:remind)
+  end
+
+  def remind
+    return if partnership.ended?
+    # Claimed in one UPDATE, so two runs at once can't both send it.
+    return unless Session.where(id:, reminded_at: nil).update_all(reminded_at: Time.current) == 1
+
+    partnership.people.each do |user|
+      SessionMailer.with(session: self, recipient: user).reminder_email.deliver_later
+    end
+  end
+
   # Emails both partners "Did it happen?" for each confirmed session that has
   # just ended, in a partnership that's still going. Each partner is asked at
   # most once per session: the answer row is created as the email goes out.
@@ -132,7 +156,7 @@ class Session < ApplicationRecord
   # because the other partner got there first or it has started. Each re-reads
   # the session under its lock.
   def confirm!(by:)
-    change!(:confirmed) { answerable_by?(by) }
+    change!(:confirmed, confirmed_at: Time.current) { answerable_by?(by) }
   end
 
   def decline!(by:)

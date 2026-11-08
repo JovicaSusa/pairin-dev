@@ -54,6 +54,21 @@ class SessionMailer < ApplicationMailer
     )
   end
 
+  # An hour before a confirmed session, to each partner (#231). No unsubscribe:
+  # both agreed to the session. Sends nothing if it has been cancelled since.
+  def reminder_email
+    partner = @session.partnership.offer.other_person(params[:recipient])
+
+    send_about(
+      status: "confirmed",
+      by: partner,
+      heading: "Your session with #{partner.display_name} starts in an hour",
+      next_step: "Join from the call link, or open your Workspace to see the details.",
+      show_call_link: true,
+      subject: ->(starts) { "Reminder: your session with #{partner.display_name} at #{starts.strftime('%H:%M')}" }
+    )
+  end
+
   # After a confirmed session ends, to each partner, with one-click Yes and No
   # links that work without signing in. Optional, like the weekly check-in.
   def did_it_happen_email
@@ -82,7 +97,9 @@ class SessionMailer < ApplicationMailer
   # Sends nothing if the session has moved on since: the job loads it fresh,
   # and an email about a confirmation that was then cancelled (or whose
   # partnership ended) would describe a session that isn't happening.
-  def send_about(status:, by:, heading:, next_step:, show_call_link: false)
+  # `subject`, if given, builds the subject from the start time in the
+  # recipient's timezone; otherwise it's the heading and the day.
+  def send_about(status:, by:, heading:, next_step:, show_call_link: false, subject: nil)
     return unless @session.status == status
 
     recipient = @session.partnership.offer.other_person(by)
@@ -95,6 +112,7 @@ class SessionMailer < ApplicationMailer
     @show_call_link = show_call_link
     @sessions_url = partner_sessions_url(@session.partnership)
 
-    mail(to: recipient.email, subject: "#{heading} on #{@starts.strftime('%a %-d %b')}", template_name: "session_email")
+    subject = subject ? subject.call(@starts) : "#{heading} on #{@starts.strftime('%a %-d %b')}"
+    mail(to: recipient.email, subject:, template_name: "session_email")
   end
 end
