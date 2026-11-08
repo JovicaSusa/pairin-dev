@@ -76,6 +76,7 @@ class Partnership < ApplicationRecord
   # the job didn't run isn't sent late.
   def send_due_check_ins
     return if ended? || weeks_completed.zero?
+    return record_week_as_worked_together(weeks_completed) if completed_session_in_week?(weeks_completed)
 
     people.each do |user|
       next if user.opted_out_of?("suggestions")
@@ -87,6 +88,11 @@ class Partnership < ApplicationRecord
     end
   end
 
+  # Week 1 is the first seven days from when the partnership formed.
+  def week_range(week)
+    (created_at + CHECK_IN_EVERY * (week - 1))...(created_at + CHECK_IN_EVERY * week)
+  end
+
   # One entry per week so far. A week counts when at least one partner said Yes.
   def weeks_summary
     yes_weeks = check_ins.select(&:worked_together).map(&:week).to_set
@@ -95,6 +101,23 @@ class Partnership < ApplicationRecord
   end
 
   private
+
+  # A session that took place that week (a partner said Yes to "Did it happen?").
+  def completed_session_in_week?(week)
+    sessions.completed.where(start_at: week_range(week)).exists?
+  end
+
+  # Instead of asking "Did you two work together this week?", record the answer
+  # the completed session already gave, for both partners, so the Workspace and
+  # the funnel count the week like a Yes. No email, so opt-outs don't matter.
+  # Safe to repeat: the unique index keeps one row per person per week.
+  def record_week_as_worked_together(week)
+    people.each do |user|
+      check_ins.create!(user:, week:, worked_together: true, answered_at: Time.current)
+    rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+      next
+    end
+  end
 
   def prefill_goal
     self.goal = offer.goal.presence&.first(GOAL_MAX_LENGTH) || pair_request.subject.first(GOAL_MAX_LENGTH) if goal.blank?

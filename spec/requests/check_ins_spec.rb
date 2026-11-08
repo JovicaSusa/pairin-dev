@@ -75,6 +75,78 @@ RSpec.describe "Weekly check-ins", type: :request do
     end
   end
 
+  describe "after a completed session (#234)" do
+    # A session in the partnership's first week, confirmed and then answered.
+    # Sessions can't be created in the past, so it's created ahead and moved.
+    def session_in_week(week, happened:)
+      start = partnership.created_at + (week - 1).weeks + 2.days
+      create(:session, partnership:, proposed_by: poster, status: "confirmed").tap do |session|
+        session.update_columns(start_at: start, end_at: start + 1.hour)
+        session.answers.create!(user: partner).answer!(happened) unless happened.nil?
+      end
+    end
+
+    def weeks
+      sign_in(poster)
+      get partner_path(partnership)
+      JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"]).dig("props", "partnership", "weeks")
+    end
+
+    it "sends no check-in for a week with a completed session, and records it as worked together" do
+      session_in_week(1, happened: true)
+      travel 7.days + 1.minute
+
+      expect { run_job }.not_to email_sent
+
+      expect(CheckIn.where(week: 1).pluck(:user_id, :worked_together)).to contain_exactly([poster.id, true], [partner.id, true])
+      expect(CheckIn.where(week: 1)).to all(be_answered)
+      expect(weeks).to eq([{ "week" => 1, "worked_together" => true }])
+    end
+
+    it "counts the week in the funnel like a Yes on the check-in" do
+      session_in_week(1, happened: true)
+      travel 7.days + 1.minute
+      run_job
+
+      expect(Stats::Funnel.new(since: partnership.created_at.beginning_of_day).pairs_with_a_yes).to eq(1)
+    end
+
+    it "doesn't send it again on later runs that week" do
+      session_in_week(1, happened: true)
+      travel 7.days + 1.minute
+      run_job
+      travel 1.day
+
+      expect { run_job }.not_to email_sent
+    end
+
+    it "still sends the check-in when the week's session didn't happen, or nobody answered" do
+      session_in_week(1, happened: false)
+      session_in_week(1, happened: nil)
+      travel 7.days + 1.minute
+
+      expect { run_job }.to email_sent.twice
+      expect(CheckIn.where(week: 1).pluck(:worked_together)).to all(be_nil)
+    end
+
+    it "still sends the check-in when the completed session was in another week" do
+      session_in_week(1, happened: true)
+      travel 14.days + 1.minute
+
+      expect { run_job }.to email_sent.twice
+      expect(CheckIn.where(week: 2).pluck(:worked_together)).to all(be_nil)
+    end
+
+    it "records the week for a partner who opted out of check-in emails too" do
+      partner.update!(suggestions_opted_out_at: Time.current)
+      session_in_week(1, happened: true)
+      travel 7.days + 1.minute
+
+      expect { run_job }.not_to email_sent
+      expect(CheckIn.where(week: 1).count).to eq(2)
+    end
+  end
+
   describe "the email" do
     let(:check_in) { CheckIn.create!(partnership:, user: partner, week: 1) }
     let(:mail) { CheckInMailer.with(check_in:).weekly_email }
