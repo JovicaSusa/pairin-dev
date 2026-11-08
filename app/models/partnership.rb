@@ -77,6 +77,10 @@ class Partnership < ApplicationRecord
   def send_due_check_ins
     return if ended? || weeks_completed.zero?
 
+    # Normally already recorded when the Yes came in; this catches any that weren't.
+    completed = sessions.completed.where(start_at: week_range(weeks_completed))
+    return completed.each { |session| record_completed_session(session) } if completed.exists?
+
     people.each do |user|
       next if user.opted_out_of?("suggestions")
 
@@ -84,6 +88,27 @@ class Partnership < ApplicationRecord
       CheckInMailer.with(check_in:).weekly_email.deliver_later
     rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
       next
+    end
+  end
+
+  # A completed session answers that week's "Did you two work together this
+  # week?" for both partners, so the Workspace and the funnel count the week
+  # like a Yes, and the check-in email isn't sent (#234). Called when a partner
+  # says Yes, so it also covers a Yes that comes after the check-in went out:
+  # unanswered rows are filled in, but an answer someone already gave is kept.
+  # Rows are written even for a partner who opted out of the emails, since
+  # nothing is sent. Dated from the Yes, so the funnel's time windows hold.
+  def record_completed_session(session)
+    week = week_of(session.start_at)
+    return if week < 1
+
+    yes_at = session.answers.where(happened: true).minimum(:answered_at) || Time.current
+
+    people.each do |user|
+      check_in = check_ins.find_or_create_by!(user:, week:)
+      check_in.update!(worked_together: true, answered_at: yes_at) unless check_in.answered?
+    rescue ActiveRecord::RecordNotUnique
+      retry
     end
   end
 
@@ -95,6 +120,16 @@ class Partnership < ApplicationRecord
   end
 
   private
+
+  # Week 1 is the first seven days from when the partnership formed; a session
+  # belongs to the week it starts in.
+  def week_range(week)
+    (created_at + CHECK_IN_EVERY * (week - 1))...(created_at + CHECK_IN_EVERY * week)
+  end
+
+  def week_of(time)
+    ((time - created_at) / CHECK_IN_EVERY).floor + 1
+  end
 
   def prefill_goal
     self.goal = offer.goal.presence&.first(GOAL_MAX_LENGTH) || pair_request.subject.first(GOAL_MAX_LENGTH) if goal.blank?
