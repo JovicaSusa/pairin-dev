@@ -92,7 +92,8 @@ class PartnershipsController < ApplicationController
 
     {
       timezone: current_user.timezone,
-      done: sessions.confirmed.where(end_at: ...Time.current).count,
+      # Took place: a partner said Yes to "Did it happen?" (#232).
+      done: sessions.completed.count,
       confirmed_ahead: upcoming.confirmed.count,
       waiting_on_you: upcoming.proposed.where.not(proposed_by: current_user).count,
       next: next_session && {

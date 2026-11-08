@@ -28,10 +28,9 @@ module Stats
     # Every session starts as a proposal.
     def sessions_proposed = sessions.count
 
-    # Confirmed at some point. A status is overwritten as it changes, but only a
-    # confirmed session can be cancelled by a partner, so that counts too. Ones
-    # cancelled by the partnership ending can't be told apart, and are left out.
-    def sessions_confirmed = sessions.confirmed.or(sessions.cancelled.where.not(cancelled_by_id: nil)).count
+    # Confirmed at some point, even if cancelled since: confirmed_at stays set
+    # when the status changes (#231).
+    def sessions_confirmed = sessions.where.not(confirmed_at: nil).count
 
     # Completed: at least one partner said Yes to "Did it happen?" (#232).
     def sessions_completed = sessions.completed.count

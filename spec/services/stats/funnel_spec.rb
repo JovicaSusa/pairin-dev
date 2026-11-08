@@ -148,6 +148,18 @@ RSpec.describe Stats::Funnel, type: :unit do
       expect(funnel.pairs_with_a_completed_session).to eq(1)
     end
 
+    it "counts a confirmed session even after ending the partnership cancelled it, but not a proposal it cancelled" do
+      pair = partnership
+      confirmed = session(pair)
+      confirmed.confirm!(by: pair.offer.poster)
+      session(pair) # only ever proposed
+      pair.end!(by: pair.offer.poster)
+
+      expect(Session.pluck(:status)).to all(eq("cancelled"))
+      expect(funnel.sessions_proposed).to eq(2)
+      expect(funnel.sessions_confirmed).to eq(1)
+    end
+
     it "only counts the sessions of partnerships formed since the date, so the stages narrow" do
       older = partnership
       done = session(older, status: "confirmed", ended: true)

@@ -122,8 +122,14 @@ RSpec.describe "Workspace sessions", type: :request do
 
   describe "the overview" do
     it "counts sessions done, confirmed ahead and waiting for an answer, and shows the next confirmed one" do
-      done = create(:session, partnership:, proposed_by: partner, status: "confirmed")
-      done.update_columns(start_at: 3.days.ago, end_at: 3.days.ago + 1.hour)
+      # "Done together" counts only sessions that took place: a partner said
+      # Yes to "Did it happen?". Not ones both said didn't, nor unanswered ones.
+      past = ->(days_ago) { create(:session, partnership:, proposed_by: partner, status: "confirmed").tap { _1.update_columns(start_at: days_ago.days.ago, end_at: days_ago.days.ago + 1.hour) } }
+      took_place = past.(3)
+      took_place.answers.create!(user: poster).answer!(true)
+      didnt_happen = past.(4)
+      didnt_happen.answers.create!(user: poster).answer!(false)
+      past.(5) # nobody answered
       next_one = create(:session, partnership:, proposed_by: partner, status: "confirmed", start_at: 1.day.from_now.change(min: 0), call_link: "https://meet.google.com/x")
       create(:session, partnership:, proposed_by: poster, status: "confirmed", start_at: 4.days.from_now.change(min: 0))
       create(:session, partnership:, proposed_by: partner, start_at: 2.days.from_now.change(min: 0))
