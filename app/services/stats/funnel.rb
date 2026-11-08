@@ -36,7 +36,7 @@ module Stats
     # Completed: at least one partner said Yes to "Did it happen?" (#232).
     def sessions_completed = sessions.completed.count
 
-    def pairs_with_a_completed_session = partnerships.where(id: Session.completed.select(:partnership_id)).count
+    def pairs_with_a_completed_session = partnerships.where(id: sessions.completed.select(:partnership_id)).count
 
     def pairs_with_a_yes = yes_weeks_by_partnership.count { |_id, weeks| weeks.any? }
 
@@ -62,7 +62,7 @@ module Stats
         Sessions proposed:      #{sessions_proposed}
         Sessions confirmed:     #{sessions_confirmed}
         Completed sessions:     #{sessions_completed}
-        Pairs, session done:    #{pairs_with_a_completed_session}
+        Pairs, 1+ session done: #{pairs_with_a_completed_session}
         Pairs with a Yes:       #{pairs_with_a_yes}
         Pairs, #{FOLLOW_UP_WEEKS}+ Yes weeks:   #{partnerships_with_three_yes_weeks}
 
@@ -85,7 +85,9 @@ module Stats
     def searches = PairRequest.where(created_at: @since..)
     def offers = Offer.where(created_at: @since..)
     def partnerships = Partnership.where(created_at: @since..)
-    def sessions = Session.where(created_at: @since..)
+    # The sessions of the partnerships counted above, so each session stage
+    # narrows from "Partnerships formed" like the rest of the funnel.
+    def sessions = Session.where(partnership: partnerships)
 
     # A week counts once, however many partners said Yes for it.
     def yes_weeks_by_partnership(within: nil)

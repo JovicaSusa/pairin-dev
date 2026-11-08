@@ -124,10 +124,13 @@ RSpec.describe Stats::Funnel, type: :unit do
       second = partnership
       partnership # a pair with no sessions
 
+      # Tally: 9 proposed (7 + 2). 6 confirmed: still ahead, called off, both
+      # Yes ones, the No one and the unanswered one. 2 completed, both in the
+      # first pair, so 1 pair.
       session(first)                                                  # proposed, never answered
       session(first, status: "declined")
       session(first, status: "withdrawn")
-      still_on = session(first, status: "confirmed")                  # confirmed, still ahead
+      session(first, status: "confirmed")                             # confirmed, still ahead
       called_off = session(first, status: "confirmed")
       called_off.cancel!(by: first.offer.poster)                      # confirmed, then cancelled
       yes = session(first, status: "confirmed", ended: true)
@@ -143,17 +146,20 @@ RSpec.describe Stats::Funnel, type: :unit do
       expect(funnel.sessions_confirmed).to eq(6)
       expect(funnel.sessions_completed).to eq(2)
       expect(funnel.pairs_with_a_completed_session).to eq(1)
-      expect(still_on.reload).to be_confirmed
     end
 
-    it "leaves out sessions before the date, and pairs that formed before it" do
-      pair = partnership
-      done = session(pair, status: "confirmed", ended: true)
-      said(done, pair.offer.poster, true)
-      Session.update_all(created_at: since - 1.day)
-      Partnership.update_all(created_at: since - 1.day)
+    it "only counts the sessions of partnerships formed since the date, so the stages narrow" do
+      older = partnership
+      done = session(older, status: "confirmed", ended: true)
+      said(done, older.offer.poster, true)
+      older.update_columns(created_at: since - 1.day)
 
-      expect([funnel.sessions_proposed, funnel.sessions_confirmed, funnel.sessions_completed, funnel.pairs_with_a_completed_session]).to all(eq(0))
+      newer = partnership
+      session(newer)
+
+      expect(funnel.partnerships_formed).to eq(1)
+      expect(funnel.sessions_proposed).to eq(1)
+      expect([funnel.sessions_confirmed, funnel.sessions_completed, funnel.pairs_with_a_completed_session]).to all(eq(0))
     end
   end
 
@@ -165,7 +171,7 @@ RSpec.describe Stats::Funnel, type: :unit do
       report = funnel.report
 
       ["Searches posted:", "Applications:", "Chats opened:", "Proposals:", "Partnerships formed:",
-       "Sessions proposed:", "Sessions confirmed:", "Completed sessions:", "Pairs, session done:",
+       "Sessions proposed:", "Sessions confirmed:", "Completed sessions:", "Pairs, 1+ session done:",
        "Pairs with a Yes:", "Yes weeks:", "Partnerships ended:"].each do |label|
         expect(report).to include(label)
       end
