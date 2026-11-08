@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_08_170000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_08_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -158,6 +158,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_08_170000) do
     t.bigint "proposed_by_id", null: false
     t.string "status", default: "proposed", null: false
     t.bigint "cancelled_by_id"
+    t.datetime "confirmed_at"
+    t.datetime "reminded_at"
     t.index ["cancelled_by_id"], name: "index_sessions_on_cancelled_by_id"
     t.index ["partnership_id", "start_at"], name: "index_sessions_on_partnership_id_and_start_at"
     t.index ["partnership_id"], name: "index_sessions_on_partnership_id"

@@ -18,6 +18,11 @@ class SessionMailerPreview < ActionMailer::Preview
     SessionMailer.with(session:, answer:).did_it_happen_email
   end
 
+  def reminder_email
+    session = session("confirmed")
+    SessionMailer.with(session:, recipient: session.proposed_by).reminder_email
+  end
+
   private
 
   # The mailer sends nothing unless the session is in the state the email

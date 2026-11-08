@@ -19,3 +19,6 @@ production:
   ask_whether_sessions_happened:
     class: AskWhetherSessionsHappenedJob
     schedule: every 15 minutes
+  remind_about_sessions:
+    class: RemindAboutSessionsJob
+    schedule: every 5 minutes
