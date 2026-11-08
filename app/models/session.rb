@@ -13,6 +13,12 @@ class Session < ApplicationRecord
   belongs_to :proposed_by, class_name: "User"
   # Nobody when ending the partnership cancelled it.
   belongs_to :cancelled_by, class_name: "User", optional: true
+  # "Did it happen?", one per partner who was asked.
+  has_many :answers, class_name: "SessionAnswer", dependent: :destroy
+
+  # How long after a session ends we still ask about it. Anything older was
+  # missed (say the job was down) and isn't worth asking about any more.
+  ASK_WITHIN = 1.day
 
   enum :status, {
     proposed: "proposed",
@@ -32,6 +38,41 @@ class Session < ApplicationRecord
 
   scope :upcoming, -> { where(start_at: Time.current..).order(:start_at, :id) }
   scope :past, -> { where(start_at: ...Time.current).order(start_at: :desc, id: :desc) }
+  # Completed: at least one partner said it happened.
+  scope :completed, -> { where(id: SessionAnswer.where(happened: true).select(:session_id)) }
+
+  # Emails both partners "Did it happen?" for each confirmed session that has
+  # just ended, in a partnership that's still going. Each partner is asked at
+  # most once per session: the answer row is created as the email goes out.
+  def self.ask_whether_they_happened
+    confirmed.where(end_at: ASK_WITHIN.ago..Time.current)
+      .joins(:partnership).where(partnerships: { ended_at: nil })
+      .includes(partnership: { offer: [:offerer, { pair_request: :user }] })
+      .find_each(&:ask_whether_it_happened)
+  end
+
+  def ask_whether_it_happened
+    return if partnership.ended?
+
+    partnership.people.each do |user|
+      next if user.opted_out_of?("suggestions")
+
+      answer = answers.create!(user:)
+      SessionMailer.with(session: self, answer:).did_it_happen_email.deliver_later
+    rescue ActiveRecord::RecordNotUnique
+      next
+    end
+  end
+
+  # true once a partner says yes, false if someone said no and nobody yes, and
+  # nil until anyone answers.
+  # Reads the loaded answers, so a list can preload them with includes(:answers).
+  def happened
+    said = answers.map(&:happened).compact
+    return if said.empty?
+
+    said.include?(true)
+  end
 
   # Builds a proposal from what the form sends: a date and a time in the
   # proposer's timezone, and a length in minutes. Anything that doesn't parse

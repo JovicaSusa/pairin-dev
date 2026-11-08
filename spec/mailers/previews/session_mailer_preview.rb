@@ -10,6 +10,14 @@ class SessionMailerPreview < ActionMailer::Preview
     end
   end
 
+  # An unsaved answer, so the preview creates nothing. Its token can't be
+  # checked, but the email renders.
+  def did_it_happen_email
+    session = Session.last
+    answer = SessionAnswer.new(session:, user: session.proposed_by)
+    SessionMailer.with(session:, answer:).did_it_happen_email
+  end
+
   private
 
   # The mailer sends nothing unless the session is in the state the email
