@@ -14,6 +14,8 @@ const BADGE = {
   proposed: ["Proposed", "bg-yellow-50"],
   confirmed: ["Confirmed", "bg-green"],
   done: ["Done", "bg-white"],
+  took_place: ["Took place", "bg-green"],
+  didnt_happen: ["Didn't happen", "bg-black/5 text-black/65"],
   declined: ["Declined", "bg-black/5 text-black/65"],
   withdrawn: ["Withdrawn", "bg-black/5 text-black/65"],
   cancelled: ["Cancelled", "bg-black/5 text-black/65"],
@@ -93,6 +95,8 @@ function note(session, name, past) {
     return "Cancelled when the partnership ended";
   }
   if (session.status === "confirmed" && !past) return session.mine ? `You proposed it, ${name} confirmed` : `${name} proposed it, you confirmed`;
+  // After it ends, both partners are emailed "Did it happen?" (#232).
+  if (session.status === "confirmed" && session.ended && session.happened === null) return "Did it happen? We've emailed you both to ask";
   return null;
 }
 
@@ -141,11 +145,19 @@ function SessionActions({ session, partnership }) {
   return null;
 }
 
+// A confirmed session that has started: whether it took place, once a partner
+// has said so. Completed means at least one said yes.
+function pastState(session) {
+  if (session.happened === true) return "took_place";
+  if (session.happened === false) return "didnt_happen";
+  return "done";
+}
+
 function SessionCard({ session, partnership, past }) {
   const name = partnership.conversation.other.name;
-  const state = past && session.status === "confirmed" ? "done" : session.status;
+  const state = past && session.status === "confirmed" ? pastState(session) : session.status;
   const [label, style] = BADGE[state];
-  const faded = ["declined", "withdrawn", "cancelled", "expired"].includes(state);
+  const faded = ["declined", "withdrawn", "cancelled", "expired", "didnt_happen"].includes(state);
   const text = note(session, name, past);
 
   return (

@@ -19,7 +19,7 @@ class Partners::SessionsController < ApplicationController
         lengths: Session::LENGTHS,
         sessions: {
           upcoming: sessions.upcoming.map { |session| props_for(session) },
-          past: sessions.past.map { |session| props_for(session) }
+          past: sessions.past.includes(:answers).map { |session| props_for(session, past: true) }
         }
       )
     }
@@ -87,7 +87,10 @@ class Partners::SessionsController < ApplicationController
     @partnership = partnerships.find(params[:partner_id])
   end
 
-  def props_for(session)
+  # Only past sessions have "Did it happen?" answers; the past list preloads them.
+  def props_for(session, past: false)
+    happened = session.happened if past
+
     {
       id: session.id,
       start_at: session.start_at.utc.iso8601,
@@ -97,6 +100,9 @@ class Partners::SessionsController < ApplicationController
       status: session.expired? ? "expired" : session.status,
       mine: session.proposed_by_id == current_user.id,
       cancelled_by: session.cancelled_by_id && (session.cancelled_by_id == current_user.id ? "you" : "partner"),
+      # "Did it happen?": true, false, or nil until either partner answers.
+      happened: (happened if session.confirmed?),
+      ended: session.end_at.past?,
       can: {
         answer: session.answerable_by?(current_user),
         withdraw: session.withdrawable_by?(current_user),

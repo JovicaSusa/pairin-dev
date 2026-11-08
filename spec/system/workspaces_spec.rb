@@ -308,6 +308,46 @@ RSpec.describe "workspaces", type: :system do
       visit partner_path(partnership)
       expect(page).not_to have_link("Propose a session")
     end
+
+    it "shows whether past sessions took place, and asks without sign-in" do
+      took_place = create(:session, partnership:, proposed_by: poster, status: "confirmed", start_at: 3.days.from_now.change(min: 0))
+      took_place.update_columns(start_at: Time.utc(2026, 3, 2, 17, 30), end_at: Time.utc(2026, 3, 2, 18, 30))
+      no_show = create(:session, partnership:, proposed_by: poster, status: "confirmed", start_at: 4.days.from_now.change(min: 0))
+      no_show.update_columns(start_at: Time.utc(2026, 3, 3, 17, 30), end_at: Time.utc(2026, 3, 3, 18, 30))
+      waiting = create(:session, partnership:, proposed_by: poster, status: "confirmed", start_at: 5.days.from_now.change(min: 0))
+      waiting.update_columns(start_at: 2.hours.ago, end_at: 1.hour.ago)
+      took_place.answers.create!(user: poster).answer!(true)
+      took_place.answers.create!(user: partner).answer!(false)
+      no_show.answers.create!(user: partner).answer!(false)
+      answer = waiting.answers.create!(user: partner)
+
+      visit session_answer_path(token: answer.generate_token_for(:answer), answer: "yes")
+      expect(page).to have_content("Did your session with Maya happen?")
+      click_button "Confirm: Yes"
+      expect(page).to have_content("Thanks, got it")
+      click_button "Change to No"
+      expect(page).to have_content("You said no")
+
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(find("li", text: "Mon 2 Mar")).to have_content("Took place")
+      expect(find("li", text: "Tue 3 Mar")).to have_content("Didn't happen")
+      expect(find("li", text: "Tue 3 Mar")[:class]).to include("opacity-70")
+      expect(page).to have_content("Didn't happen", count: 2)
+    end
+
+    it "says the partners have been asked while nobody has answered yet" do
+      unanswered = create(:session, partnership:, proposed_by: poster, status: "confirmed", start_at: 3.days.from_now.change(min: 0))
+      unanswered.update_columns(start_at: Time.utc(2026, 3, 2, 17, 30), end_at: Time.utc(2026, 3, 2, 18, 30))
+      sign_in(partner)
+      visit partner_sessions_path(partnership)
+
+      within(find("li", text: "Mon 2 Mar")) do
+        expect(page).to have_content("Done")
+        expect(page).to have_content("Did it happen? We've emailed you both to ask")
+      end
+    end
   end
 
   describe "resources" do

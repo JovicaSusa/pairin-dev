@@ -1,6 +1,9 @@
 # Emails about sessions, always to the partner who didn't act, with the time
-# shown in their own timezone. They all share one template.
+# shown in their own timezone. They all share one template, except "Did it
+# happen?", which goes to both partners and asks a question.
 class SessionMailer < ApplicationMailer
+  include Unsubscribable
+
   before_action :set_session
 
   def proposed_email
@@ -49,6 +52,25 @@ class SessionMailer < ApplicationMailer
       heading: "#{params[:by].display_name} cancelled the session",
       next_step: "You can propose another time in your Workspace."
     )
+  end
+
+  # After a confirmed session ends, to each partner, with one-click Yes and No
+  # links that work without signing in. Optional, like the weekly check-in.
+  def did_it_happen_email
+    answer = params[:answer]
+    user = answer.user
+    @partner = @session.partnership.offer.other_person(user)
+    zone = Time.find_zone!(user.timezone)
+    @starts = @session.start_at.in_time_zone(zone)
+    @ends = @session.end_at.in_time_zone(zone)
+    @timezone = user.timezone
+    token = answer.generate_token_for(:answer)
+    @yes_url = session_answer_url(token:, answer: "yes")
+    @no_url = session_answer_url(token:, answer: "no")
+
+    allow_unsubscribe(user, "suggestions")
+
+    mail(to: user.email, subject: "Did your session with #{@partner.display_name} happen?")
   end
 
   private

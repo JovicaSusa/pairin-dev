@@ -90,6 +90,10 @@ Rails.application.routes.draw do
   get "check-ins/:token", to: "check_ins#show", as: :check_in
   post "check-ins/:token", to: "check_ins#create"
 
+  # No-login Yes/No, reached from the "Did it happen?" email after a session.
+  get "did-it-happen/:token", to: "session_answers#show", as: :session_answer
+  post "did-it-happen/:token", to: "session_answers#create"
+
   # No-login "Pause this search", reached from the emails about a search.
   get "requests/pause/:token", to: "request_pauses#show", as: :request_pause
   post "requests/pause/:token", to: "request_pauses#create"

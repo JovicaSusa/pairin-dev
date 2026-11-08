@@ -16,3 +16,6 @@ production:
   send_weekly_check_ins:
     class: SendWeeklyCheckInsJob
     schedule: at 9am every day
+  ask_whether_sessions_happened:
+    class: AskWhetherSessionsHappenedJob
+    schedule: every 15 minutes
