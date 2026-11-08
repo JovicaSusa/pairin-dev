@@ -106,6 +106,57 @@ RSpec.describe Stats::Funnel, type: :unit do
     end
   end
 
+  describe "sessions" do
+    # Sessions can't be created in the past, so each is created ahead and then
+    # moved to have ended an hour ago.
+    def session(pair, status: "proposed", by: pair.offer.offerer, ended: false, **attrs)
+      create(:session, partnership: pair, proposed_by: by, status:, **attrs).tap do |s|
+        s.update_columns(start_at: 2.hours.ago, end_at: 1.hour.ago) if ended
+      end
+    end
+
+    def said(session, user, happened)
+      session.answers.create!(user:).answer!(happened)
+    end
+
+    it "counts proposed, confirmed and completed sessions, and pairs with a completed one" do
+      first = partnership
+      second = partnership
+      partnership # a pair with no sessions
+
+      session(first)                                                  # proposed, never answered
+      session(first, status: "declined")
+      session(first, status: "withdrawn")
+      still_on = session(first, status: "confirmed")                  # confirmed, still ahead
+      called_off = session(first, status: "confirmed")
+      called_off.cancel!(by: first.offer.poster)                      # confirmed, then cancelled
+      yes = session(first, status: "confirmed", ended: true)
+      said(yes, first.offer.poster, false)
+      said(yes, first.offer.offerer, true)                            # completed: one Yes is enough
+      also_yes = session(first, status: "confirmed", ended: true)
+      said(also_yes, first.offer.poster, true)                        # completed: the same pair again
+      no = session(second, status: "confirmed", ended: true)
+      said(no, second.offer.poster, false)                            # confirmed, didn't happen
+      session(second, status: "confirmed", ended: true)               # confirmed, nobody answered
+
+      expect(funnel.sessions_proposed).to eq(9)
+      expect(funnel.sessions_confirmed).to eq(6)
+      expect(funnel.sessions_completed).to eq(2)
+      expect(funnel.pairs_with_a_completed_session).to eq(1)
+      expect(still_on.reload).to be_confirmed
+    end
+
+    it "leaves out sessions before the date, and pairs that formed before it" do
+      pair = partnership
+      done = session(pair, status: "confirmed", ended: true)
+      said(done, pair.offer.poster, true)
+      Session.update_all(created_at: since - 1.day)
+      Partnership.update_all(created_at: since - 1.day)
+
+      expect([funnel.sessions_proposed, funnel.sessions_confirmed, funnel.sessions_completed, funnel.pairs_with_a_completed_session]).to all(eq(0))
+    end
+  end
+
   describe "the report and the task" do
     it "prints every stage and both targets" do
       pair = partnership
@@ -113,7 +164,9 @@ RSpec.describe Stats::Funnel, type: :unit do
 
       report = funnel.report
 
-      ["Searches posted:", "Applications:", "Chats opened:", "Proposals:", "Partnerships formed:", "Pairs with a Yes:", "Yes weeks:", "Partnerships ended:"].each do |label|
+      ["Searches posted:", "Applications:", "Chats opened:", "Proposals:", "Partnerships formed:",
+       "Sessions proposed:", "Sessions confirmed:", "Completed sessions:", "Pairs, session done:",
+       "Pairs with a Yes:", "Yes weeks:", "Partnerships ended:"].each do |label|
         expect(report).to include(label)
       end
       expect(report).to include("Target: 1 of 3 pairs with a Yes within 30 days")

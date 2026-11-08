@@ -25,6 +25,19 @@ module Stats
     def partnerships_formed = partnerships.count
     def partnerships_ended = partnerships.where.not(ended_at: nil).count
 
+    # Every session starts as a proposal.
+    def sessions_proposed = sessions.count
+
+    # Confirmed at some point. A status is overwritten as it changes, but only a
+    # confirmed session can be cancelled by a partner, so that counts too. Ones
+    # cancelled by the partnership ending can't be told apart, and are left out.
+    def sessions_confirmed = sessions.confirmed.or(sessions.cancelled.where.not(cancelled_by_id: nil)).count
+
+    # Completed: at least one partner said Yes to "Did it happen?" (#232).
+    def sessions_completed = sessions.completed.count
+
+    def pairs_with_a_completed_session = partnerships.where(id: Session.completed.select(:partnership_id)).count
+
     def pairs_with_a_yes = yes_weeks_by_partnership.count { |_id, weeks| weeks.any? }
 
     # The launch target: at least one Yes, answered within 30 days of the date.
@@ -46,6 +59,10 @@ module Stats
         Chats opened:           #{chats_opened}
         Proposals:              #{proposals}
         Partnerships formed:    #{partnerships_formed}
+        Sessions proposed:      #{sessions_proposed}
+        Sessions confirmed:     #{sessions_confirmed}
+        Completed sessions:     #{sessions_completed}
+        Pairs, session done:    #{pairs_with_a_completed_session}
         Pairs with a Yes:       #{pairs_with_a_yes}
         Pairs, #{FOLLOW_UP_WEEKS}+ Yes weeks:   #{partnerships_with_three_yes_weeks}
 
@@ -68,6 +85,7 @@ module Stats
     def searches = PairRequest.where(created_at: @since..)
     def offers = Offer.where(created_at: @since..)
     def partnerships = Partnership.where(created_at: @since..)
+    def sessions = Session.where(created_at: @since..)
 
     # A week counts once, however many partners said Yes for it.
     def yes_weeks_by_partnership(within: nil)
