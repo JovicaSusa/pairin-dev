@@ -61,8 +61,11 @@ class SessionMailer < ApplicationMailer
 
     send_about(
       status: "confirmed",
+      # send_about emails the other person of `by`, so passing the partner
+      # sends it to the recipient.
       by: partner,
-      heading: "Your session with #{partner.display_name} starts in an hour",
+      # Not "in an hour": after a job outage it can go out later than that.
+      heading: "Your session with #{partner.display_name} is coming up",
       next_step: "Join from the call link, or open your Workspace to see the details.",
       show_call_link: true,
       subject: ->(starts) { "Reminder: your session with #{partner.display_name} at #{starts.strftime('%H:%M')}" }

@@ -30,6 +30,8 @@ RSpec.describe "Reminders before a session", type: :request do
 
   def reminder_sent = have_enqueued_mail(SessionMailer, :reminder_email)
 
+  def body_of(mail) = CGI.unescapeHTML(mail.html_part ? mail.html_part.body.to_s : mail.body.to_s)
+
   describe "when it goes out" do
     it "sends both partners a reminder in the hour before a confirmed session" do
       confirmed
@@ -62,6 +64,43 @@ RSpec.describe "Reminders before a session", type: :request do
       expect { run_job }.not_to reminder_sent
       expect(session.reload.reminded_at).to be_present
     end
+
+    it "tries again on the next run if queueing the reminder failed" do
+      session = confirmed
+      travel_to starts - 50.minutes
+      failing = true
+      allow(SessionMailer).to receive(:with).and_wrap_original do |original, **args|
+        message = original.call(**args)
+        if failing
+          failing = false
+          allow(message).to receive(:reminder_email).and_raise(StandardError, "queue down")
+        end
+        message
+      end
+
+      expect { run_job }.not_to reminder_sent
+      expect(session.reload.reminded_at).to be_nil
+
+      travel 5.minutes
+      expect { run_job }.to reminder_sent.twice
+      expect(session.reload.reminded_at).to be_present
+    end
+
+    it "still reminds the other sessions when one fails" do
+      first = confirmed
+      second = create(:session, partnership:, proposed_by: poster, start_at: starts + 10.minutes, end_at: starts + 70.minutes)
+      travel_to(starts - 1.day) { second.confirm!(by: partner) }
+      travel_to starts - 45.minutes
+      allow(SessionMailer).to receive(:with).and_wrap_original do |original, **args|
+        raise StandardError, "bad row" if args[:session].id == first.id
+
+        original.call(**args)
+      end
+
+      expect { run_job }.to reminder_sent.twice
+      expect(second.reload.reminded_at).to be_present
+      expect(first.reload.reminded_at).to be_nil
+    end
   end
 
   describe "when it doesn't" do
@@ -88,6 +127,15 @@ RSpec.describe "Reminders before a session", type: :request do
       travel_to starts - 30.minutes
 
       expect { run_job }.not_to reminder_sent
+    end
+
+    it "skips sessions when the chat behind the partnership has ended, even if the partnership row hasn't" do
+      session = confirmed
+      offer.update_columns(ended_at: starts - 2.hours)
+      travel_to starts - 30.minutes
+
+      expect { run_job }.not_to reminder_sent
+      expect(session.reload.reminded_at).to be_nil
     end
 
     it "skips sessions confirmed less than an hour before they start" do
@@ -128,8 +176,8 @@ RSpec.describe "Reminders before a session", type: :request do
 
       to_sam = mails.fetch("sam@example.com")
       expect(to_sam.subject).to eq("Reminder: your session with Maya at 12:30")
-      body = CGI.unescapeHTML(to_sam.html_part ? to_sam.html_part.body.to_s : to_sam.body.to_s)
-      expect(body).to include("Monday 4 March", "12:30–13:30", "America/New_York", "https://meet.google.com/abc", "/partners/#{partnership.id}/sessions")
+      body = body_of(to_sam)
+      expect(body).to include("Your session with Maya is coming up", "Monday 4 March", "12:30–13:30", "America/New_York", "https://meet.google.com/abc", "/partners/#{partnership.id}/sessions")
       expect(to_sam["List-Unsubscribe"]).to be_nil
       expect(body).not_to include("/unsubscribe/")
 
@@ -141,8 +189,7 @@ RSpec.describe "Reminders before a session", type: :request do
       travel_to starts - 50.minutes
       perform_enqueued_jobs { run_job }
 
-      body = ActionMailer::Base.deliveries.last.then { _1.html_part ? _1.html_part.body.to_s : _1.body.to_s }
-      expect(body).not_to include("Call link:")
+      expect(body_of(ActionMailer::Base.deliveries.last)).not_to include("Call link:")
     end
   end
 

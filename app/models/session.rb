@@ -49,10 +49,15 @@ class Session < ApplicationRecord
   # just agreed) or the partnership has ended. No opt-out: both agreed to it.
   def self.remind_about_upcoming
     confirmed.where(start_at: Time.current..REMIND_BEFORE.from_now, reminded_at: nil)
-      .where("confirmed_at <= start_at - interval '1 hour'")
+      .where("confirmed_at <= start_at - make_interval(secs => ?)", REMIND_BEFORE.to_i)
       .joins(:partnership).where(partnerships: { ended_at: nil })
       .includes(partnership: { offer: [:offerer, { pair_request: :user }] })
-      .find_each(&:remind)
+      .find_each do |session|
+        session.remind
+      rescue StandardError => e
+        # One bad session shouldn't hold up the others; it's retried next run.
+        Rails.error.report(e, handled: true, context: { session_id: session.id })
+      end
   end
 
   def remind
@@ -60,8 +65,16 @@ class Session < ApplicationRecord
     # Claimed in one UPDATE, so two runs at once can't both send it.
     return unless Session.where(id:, reminded_at: nil).update_all(reminded_at: Time.current) == 1
 
-    partnership.people.each do |user|
-      SessionMailer.with(session: self, recipient: user).reminder_email.deliver_later
+    begin
+      partnership.people.each do |user|
+        SessionMailer.with(session: self, recipient: user).reminder_email.deliver_later
+      end
+    rescue StandardError
+      # The job queue is a separate database, so this can't share a transaction
+      # with the claim. Release it so the next run tries again: a possible
+      # duplicate for one partner beats nobody being reminded.
+      Session.where(id:).update_all(reminded_at: nil)
+      raise
     end
   end
 

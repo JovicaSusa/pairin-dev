@@ -7,7 +7,10 @@ class AddConfirmedAtAndRemindedAtToSessions < ActiveRecord::Migration[7.1]
     add_column :sessions, :reminded_at, :datetime
 
     # Sessions already confirmed: their last change was the confirmation, so
-    # updated_at is the best guess. Cancelled ones by a partner were confirmed too.
+    # updated_at is the best guess (a session confirmed just before deploy may
+    # miss its reminder). Ones a partner cancelled were confirmed too; filling
+    # those in keeps confirmed_at meaning "was ever confirmed", so the funnel
+    # can count confirmed sessions exactly later.
     execute <<~SQL
       UPDATE sessions SET confirmed_at = updated_at
       WHERE status = 'confirmed' OR (status = 'cancelled' AND cancelled_by_id IS NOT NULL)
