@@ -13,3 +13,4 @@ Use the words on the left in the UI and in emails. The code keeps its older name
 | **Applicant** | The person who sent an application | `Offer#offerer` |
 | **Partnership** | Two people who agreed to work together on a partner search | Not built yet (#169) |
 | **Workspace** | The private page a partnership shares | Not built yet (#185) |
+| **Resource** | A link with an optional note that either partner adds to the Workspace | `SharedLink` (`Resource` would clash with the Alba serializers) |

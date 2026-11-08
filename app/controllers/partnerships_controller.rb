@@ -1,6 +1,7 @@
 # A Workspace: the page two partners share. Only those two can open it.
 class PartnershipsController < ApplicationController
   include Authenticated
+  include WorkspacePages
 
   LAST_MESSAGE_LENGTH = 140
 
@@ -38,6 +39,7 @@ class PartnershipsController < ApplicationController
         your_commitment: partnership.commitment_of(current_user),
         partner_commitment: partnership.commitment_of(offer.other_person(current_user)),
         unread: offer.unread_messages_for(current_user).count,
+        resources: resources_summary(partnership),
         last_message: last_message && {
           body: last_message.body.truncate(LAST_MESSAGE_LENGTH),
           mine: last_message.sender_id == current_user.id
@@ -82,24 +84,10 @@ class PartnershipsController < ApplicationController
 
   private
 
-  # What every Workspace page shows in its header.
-  def workspace(partnership)
-    offer = partnership.offer
+  def resources_summary(partnership)
+    links = partnership.shared_links
+    latest = links.order(:created_at, :id).last
 
-    {
-      id: partnership.id,
-      goal: partnership.goal,
-      ended: partnership.ended?,
-      ended_by_viewer: partnership.ended_by_id == current_user.id,
-      conversation: {
-        id: offer.id,
-        other: offer.other_person(current_user).profile_for_others.slice(:name, :image_url),
-        search: { subject: offer.pair_request.subject }
-      }
-    }
-  end
-
-  def partnerships
-    Partnership.involving(current_user)
+    { count: links.count, latest: latest&.host }
   end
 end
