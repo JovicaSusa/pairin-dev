@@ -307,13 +307,25 @@ RSpec.describe "Workspace sessions", type: :request do
       expect(props.dig("partnership", "sessions", "upcoming", 0)).to include("status" => "cancelled", "cancelled_by" => "partner")
     end
 
-    it "isn't open to anyone outside the partnership" do
-      sign_in(create(:user))
+    %i[confirm decline withdraw cancel].each do |action|
+      it "doesn't let anyone outside the partnership #{action} it" do
+        sign_in(create(:user))
 
-      patch confirm_partner_session_path(partnership, session)
+        patch public_send(:"#{action}_partner_session_path", partnership, session)
 
-      expect(response).to have_http_status(:not_found)
-      expect(session.reload).to be_proposed
+        expect(response).to have_http_status(:not_found)
+        expect(session.reload).to be_proposed
+      end
+    end
+
+    it "says the partnership has ended, rather than that the session can't change" do
+      partnership.end!(by: poster)
+      sign_in(partner)
+
+      expect { patch confirm_partner_session_path(partnership, session) }.not_to have_enqueued_mail(SessionMailer)
+
+      expect(response).to redirect_to(partner_sessions_path(partnership))
+      expect(flash[:alert]).to eq("This partnership has ended.")
     end
 
     it "doesn't reach a session from another partnership" do

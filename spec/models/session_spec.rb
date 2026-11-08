@@ -94,6 +94,20 @@ RSpec.describe Session do
       expect(session.reload).to be_withdrawn
     end
 
+    it "doesn't let anyone outside the partnership decline or withdraw it" do
+      expect(session.decline!(by: outsider)).to be(false)
+      expect(session.withdraw!(by: outsider)).to be(false)
+      expect(session.reload).to be_proposed
+    end
+
+    it "can't confirm or decline a proposal that was withdrawn" do
+      session.withdraw!(by: proposer)
+
+      expect(session.confirm!(by: other)).to be(false)
+      expect(session.decline!(by: other)).to be(false)
+      expect(session.reload).to be_withdrawn
+    end
+
     it "takes only one answer" do
       session.decline!(by: other)
 
@@ -111,10 +125,13 @@ RSpec.describe Session do
       expect(session.reload).to be_expired
     end
 
-    it "can't answer once the partnership has ended" do
+    it "can't answer or withdraw once the partnership has ended" do
       partnership.update_columns(ended_at: Time.current, ended_by_id: proposer.id)
 
       expect(session.confirm!(by: other)).to be(false)
+      expect(session.decline!(by: other)).to be(false)
+      expect(session.withdraw!(by: proposer)).to be(false)
+      expect(session.reload).to be_proposed
     end
   end
 
@@ -146,6 +163,28 @@ RSpec.describe Session do
       proposal = create(:session, partnership:, proposed_by: proposer, start_at: 3.days.from_now.change(min: 0))
 
       expect(proposal.cancel!(by: other)).to be(false)
+    end
+
+    it "can't withdraw a confirmed session, only cancel it" do
+      expect(session.withdraw!(by: proposer)).to be(false)
+      expect(session.reload).to be_confirmed
+    end
+
+    it "can't confirm, decline or cancel again once it's cancelled" do
+      session.cancel!(by: proposer)
+
+      expect(session.confirm!(by: other)).to be(false)
+      expect(session.decline!(by: other)).to be(false)
+      expect(session.cancel!(by: other)).to be(false)
+      expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: proposer)
+    end
+
+    it "can't cancel once the partnership has ended" do
+      partnership.update_columns(ended_at: Time.current, ended_by_id: proposer.id)
+
+      expect(session.cancel!(by: proposer)).to be(false)
+      expect(session.cancel!(by: other)).to be(false)
+      expect(session.reload).to be_confirmed
     end
   end
 

@@ -77,7 +77,9 @@ class Partners::SessionsController < ApplicationController
       ConversationsChannel.notify(@partnership.offer)
       redirect_back_or_to partner_sessions_path(@partnership)
     else
-      redirect_back_or_to partner_sessions_path(@partnership), alert: "This session can't be changed any more."
+      # Same wording as proposing in an ended partnership, when that's the reason.
+      alert = @partnership.reload.ended? ? "This partnership has ended." : "This session can't be changed any more."
+      redirect_back_or_to partner_sessions_path(@partnership), alert:
     end
   end
 

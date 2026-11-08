@@ -1,6 +1,8 @@
-# A time two partners plan to work together. One partner proposes it, and the
-# other answers. Times are stored in UTC and entered and shown in each person's
-# own timezone.
+# A time two partners plan to work together. One partner proposes it; the other
+# confirms or declines it, or the proposer withdraws it before then. Either can
+# cancel a confirmed one before it starts, and ending the partnership cancels
+# the rest. Times are stored in UTC and entered and shown in each person's own
+# timezone.
 class Session < ApplicationRecord
   LENGTHS = [30, 45, 60, 90, 120].freeze
   CALL_LINK_MAX_LENGTH = 2000
