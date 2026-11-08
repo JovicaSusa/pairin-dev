@@ -8,8 +8,13 @@ class SessionAnswer < ApplicationRecord
   # Signed token for the no-login Yes/No links in the email.
   generates_token_for :answer, expires_in: 30.days
 
+  # A Yes also records that week as worked together on the weekly check-in
+  # (#234), even if the check-in has already gone out.
   def answer!(happened)
-    update!(happened:, answered_at: Time.current)
+    transaction do
+      update!(happened:, answered_at: Time.current)
+      session.partnership.record_completed_session(session) if happened
+    end
   end
 
   def answered?

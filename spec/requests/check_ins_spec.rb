@@ -111,13 +111,72 @@ RSpec.describe "Weekly check-ins", type: :request do
       expect(Stats::Funnel.new(since: partnership.created_at.beginning_of_day).pairs_with_a_yes).to eq(1)
     end
 
-    it "doesn't send it again on later runs that week" do
+    it "doesn't send it again on later runs that week, and keeps the week as worked together" do
       session_in_week(1, happened: true)
       travel 7.days + 1.minute
       run_job
       travel 1.day
 
       expect { run_job }.not_to email_sent
+      expect(CheckIn.count).to eq(2)
+      expect(CheckIn.pluck(:worked_together)).to all(be(true))
+    end
+
+    it "records the week as soon as the Yes comes in, before the week has ended" do
+      session = session_in_week(1, happened: nil)
+      travel 3.days
+      session.answers.create!(user: poster).answer!(true)
+
+      expect(CheckIn.where(week: 1).pluck(:user_id, :worked_together)).to contain_exactly([poster.id, true], [partner.id, true])
+      travel 4.days + 1.minute
+      expect { run_job }.not_to email_sent
+    end
+
+    it "records the week when the Yes comes in after the check-in has gone out" do
+      session = session_in_week(1, happened: nil)
+      travel 7.days + 1.minute
+      expect { run_job }.to email_sent.twice
+
+      travel 1.hour
+      session.answers.create!(user: partner).answer!(true)
+
+      expect(CheckIn.where(week: 1).pluck(:worked_together)).to all(be(true))
+      expect(weeks).to eq([{ "week" => 1, "worked_together" => true }])
+      expect(Stats::Funnel.new(since: partnership.created_at.beginning_of_day).pairs_with_a_yes).to eq(1)
+    end
+
+    it "keeps a partner's own No on the check-in, and still counts the week" do
+      session = session_in_week(1, happened: nil)
+      travel 7.days + 1.minute
+      run_job
+      CheckIn.find_by!(user: poster, week: 1).answer!(false)
+
+      session.answers.create!(user: partner).answer!(true)
+
+      expect(CheckIn.find_by!(user: poster, week: 1).worked_together).to be(false)
+      expect(CheckIn.find_by!(user: partner, week: 1).worked_together).to be(true)
+      expect(weeks).to eq([{ "week" => 1, "worked_together" => true }])
+    end
+
+    it "dates the recorded answer from the Yes, not from when the job ran" do
+      session = session_in_week(1, happened: nil)
+      travel 2.days
+      yes_at = Time.current
+      session.answers.create!(user: partner).answer!(true)
+      travel 5.days + 1.minute
+      run_job
+
+      expect(CheckIn.where(week: 1).pluck(:answered_at)).to all(be_within(1.second).of(yes_at))
+    end
+
+    it "puts a session starting exactly a week in into week 2" do
+      start = partnership.created_at + 7.days
+      session = create(:session, partnership:, proposed_by: poster, status: "confirmed").tap { _1.update_columns(start_at: start, end_at: start + 1.hour) }
+      travel 7.days + 2.hours
+      session.answers.create!(user: partner).answer!(true)
+
+      expect(CheckIn.pluck(:week).uniq).to eq([2])
+      expect { run_job }.to email_sent.twice
     end
 
     it "still sends the check-in when the week's session didn't happen, or nobody answered" do
