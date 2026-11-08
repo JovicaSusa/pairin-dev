@@ -1,6 +1,6 @@
 import { router, useForm } from "@inertiajs/react";
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { CalendarPlus, Check } from "lucide-react";
 import SessionTime, { isoDay, zoneLabel } from "@/components/SessionTime";
 import WorkspaceFrame from "@/components/WorkspaceFrame";
 import { Button } from "@/components/ui/button";
@@ -172,6 +172,13 @@ function SessionCard({ session, partnership, past }) {
           </a>
         )}
         <div className="mt-3 empty:hidden">
+          {/* A plain link: it downloads a file, so no Inertia visit (#230). */}
+          {session.calendar_path && (
+            <a href={session.calendar_path} download className="mb-3 inline-flex items-center gap-1.5 text-xs font-bold underline">
+              <CalendarPlus className="h-3.5 w-3.5" />
+              Add to calendar
+            </a>
+          )}
           <SessionActions session={session} partnership={partnership} />
         </div>
       </div>

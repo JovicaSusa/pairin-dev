@@ -64,6 +64,15 @@ class Partners::SessionsController < ApplicationController
     change(:cancel!, :cancelled_email)
   end
 
+  # "Add to calendar": the session as an .ics file, named from the viewer's
+  # side (#230). Only for confirmed sessions.
+  def calendar
+    planned = @partnership.sessions.confirmed.find(params[:id])
+    file = SessionCalendar.new(planned, for_user: current_user)
+
+    send_data file.download, filename: file.filename, type: "text/calendar; charset=utf-8", disposition: "attachment"
+  end
+
   private
 
   # Says so, rather than erroring, when the other partner got there first or
@@ -100,6 +109,7 @@ class Partners::SessionsController < ApplicationController
       status: session.expired? ? "expired" : session.status,
       mine: session.proposed_by_id == current_user.id,
       cancelled_by: session.cancelled_by_id && (session.cancelled_by_id == current_user.id ? "you" : "partner"),
+      calendar_path: (calendar_partner_session_path(@partnership, session) if session.confirmed? && !past),
       # "Did it happen?": true, false, or nil until either partner answers.
       happened: (happened if session.confirmed?),
       ended: session.end_at.past?,

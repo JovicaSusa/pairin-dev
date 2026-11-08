@@ -21,8 +21,9 @@ class SessionMailer < ApplicationMailer
       status: "confirmed",
       by: params[:by],
       heading: "#{params[:by].display_name} confirmed your session",
-      next_step: "It's in your Workspace, with the call link if there is one.",
-      show_call_link: true
+      next_step: "It's in your Workspace, with the call link if there is one. The attached invitation adds it to your calendar.",
+      show_call_link: true,
+      calendar: :invitation
     )
   end
 
@@ -50,7 +51,8 @@ class SessionMailer < ApplicationMailer
       by: params[:by],
       # "the", not "your": the other partner may have been the one to propose it.
       heading: "#{params[:by].display_name} cancelled the session",
-      next_step: "You can propose another time in your Workspace."
+      next_step: "You can propose another time in your Workspace.",
+      calendar: :cancellation
     )
   end
 
@@ -101,8 +103,10 @@ class SessionMailer < ApplicationMailer
   # and an email about a confirmation that was then cancelled (or whose
   # partnership ended) would describe a session that isn't happening.
   # `subject`, if given, builds the subject from the start time in the
-  # recipient's timezone; otherwise it's the heading and the day.
-  def send_about(status:, by:, heading:, next_step:, show_call_link: false, subject: nil)
+  # recipient's timezone; otherwise it's the heading and the day. `calendar`
+  # attaches the session as an :invitation or a :cancellation for the
+  # recipient (#230).
+  def send_about(status:, by:, heading:, next_step:, show_call_link: false, subject: nil, calendar: nil)
     return unless @session.status == status
 
     recipient = @session.partnership.offer.other_person(by)
@@ -115,7 +119,21 @@ class SessionMailer < ApplicationMailer
     @show_call_link = show_call_link
     @sessions_url = partner_sessions_url(@session.partnership)
 
+    attach_calendar(calendar, recipient) if calendar
+
     subject = subject ? subject.call(@starts) : "#{heading} on #{@starts.strftime('%a %-d %b')}"
     mail(to: recipient.email, subject:, template_name: "session_email")
+  end
+
+  # The method parameter on the content type is what makes Gmail, Outlook and
+  # Apple Mail treat it as an invitation (or its cancellation).
+  def attach_calendar(kind, recipient)
+    file = SessionCalendar.new(@session, for_user: recipient)
+    method = kind == :cancellation ? "CANCEL" : "REQUEST"
+
+    attachments[file.filename] = {
+      content_type: "text/calendar; method=#{method}; charset=UTF-8",
+      content: file.public_send(kind)
+    }
   end
 end
