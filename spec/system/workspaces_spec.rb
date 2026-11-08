@@ -167,6 +167,149 @@ RSpec.describe "workspaces", type: :system do
     end
   end
 
+  describe "sessions" do
+    let!(:partnership) { offer.accept_proposal!(by: poster) }
+
+    # Cuprite can't type into a native time field, so set it the way React
+    # sees a change.
+    def set_time_field(id, value)
+      page.execute_script(<<~JS, id, value)
+        const [id, value] = arguments;
+        const input = document.getElementById(id);
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(input, value);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      JS
+    end
+
+    before do
+      poster.update!(timezone: "Europe/Berlin")
+      partner.update!(timezone: "America/New_York")
+    end
+
+    it "can be proposed from the overview, and the partner sees it waiting for them" do
+      sign_in(poster)
+      visit partner_path(partnership)
+
+      expect(page).to have_content("Nothing planned yet")
+      click_link "Propose a session"
+
+      expect(page).to have_content("No sessions yet")
+      expect(page).to have_content("Times are in your timezone, Europe/Berlin.")
+      fill_in "Date", with: Date.new(2030, 3, 4)
+      set_time_field("session_time", "18:30")
+      select "1.5 hours", from: "Length"
+      fill_in "Call link (optional)", with: "https://meet.google.com/abc-defg-hij"
+      click_button "Propose session"
+
+      expect(page).to have_content("Mon 4 Mar · 18:30–20:00")
+      expect(page).to have_content("12:30–14:00 GMT-5 for Sam")
+      expect(page).to have_content("Waiting for Sam to answer")
+      expect(page).to have_link("meet.google.com/abc-defg-hij", href: "https://meet.google.com/abc-defg-hij")
+
+      sign_in(partner)
+      visit partner_path(partnership)
+
+      expect(page).to have_content("1 waiting for your answer")
+      click_link "Open sessions"
+
+      expect(page).to have_content("Mon 4 Mar · 12:30–14:00 GMT-5")
+      expect(page).to have_content("Maya proposed this")
+    end
+
+    it "can be confirmed by the partner, shows as next, and cancelled by either" do
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30))
+      sign_in(partner)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("Maya proposed this")
+      click_button "Confirm"
+
+      expect(page).to have_content("Maya proposed it, you confirmed")
+      expect(page).not_to have_button("Confirm")
+
+      click_link "Overview"
+      expect(page).to have_content("Mon 4 Mar · 12:30–13:30")
+      expect(page).to have_content(/1\s+confirmed ahead/)
+
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("You proposed it, Sam confirmed")
+      click_button "Cancel session"
+      expect(page).to have_content("Cancel this session? We'll tell Sam.")
+      click_button "Yes, cancel it"
+
+      expect(page).to have_content("You cancelled")
+      expect(page).not_to have_button("Cancel session")
+    end
+
+    it "can be declined by the partner or withdrawn by the proposer" do
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30))
+      create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 5, 17, 30), end_at: Time.utc(2030, 3, 5, 18, 30))
+      sign_in(partner)
+      visit partner_sessions_path(partnership)
+
+      within(find("li", text: "Mon 4 Mar")) { click_button "Decline" }
+      expect(page).to have_content("You declined")
+
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("Sam declined")
+      within(find("li", text: "Tue 5 Mar")) { click_button "Withdraw" }
+      expect(page).to have_content("You withdrew this")
+    end
+
+    it "says what's wrong with a time in the past" do
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      fill_in "Date", with: Date.yesterday
+      page.execute_script("document.getElementById('session_date').removeAttribute('min')")
+      click_button "Propose session"
+
+      expect(page).to have_content("Start must be in the future")
+      expect(partnership.sessions).to be_empty
+    end
+
+    it "shows the next confirmed session on the overview" do
+      create(:session, partnership:, proposed_by: partner, status: "confirmed", start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30), call_link: "https://zoom.us/j/1")
+      sign_in(poster)
+      visit partner_path(partnership)
+
+      expect(page).to have_content("Mon 4 Mar · 18:30–19:30")
+      expect(page).to have_link("Join call", href: "https://zoom.us/j/1")
+      expect(page).to have_content(/1\s+confirmed ahead/)
+    end
+
+    it "fits a phone, with the form above the list" do
+      create(:session, partnership:, proposed_by: partner, call_link: "https://meet.google.com/a-really-long-meeting-code-that-keeps-going-and-going")
+      sign_in(poster)
+      page.driver.resize(390, 800)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("Sam proposed this")
+      form_bottom = page.evaluate_script("document.querySelector('form').getBoundingClientRect().bottom")
+      list_top = page.evaluate_script("[...document.querySelectorAll('h2')].find((h) => h.textContent === 'Upcoming').getBoundingClientRect().top")
+      expect(list_top).to be > form_bottom
+      expect(page.evaluate_script("document.documentElement.scrollWidth - window.innerWidth")).to be <= 0
+    end
+
+    it "stays readable, cancelled, and takes no proposals once the partnership ends" do
+      create(:session, partnership:, proposed_by: partner)
+      partnership.end!(by: partner)
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("Cancelled when the partnership ended")
+      expect(page).not_to have_button("Propose session")
+      expect(page).not_to have_button("Confirm")
+
+      visit partner_path(partnership)
+      expect(page).not_to have_link("Propose a session")
+    end
+  end
+
   describe "resources" do
     let!(:partnership) { offer.accept_proposal!(by: poster) }
 

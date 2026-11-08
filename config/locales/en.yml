@@ -31,6 +31,10 @@ en:
   hello: "Hello world"
   activerecord:
     attributes:
+      session:
+        start_at: "Start"
+        end_at: "Length"
+        call_link: "Call link"
       shared_link:
         url: "Link"
         note: "Note"

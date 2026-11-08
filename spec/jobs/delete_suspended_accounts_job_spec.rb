@@ -13,7 +13,9 @@ RSpec.describe DeleteSuspendedAccountsJob, type: :job do
     their_offer = create(:offer, offerer: user)
     offer_on_their_search = create(:offer, pair_request: search)
     window = create(:availability_window, user:)
-    create(:session, sessionable: search).participations.create!(participant: user, role: Participation::ROLE_INITIATOR)
+    offer_on_their_search.post_message(user, "Hi")
+    offer_on_their_search.propose_partnership!(by: user)
+    session = create(:session, partnership: offer_on_their_search.accept_proposal!(by: offer_on_their_search.offerer), proposed_by: user)
     user.activities.create!(title: "Hi", content: "There")
     poster_of_their_offer = their_offer.pair_request
 
@@ -24,7 +26,7 @@ RSpec.describe DeleteSuspendedAccountsJob, type: :job do
     expect(Offer.exists?(their_offer.id)).to be(false)
     expect(Offer.exists?(offer_on_their_search.id)).to be(false)
     expect(AvailabilityWindow.exists?(window.id)).to be(false)
-    expect(Participation.where(participant_id: user.id)).to be_empty
+    expect(Session.exists?(session.id)).to be(false)
     expect(Activity.where(receiver_id: user.id)).to be_empty
     expect(PairRequest.exists?(poster_of_their_offer.id)).to be(true)
   end

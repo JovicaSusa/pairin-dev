@@ -22,9 +22,7 @@ class User < ApplicationRecord
   belongs_to :signup_pair_request, class_name: "PairRequest", optional: true
   has_many :pair_requests, dependent: :destroy
   has_many :offers, foreign_key: :offerer_id, dependent: :destroy
-  has_many :participations, foreign_key: :participant_id, dependent: :destroy
   has_many :activities, foreign_key: :receiver_id, dependent: :destroy, inverse_of: :receiver
-  has_many :sessions, through: :participations, source: :participable, source_type: Session.name
   has_many :availability_windows, dependent: :destroy
   has_many :check_ins, dependent: :destroy
   has_many :blocks_made, class_name: "Block", foreign_key: :blocker_id, dependent: :destroy, inverse_of: :blocker

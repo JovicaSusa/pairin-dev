@@ -7,6 +7,7 @@ class Partnership < ApplicationRecord
   belongs_to :pair_request
   belongs_to :ended_by, class_name: "User", optional: true
   has_many :check_ins, dependent: :destroy
+  has_many :sessions, dependent: :destroy
   has_many :shared_links, dependent: :destroy
 
   GOAL_MAX_LENGTH = 500
@@ -29,14 +30,20 @@ class Partnership < ApplicationRecord
     ended_at? || offer.ended?
   end
 
-  # Ending it ends the chat too, and the search stays Off. The record stays for
-  # metrics. The other person hears only that it ended, even after a block, and
-  # the reason stays private. Returns false if it had already ended.
+  # Ending it ends the chat too, cancels the sessions still ahead, and the
+  # search stays Off. The record stays for metrics. The other person hears only
+  # that it ended, even after a block, and the reason stays private. Returns
+  # false if it had already ended.
   def end!(by:, reason: nil)
     ended = offer.with_lock do
       next false if ended_at?
 
       update_columns(ended_at: Time.current, ended_by_id: by.id, end_reason: reason.presence)
+      # Quietly: the partnership-ended email already says it all. Only sessions
+      # that haven't started: one already under way stays as it was, since it
+      # may well be happening. update_all skips Session callbacks on purpose.
+      sessions.where(status: %w[proposed confirmed], start_at: Time.current..)
+        .update_all(status: "cancelled", cancelled_by_id: nil, updated_at: Time.current)
       offer.not_a_match!(by:)
       true
     end

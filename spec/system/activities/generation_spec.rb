@@ -61,7 +61,6 @@ RSpec.describe "generates expected activites", type: :system do
     it "displays expected activities" do
       visit activities_path
 
-      expect(page).not_to have_one_of_the_texts(I18n.t("activities.session_scheduled.titles"))
       expect(page).to have_one_of_the_texts(I18n.t("activities.offer_accepted.titles"))
       expect(page).to have_one_of_the_texts(I18n.t("activities.offer_accepted.content"))
     end

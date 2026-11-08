@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_11_06_090000) do
+ActiveRecord::Schema[7.1].define(version: 2026_11_08_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "plpgsql"
@@ -112,15 +112,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_090000) do
     t.index ["user_id"], name: "index_pair_requests_on_user_id"
   end
 
-  create_table "participations", force: :cascade do |t|
-    t.string "participable_type", null: false
-    t.bigint "participable_id", null: false
-    t.bigint "participant_id", null: false
-    t.string "role", null: false
-    t.index ["participable_type", "participable_id"], name: "index_participations_on_participable"
-    t.index ["participant_id"], name: "index_participations_on_participant_id"
-  end
-
   create_table "partnerships", force: :cascade do |t|
     t.bigint "offer_id", null: false
     t.bigint "pair_request_id", null: false
@@ -146,14 +137,19 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_090000) do
   end
 
   create_table "sessions", force: :cascade do |t|
-    t.string "sessionable_type", null: false
-    t.bigint "sessionable_id", null: false
     t.datetime "start_at", null: false
     t.datetime "end_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "call_link"
-    t.index ["sessionable_type", "sessionable_id"], name: "index_sessions_on_sessionable"
+    t.bigint "partnership_id", null: false
+    t.bigint "proposed_by_id", null: false
+    t.string "status", default: "proposed", null: false
+    t.bigint "cancelled_by_id"
+    t.index ["cancelled_by_id"], name: "index_sessions_on_cancelled_by_id"
+    t.index ["partnership_id", "start_at"], name: "index_sessions_on_partnership_id_and_start_at"
+    t.index ["partnership_id"], name: "index_sessions_on_partnership_id"
+    t.index ["proposed_by_id"], name: "index_sessions_on_proposed_by_id"
   end
 
   create_table "shared_links", force: :cascade do |t|
@@ -240,7 +236,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_11_06_090000) do
   add_foreign_key "offers", "pair_requests"
   add_foreign_key "offers", "users", column: "offerer_id"
   add_foreign_key "pair_requests", "users"
-  add_foreign_key "participations", "users", column: "participant_id"
+  add_foreign_key "sessions", "partnerships"
+  add_foreign_key "sessions", "users", column: "cancelled_by_id"
+  add_foreign_key "sessions", "users", column: "proposed_by_id"
   add_foreign_key "shared_links", "partnerships"
   add_foreign_key "shared_links", "users", column: "added_by_id"
   add_foreign_key "taggings", "tags"
