@@ -19,15 +19,20 @@ RSpec.describe User, type: :model do
       expect(other.reload.pair_requests.count).to eq(2)
     end
 
-    it "works for a conversation they ended, a block and an old session" do
+    it "works for a conversation they ended, a block and a session they proposed" do
       offer = create(:offer, pair_request: create(:pair_request, user:), offerer: other)
       offer.not_a_match!(by: user)
       user.block!(other)
-      create(:session, sessionable: user.pair_requests.first).participations.create!(participant: user, role: Participation::ROLE_INITIATOR)
+      third = create(:user)
+      partnership_offer = create(:offer, pair_request: create(:pair_request, user: third), offerer: user)
+      partnership_offer.post_message(third, "Hi")
+      partnership_offer.propose_partnership!(by: user)
+      session = create(:session, partnership: partnership_offer.accept_proposal!(by: third), proposed_by: user)
       user.activities.create!(title: "Hi", content: "There")
 
       expect { user.destroy! }.to change(User, :count).by(-1)
       expect(Block.count).to eq(0)
+      expect(Session.exists?(session.id)).to be(false)
     end
 
     it "also clears the other side of a conversation that person ended" do

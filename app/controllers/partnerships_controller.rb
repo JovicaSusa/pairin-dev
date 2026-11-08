@@ -1,6 +1,7 @@
 # A Workspace: the page two partners share. Only those two can open it.
 class PartnershipsController < ApplicationController
   include Authenticated
+  include WorkspacePages
 
   LAST_MESSAGE_LENGTH = 140
 
@@ -38,6 +39,7 @@ class PartnershipsController < ApplicationController
         your_commitment: partnership.commitment_of(current_user),
         partner_commitment: partnership.commitment_of(offer.other_person(current_user)),
         unread: offer.unread_messages_for(current_user).count,
+        sessions: sessions_summary(partnership),
         last_message: last_message && {
           body: last_message.body.truncate(LAST_MESSAGE_LENGTH),
           mine: last_message.sender_id == current_user.id
@@ -82,24 +84,21 @@ class PartnershipsController < ApplicationController
 
   private
 
-  # What every Workspace page shows in its header.
-  def workspace(partnership)
-    offer = partnership.offer
+  def sessions_summary(partnership)
+    sessions = partnership.sessions
+    upcoming = sessions.where(start_at: Time.current..)
+    next_session = upcoming.confirmed.order(:start_at, :id).first
 
     {
-      id: partnership.id,
-      goal: partnership.goal,
-      ended: partnership.ended?,
-      ended_by_viewer: partnership.ended_by_id == current_user.id,
-      conversation: {
-        id: offer.id,
-        other: offer.other_person(current_user).profile_for_others.slice(:name, :image_url),
-        search: { subject: offer.pair_request.subject }
+      timezone: current_user.timezone,
+      done: sessions.confirmed.where(end_at: ...Time.current).count,
+      confirmed_ahead: upcoming.confirmed.count,
+      waiting_on_you: upcoming.proposed.where.not(proposed_by: current_user).count,
+      next: next_session && {
+        start_at: next_session.start_at.utc.iso8601,
+        end_at: next_session.end_at.utc.iso8601,
+        call_link: next_session.call_link
       }
     }
-  end
-
-  def partnerships
-    Partnership.involving(current_user)
   end
 end

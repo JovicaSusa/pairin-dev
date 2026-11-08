@@ -10,7 +10,6 @@ class PairRequest < ApplicationRecord
   has_one :accepted_offer, -> { accepted }, class_name: "Offer"
   # History only: requests used to own their time slots.
   has_many :periods, as: :periodable, dependent: :destroy, inverse_of: :periodable
-  has_many :sessions, as: :sessionable
   has_many :taggings, as: :taggable, dependent: :destroy
   has_many :tags, through: :taggings
 
@@ -36,7 +35,6 @@ class PairRequest < ApplicationRecord
   accepts_nested_attributes_for :taggings,
     reject_if: ->(attrs) { attrs["tag_attributes"].blank? || attrs["tag_attributes"]["name"].blank? },
     allow_destroy: true
-  accepts_nested_attributes_for :sessions, reject_if: :new_record?
 
   class << self
     def ransackable_associations(auth_object=nil)

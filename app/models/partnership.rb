@@ -7,6 +7,7 @@ class Partnership < ApplicationRecord
   belongs_to :pair_request
   belongs_to :ended_by, class_name: "User", optional: true
   has_many :check_ins, dependent: :destroy
+  has_many :sessions, dependent: :destroy
 
   GOAL_MAX_LENGTH = 500
   CHECK_IN_EVERY = 1.week
