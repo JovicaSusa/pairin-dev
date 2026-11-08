@@ -159,6 +159,9 @@ RSpec.describe Session do
       done.update_columns(start_at: 2.days.ago, end_at: 2.days.ago + 1.hour)
       declined = create(:session, partnership:, proposed_by: proposer, start_at: 5.days.from_now.change(min: 0))
       declined.decline!(by: other)
+      under_way = create(:session, partnership:, proposed_by: proposer, start_at: 6.days.from_now.change(min: 0))
+      under_way.confirm!(by: other)
+      under_way.update_columns(start_at: 10.minutes.ago, end_at: 50.minutes.from_now)
 
       partnership.end!(by: other)
 
@@ -166,6 +169,8 @@ RSpec.describe Session do
       expect(confirmed.reload).to have_attributes(status: "cancelled", cancelled_by: nil)
       expect(done.reload).to be_confirmed
       expect(declined.reload).to be_declined
+      # Already started, so it may well be happening: left as it was.
+      expect(under_way.reload).to be_confirmed
     end
   end
 end

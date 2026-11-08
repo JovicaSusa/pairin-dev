@@ -207,6 +207,28 @@ RSpec.describe "Workspace sessions", type: :request do
       mail.html_part ? mail.html_part.body.to_s : mail.body.to_s
     end
 
+    it "doesn't send an email about a change that has since been undone" do
+      sign_in(partner)
+      patch confirm_partner_session_path(partnership, session)
+      patch cancel_partner_session_path(partnership, session)
+
+      perform_enqueued_jobs
+
+      # The confirmation (with its call link) would describe a session that's
+      # now cancelled, so only the cancellation goes out.
+      expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(["Sam cancelled the session on Mon 4 Mar"])
+    end
+
+    it "doesn't send a confirmation once the partnership has ended" do
+      sign_in(partner)
+      patch confirm_partner_session_path(partnership, session)
+      partnership.end!(by: poster)
+
+      perform_enqueued_jobs
+
+      expect(ActionMailer::Base.deliveries.map(&:subject)).not_to include(a_string_including("confirmed"))
+    end
+
     it "lets the partner confirm, emails the proposer the time in their timezone, and signals them" do
       sign_in(partner)
 

@@ -68,11 +68,12 @@ class Partners::SessionsController < ApplicationController
 
   # Says so, rather than erroring, when the other partner got there first or
   # the session has started.
+  # (`planned`, not `session`, which would hide Rails' own session here.)
   def change(transition, email)
-    session = @partnership.sessions.find(params[:id])
+    planned = @partnership.sessions.find(params[:id])
 
-    if session.public_send(transition, by: current_user)
-      SessionMailer.with(session:, by: current_user).public_send(email).deliver_later
+    if planned.public_send(transition, by: current_user)
+      SessionMailer.with(session: planned, by: current_user).public_send(email).deliver_later
       ConversationsChannel.notify(@partnership.offer)
       redirect_back_or_to partner_sessions_path(@partnership)
     else
