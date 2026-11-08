@@ -65,7 +65,7 @@ RSpec.describe "Calendar files for sessions", type: :request do
       expect(response.media_type).to eq("text/calendar")
       expect(response.headers["Content-Disposition"]).to include("attachment", "pairin-session-2030-03-04.ics")
       expect(response.body).to include("METHOD:PUBLISH", "DTSTART:20300304T173000Z", "SUMMARY:Pairin session with Maya", "LOCATION:https://meet.google.com/x")
-      expect(response.body).not_to include("mailto:")
+      expect(response.body).not_to include("maya@example.com", "sam@example.com", "ATTENDEE")
     end
 
     it "isn't there for a session that isn't confirmed" do

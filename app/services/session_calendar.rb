@@ -8,8 +8,6 @@
 #
 # Only the recipient's own address is ever in the file, never the partner's.
 class SessionCalendar
-  include Rails.application.routes.url_helpers
-
   PRODID = "-//Pairin//Sessions//EN".freeze
   MAX_OCTETS = 75
 
@@ -19,17 +17,20 @@ class SessionCalendar
     @partner = session.partnership.offer.other_person(for_user)
   end
 
-  def download = calendar("PUBLISH")
-  def invitation = calendar("REQUEST", status: "CONFIRMED", sequence: 0, addressed: true)
-  def cancellation = calendar("CANCEL", status: "CANCELLED", sequence: 1, addressed: true)
+  # Every form has Pairin as the organizer: iTIP requires it on PUBLISH, and it
+  # helps a calendar match a later CANCEL to the downloaded entry. A session is
+  # never edited in place (a new time is a new session), so the confirmed event
+  # is always sequence 0 and its cancellation 1; rescheduling would need a
+  # stored revision instead.
+  def download = calendar("PUBLISH", sequence: 0)
+  def invitation = calendar("REQUEST", status: "CONFIRMED", sequence: 0, attendee: true)
+  def cancellation = calendar("CANCEL", status: "CANCELLED", sequence: 1, attendee: true)
 
-  def filename = "pairin-session-#{@session.start_at.utc.strftime('%Y-%m-%d')}.ics"
+  def filename = "pairin-session-#{@session.start_at.getutc.strftime('%Y-%m-%d')}.ics"
 
   private
 
-  def default_url_options = Rails.application.config.action_mailer.default_url_options
-
-  def calendar(method, status: nil, sequence: nil, addressed: false)
+  def calendar(method, sequence:, status: nil, attendee: false)
     lines = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -46,8 +47,9 @@ class SessionCalendar
       "DESCRIPTION:#{text(description)}",
       "URL:#{workspace_url}",
       ("STATUS:#{status}" if status),
-      ("SEQUENCE:#{sequence}" if sequence),
-      *(addressed ? addresses : []),
+      "SEQUENCE:#{sequence}",
+      "ORGANIZER;CN=Pairin:mailto:#{organizer_email}",
+      (attendee_line if attendee),
       "END:VEVENT",
       "END:VCALENDAR"
     ].compact
@@ -59,27 +61,30 @@ class SessionCalendar
     [("Call link: #{@session.call_link}" if @session.call_link), "Workspace: #{workspace_url}"].compact.join("\n")
   end
 
-  def workspace_url = partner_sessions_url(@session.partnership)
+  def workspace_url
+    Rails.application.routes.url_helpers.partner_sessions_url(@session.partnership, **Rails.application.config.action_mailer.default_url_options)
+  end
 
-  def addresses
-    [
-      "ORGANIZER;CN=Pairin:mailto:#{organizer_email}",
-      "ATTENDEE;CN=#{param(@user.display_name)};ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED:mailto:#{@user.email}"
-    ]
+  # Only the recipient. Already agreed, so ACCEPTED and RSVP=FALSE: no Yes/No
+  # buttons whose replies would go to a mailbox nobody reads.
+  def attendee_line
+    "ATTENDEE;CN=#{param(@user.display_name)};ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=FALSE:mailto:#{@user.email}"
   end
 
   def organizer_email = Mail::Address.new(ApplicationMailer.default[:from]).address
 
-  def utc(time) = time.utc.strftime("%Y%m%dT%H%M%SZ")
+  def utc(time) = time.getutc.strftime("%Y%m%dT%H%M%SZ")
 
-  # TEXT values: backslash, semicolon, comma and newline are escaped (§3.3.11).
+  # TEXT values: backslash, semicolon, comma and newline are escaped (§3.3.11);
+  # other control characters are dropped.
   def text(value)
-    value.to_s.gsub("\\", "\\\\\\\\").gsub(";", "\\;").gsub(",", "\\,").gsub(/\r?\n/, "\\n")
+    value.to_s.gsub("\\", "\\\\\\\\").gsub(";", "\\;").gsub(",", "\\,").gsub(/\r?\n/, "\\n").gsub(/\p{Cntrl}/, "")
   end
 
-  # Parameter values with , ; or : must be quoted, and can't contain quotes (§3.2).
+  # Parameter values with , ; or : must be quoted, and can't contain quotes or
+  # control characters (§3.2), which could otherwise start a new line.
   def param(value)
-    value = value.to_s.delete('"')
+    value = value.to_s.gsub(/["\p{Cntrl}]/, "")
     value.match?(/[,;:]/) ? %("#{value}") : value
   end
 

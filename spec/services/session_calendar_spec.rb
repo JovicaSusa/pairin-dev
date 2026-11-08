@@ -40,7 +40,7 @@ RSpec.describe SessionCalendar do
     end
 
     it "names the partner from this person's side, with the call link and a link back to the Workspace" do
-      workspace = "http://localhost:3000/partners/#{partnership.id}/sessions"
+      workspace = Rails.application.routes.url_helpers.partner_sessions_url(partnership, **Rails.application.config.action_mailer.default_url_options)
 
       expect(fields(file)).to include(
         "SUMMARY" => "Pairin session with Sam O'Neil",
@@ -63,8 +63,10 @@ RSpec.describe SessionCalendar do
       expect(fields(file)["DESCRIPTION"]).not_to include("Call link")
     end
 
-    it "lists nobody's email address" do
-      expect(file).not_to include("maya@example.com", "sam@example.com", "ATTENDEE", "ORGANIZER")
+    it "lists neither partner's email address, only Pairin as the organizer, so a later cancellation can match it" do
+      expect(file).not_to include("maya@example.com", "sam@example.com", "ATTENDEE")
+      expect(file).to include("ORGANIZER;CN=Pairin:mailto:info@pairin.dev")
+      expect(fields(file)["SEQUENCE"]).to eq("0")
     end
 
     it "escapes commas, semicolons, backslashes and newlines in text" do
@@ -72,6 +74,18 @@ RSpec.describe SessionCalendar do
       partner_file = ics(:download)
 
       expect(fields(partner_file)["SUMMARY"]).to eq("Pairin session with Sam\\; the\\, \\\\ coder")
+      # The two description lines are joined by an escaped newline, not a real one.
+      expect(fields(partner_file)["DESCRIPTION"]).to match(/Call link: \S+\\nWorkspace: /)
+    end
+
+    it "folds long lines without splitting a character, and unfolds back to the original" do
+      long_link = "https://meet.google.com/#{'zoë-' * 30}end"
+      session.update_columns(call_link: long_link)
+      file = ics(:download)
+
+      expect(file.split("\r\n").map(&:bytesize).max).to be <= 75
+      expect(file.split("\r\n")).to all(be_valid_encoding)
+      expect(fields(file)["LOCATION"]).to eq(long_link)
     end
   end
 
@@ -81,8 +95,17 @@ RSpec.describe SessionCalendar do
 
       expect(fields(file)).to include("METHOD" => "REQUEST", "STATUS" => "CONFIRMED", "SEQUENCE" => "0")
       expect(file).to include("ORGANIZER;CN=Pairin:mailto:info@pairin.dev")
-      expect(file.gsub("\r\n ", "")).to include("ATTENDEE;CN=Maya;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED:mailto:maya@example.com")
+      # Already agreed, so no Yes/No buttons that would reply to an unread mailbox.
+      expect(file.gsub("\r\n ", "")).to include("ATTENDEE;CN=Maya;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=FALSE:mailto:maya@example.com")
       expect(file).not_to include("sam@example.com")
+    end
+
+    it "quotes a name with commas, colons or semicolons, and drops quotes and control characters" do
+      poster.update_columns(name: "Maya \"M\": Lee,\r\nX-INJECTED:1")
+      file = ics(:invitation).gsub("\r\n ", "")
+
+      expect(file).to include('ATTENDEE;CN="Maya M: Lee,X-INJECTED:1";ROLE=')
+      expect(file.split("\r\n")).not_to include(a_string_starting_with("X-INJECTED"))
     end
   end
 
