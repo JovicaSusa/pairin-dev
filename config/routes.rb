@@ -62,6 +62,7 @@ Rails.application.routes.draw do
         patch :decline
         patch :withdraw
         patch :cancel
+        get :calendar
       end
     end
     resources :resources, only: [:index, :create, :destroy], controller: "partners/resources"

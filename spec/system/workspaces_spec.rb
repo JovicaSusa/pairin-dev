@@ -348,6 +348,18 @@ RSpec.describe "workspaces", type: :system do
         expect(page).to have_content("Did it happen? We've emailed you both to ask")
       end
     end
+
+    it "offers Add to calendar on a confirmed upcoming session only" do
+      confirmed = create(:session, partnership:, proposed_by: poster, status: "confirmed", start_at: 3.days.from_now.change(min: 0))
+      create(:session, partnership:, proposed_by: poster, start_at: 4.days.from_now.change(min: 0))
+      sign_in(partner)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_link("Add to calendar", count: 1)
+      link = find_link("Add to calendar")
+      expect(link[:href]).to end_with(calendar_partner_session_path(partnership, confirmed))
+      expect(link[:download]).not_to be_nil
+    end
   end
 
   describe "resources" do
