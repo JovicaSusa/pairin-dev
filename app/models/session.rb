@@ -67,10 +67,16 @@ class Session < ApplicationRecord
   def confirm!(by:) = answer!(by:, status: "confirmed")
   def decline!(by:) = answer!(by:, status: "declined")
 
+  # What a successful cancel! called off: "proposed" (a withdrawal) or
+  # "confirmed". Read under the lock, so a confirm that lands just before a
+  # withdrawal is reported as the cancel it became.
+  attr_reader :cancelled_from
+
   # The proposer withdraws a proposal, or either partner calls off a confirmed
   # session, as long as it hasn't started.
   def cancel!(by:)
     change!(by:, status: "cancelled", cancelled_by: by) do
+      @cancelled_from = status
       (proposed? && by == proposed_by) || confirmed?
     end
   end

@@ -141,6 +141,18 @@ RSpec.describe Session do
         expect(session.reload).to be_confirmed
       end
 
+      it "remembers what it cancelled, read under the lock" do
+        stale = described_class.find(session.id)
+        session.confirm!(by: other)
+
+        expect(stale.cancel!(by: proposer)).to be(true)
+        expect(stale.cancelled_from).to eq("confirmed")
+
+        withdrawn = create(:session, partnership:, proposed_by: proposer)
+        withdrawn.cancel!(by: proposer)
+        expect(withdrawn.cancelled_from).to eq("proposed")
+      end
+
       it "can't cancel a declined session" do
         session.decline!(by: other)
 

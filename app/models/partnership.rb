@@ -40,6 +40,9 @@ class Partnership < ApplicationRecord
       update_columns(ended_at: Time.current, ended_by_id: by.id, end_reason: reason.presence)
       offer.not_a_match!(by:)
       # Nobody in particular called these off, and nobody is emailed about them.
+      # Only sessions that haven't started: one already under way stays as it
+      # was, since it may well be happening. update_all skips Session's
+      # callbacks and validations on purpose; it only changes the status.
       sessions.where(status: %w[proposed confirmed], start_at: Time.current..).update_all(status: "cancelled", updated_at: Time.current)
       true
     end

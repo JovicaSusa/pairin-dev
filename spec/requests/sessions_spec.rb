@@ -142,7 +142,7 @@ RSpec.describe "Workspace sessions", type: :request do
       perform_enqueued_jobs { post cancel_partner_session_path(partnership, session) }
 
       expect(session.reload).to have_attributes(status: "cancelled", cancelled_by: partner)
-      expect(ActionMailer::Base.deliveries.last).to have_attributes(to: ["maya@example.com"], subject: "Sam cancelled your session on Mon 4 Mar")
+      expect(ActionMailer::Base.deliveries.last).to have_attributes(to: ["maya@example.com"], subject: "Sam cancelled the session on Mon 4 Mar")
     end
 
     it "refuses an answer that isn't allowed, without emailing anyone" do

@@ -6,7 +6,7 @@ class SessionMailer < ApplicationMailer
     "confirmed" => "confirmed your session",
     "declined" => "declined your session",
     "withdrawn" => "withdrew the session",
-    "cancelled" => "cancelled your session"
+    "cancelled" => "cancelled the session"
   }.freeze
 
   before_action :set_session

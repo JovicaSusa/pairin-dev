@@ -50,18 +50,19 @@ class Partners::SessionsController < ApplicationController
   end
 
   def confirm
-    change_session("confirmed") { @session.confirm!(by: current_user) }
+    change_session { @session.confirm!(by: current_user) && "confirmed" }
   end
 
   def decline
-    change_session("declined") { @session.decline!(by: current_user) }
+    change_session { @session.decline!(by: current_user) && "declined" }
   end
 
   # Withdrawing a proposal and calling off a confirmed session read
-  # differently in the email.
+  # differently in the email, so ask the model which one it was.
   def cancel
-    change = @session.proposed? ? "withdrawn" : "cancelled"
-    change_session(change) { @session.cancel!(by: current_user) }
+    change_session do
+      @session.cancel!(by: current_user) && (@session.cancelled_from == "proposed" ? "withdrawn" : "cancelled")
+    end
   end
 
   private
@@ -74,10 +75,10 @@ class Partners::SessionsController < ApplicationController
     @session = @partnership.sessions.find(params[:id])
   end
 
-  # The model decides who may make each change; anything else is refused
-  # without emailing anyone.
-  def change_session(change)
-    if yield
+  # The block makes the change and returns what happened (a SessionMailer
+  # change), or false when the model refused it. A refusal emails nobody.
+  def change_session
+    if (change = yield)
       SessionMailer.with(session: @session, by: current_user, change:).changed_email.deliver_later
       ConversationsChannel.notify(@partnership.offer)
       redirect_to partner_sessions_path(@partnership)
