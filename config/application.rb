@@ -21,7 +21,13 @@ Bundler.require(*Rails.groups)
 module Pairin
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 7.2
+
+    # Queue jobs straight away, even inside a transaction, as before 7.2. Some
+    # code relies on it: Session#ask_whether_it_happened creates the answer row
+    # and queues its email together, so a failed enqueue rolls the row back and
+    # the next run asks again.
+    config.active_job.enqueue_after_transaction_commit = :never
 
     # Where chat reports go. They contain private messages.
     config.x.reports_email = "reports@pairin.dev"
