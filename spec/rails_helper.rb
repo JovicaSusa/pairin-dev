@@ -36,6 +36,10 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
 
+  # Rails 8 draws routes lazily in tests, and Devise 4.9 only knows the User
+  # mapping once they're drawn. Mailer specs never make a request, so draw them.
+  config.before(:suite) { Rails.application.reload_routes_unless_loaded }
+
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::ControllerHelpers, type: :view
 
