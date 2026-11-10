@@ -2,7 +2,7 @@
 class DateOfBirthsController < ApplicationController
   include Authenticated
 
-  skip_before_action :require_date_of_birth
+  skip_before_action :require_date_of_birth, :require_name
   before_action :redirect_if_answered
 
   def show

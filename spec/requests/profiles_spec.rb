@@ -22,6 +22,21 @@ RSpec.describe "Profiles", type: :request do
       expect(session[:inertia_errors]).to include(:country)
     end
 
+    it "refuses an About over #{User::ABOUT_MAX} characters, the same cap as onboarding" do
+      patch profile_path(user), params: { about: "a" * (User::ABOUT_MAX + 1) }
+
+      expect(user.reload.about).not_to eq("a" * (User::ABOUT_MAX + 1))
+      expect(session[:inertia_errors]).to include(:about)
+    end
+
+    it "still saves other fields when an older About is over the cap" do
+      user.update_columns(about: "a" * (User::ABOUT_MAX + 1))
+
+      patch profile_path(user), params: { name: "Ada" }
+
+      expect(user.reload.name).to eq("Ada")
+    end
+
     it "saves a GitHub link" do
       patch profile_path(user), params: { github_url: "https://github.com/ada" }
 

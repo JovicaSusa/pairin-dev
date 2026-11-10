@@ -36,7 +36,7 @@ RSpec.describe "generates expected activites", type: :system do
       fill_in "What do you want to get out of this?", with: "Finish a course"
       select_option!("How often can you pair?", "Twice a week")
       select_option!("How long can you commit?", "A few weeks")
-      fill_in "Your message to the poster", with: "Let's hack!"
+      fill_in "Your message to #{pair_request.user.name}", with: "Let's hack!"
 
       perform_enqueued_jobs do
         click_button "Send application"

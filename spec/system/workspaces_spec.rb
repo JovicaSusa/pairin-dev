@@ -334,6 +334,20 @@ RSpec.describe "workspaces", type: :system do
       expect(page).to have_content(/You're usually free: Mon \d+ \w+ 08:00–09:00/)
     end
 
+    it "adds a confirmed session to Google, Outlook or another calendar from one menu" do
+      confirmed = create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30))
+      confirmed.confirm!(by: partner)
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).not_to have_link("Google Calendar")
+      click_button "Add to calendar"
+
+      expect(page).to have_link("Google Calendar", href: /\Ahttps:\/\/calendar\.google\.com\/calendar\/render\?action=TEMPLATE/)
+      expect(page).to have_link("Outlook", href: /\Ahttps:\/\/outlook\.live\.com\/calendar\/0\/deeplink\/compose\?path=/)
+      expect(page).to have_link("Apple / other (.ics)", href: calendar_partner_session_path(partnership, confirmed))
+    end
+
     it "offers 15 minutes as the shortest length" do
       sign_in(poster)
       visit partner_sessions_path(partnership)
@@ -457,8 +471,9 @@ RSpec.describe "workspaces", type: :system do
       sign_in(partner)
       visit partner_sessions_path(partnership)
 
-      expect(page).to have_link("Add to calendar", count: 1)
-      link = find_link("Add to calendar")
+      expect(page).to have_button("Add to calendar", count: 1)
+      click_button "Add to calendar"
+      link = find_link("Apple / other (.ics)")
       expect(link[:href]).to end_with(calendar_partner_session_path(partnership, confirmed))
       expect(link[:download]).not_to be_nil
     end

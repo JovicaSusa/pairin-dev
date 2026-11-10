@@ -118,4 +118,50 @@ RSpec.describe SessionCalendar do
       expect(file).to include("ORGANIZER;CN=Pairin:mailto:info@pairin.dev")
     end
   end
+
+  describe "the Google and Outlook links" do
+    def query(url) = Rack::Utils.parse_query(URI(url).query)
+
+    it "opens Google Calendar with the event filled in, named from the viewer's side" do
+      url = described_class.new(session, for_user: poster).google_url
+
+      expect(url).to start_with("https://calendar.google.com/calendar/render?")
+      expect(query(url)).to include(
+        "action" => "TEMPLATE",
+        "text" => "Pairin session with Sam O'Neil",
+        "dates" => "20300304T173000Z/20300304T190000Z",
+        "location" => "https://meet.google.com/abc-defg-hij"
+      )
+      expect(query(url)["details"]).to include("Call link: https://meet.google.com/abc-defg-hij", "/partners/#{partnership.id}/sessions")
+    end
+
+    it "opens Outlook with the event filled in" do
+      url = described_class.new(session, for_user: partner).outlook_url
+
+      expect(url).to start_with("https://outlook.live.com/calendar/0/deeplink/compose?")
+      expect(query(url)).to include(
+        "path" => "/calendar/action/compose",
+        "rru" => "addevent",
+        "subject" => "Pairin session with Maya",
+        "startdt" => "2030-03-04T17:30:00Z",
+        "enddt" => "2030-03-04T19:00:00Z",
+        "location" => "https://meet.google.com/abc-defg-hij"
+      )
+    end
+
+    it "encodes spaces as %20 and escapes characters that would break the link" do
+      partner.update_columns(name: "Sam & Co #1")
+      url = described_class.new(session, for_user: poster).google_url
+
+      expect(url).not_to include("+", " ")
+      expect(query(url)["text"]).to eq("Pairin session with Sam & Co #1")
+    end
+
+    it "leaves out the location when there's no call link" do
+      session.update_columns(call_link: nil)
+
+      expect(query(described_class.new(session, for_user: poster).google_url)).not_to have_key("location")
+      expect(query(described_class.new(session, for_user: poster).outlook_url)).not_to have_key("location")
+    end
+  end
 end
