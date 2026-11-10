@@ -3,8 +3,8 @@
 # is turned into real UTC times day by day, which follows daylight saving.
 #
 # Suggestions are the start of each stretch where both are free in the next
-# week, around confirmed sessions, at least an hour away and long enough for
-# the session. The partner's hours also go further ahead, so the form can say
+# week, around the viewer's confirmed sessions, from an hour ahead and long
+# enough for the session. The partner's hours also go further ahead, so the form can say
 # when a proposal falls outside them. All times go out in UTC, so the page
 # shows them in the viewer's timezone and never reveals the partner's.
 class SessionTimes
@@ -24,8 +24,11 @@ class SessionTimes
   def suggestions(minutes)
     free = intersect(hours(@viewer, AHEAD), hours(@partner, AHEAD))
     subtract(free, busy)
-      .select { |from, to| from >= @now + NOTICE && to - from >= minutes.minutes }
-      .map(&:first)
+      .filter_map do |from, to|
+        # A stretch under way, or about to be, is offered from an hour ahead.
+        start = [from, earliest].max
+        start if to - start >= minutes.minutes
+      end
       .first(MAX_SUGGESTIONS)
   end
 
@@ -33,7 +36,9 @@ class SessionTimes
     {
       suggestions: Session::LENGTHS.index_with { |minutes| suggestions(minutes).map { iso(_1) } },
       my_hours: hours(@viewer, AHEAD).map { |range| range.map { iso(_1) } },
-      partner_hours: hours(@partner, HOURS_AHEAD).map { |range| range.map { iso(_1) } }
+      # An under-18's hours would hint at their timezone, which their partner
+      # isn't shown; the suggestions still use them.
+      partner_hours: (hours(@partner, HOURS_AHEAD).map { |range| range.map { iso(_1) } } unless @partner.minor?)
     }
   end
 
@@ -98,8 +103,21 @@ class SessionTimes
     end
   end
 
+  # On the quarter hour, an hour from now.
+  def earliest
+    @earliest ||= begin
+      soonest = @now + NOTICE
+      quarter = 15.minutes.to_i
+      Time.at((soonest.to_i + quarter - 1) / quarter * quarter).utc
+    end
+  end
+
+  # The viewer's confirmed sessions in every partnership, so a suggestion
+  # never double-books them. (The partner's other sessions aren't theirs to see.)
   def busy
-    @partnership.sessions.confirmed.where(end_at: @now..).pluck(:start_at, :end_at).map { |from, to| [from.utc, to.utc] }
+    @busy ||= Session.confirmed.where(end_at: @now..)
+      .where(partnership: Partnership.involving(@viewer))
+      .pluck(:start_at, :end_at).map { |from, to| [from.utc, to.utc] }
   end
 
   def iso(time) = time.utc.iso8601

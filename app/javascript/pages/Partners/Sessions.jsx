@@ -47,7 +47,10 @@ function hoursText(hours, timeZone) {
 // chosen time is outside the partner's. Only ever a hint: any time can be
 // proposed (#261).
 function Availability({ availability, data, setData, timezone, name }) {
-  const { suggestions, my_hours: mine, partner_hours: theirs, hours_path: hoursPath } = availability;
+  const { suggestions, my_hours: mine, hours_path: hoursPath } = availability;
+  // null for an under-18 partner, whose hours aren't shown.
+  const hidden = availability.partner_hours === null;
+  const theirs = availability.partner_hours ?? [];
   const chips = suggestions[data.minutes] ?? [];
   const start = zonedTime(data.date, data.time, timezone);
   const end = start && new Date(start.getTime() + Number(data.minutes) * MINUTE);
@@ -81,10 +84,10 @@ function Availability({ availability, data, setData, timezone, name }) {
         </>
       ) : (
         <div className="text-xs text-black/65">
-          {mine.length > 0 && theirs.length > 0 && <p className="mb-1 font-bold">No shared hours in the next week that fit {lengthLabel(Number(data.minutes))}.</p>}
+          {mine.length > 0 && (theirs.length > 0 || hidden) && <p className="mb-1 font-bold">No shared hours in the next week that fit {lengthLabel(Number(data.minutes))}.</p>}
           {theirs.length > 0 && hoursText(theirs, timezone) && <p>{name} is usually free (your time): {hoursText(theirs, timezone)}</p>}
           {mine.length > 0 && hoursText(mine, timezone) && <p>You're usually free: {hoursText(mine, timezone)}</p>}
-          {theirs.length === 0 && <p>{name} hasn't added their usual hours yet.</p>}
+          {theirs.length === 0 && !hidden && <p>{name} hasn't added their usual hours yet.</p>}
         </div>
       )}
       {mine.length === 0 && (

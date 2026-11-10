@@ -49,9 +49,11 @@ RSpec.describe SessionTimes do
     window(me, 1, "18:00", "21:00")
     window(partner, 1, "13:00", "14:00")
 
-    # Today's is 30 minutes away, so the next is a week later (in EDT by then).
-    expect(suggested(15, at: Time.utc(2030, 3, 4, 17, 30))).to eq([Time.utc(2030, 3, 11, 17, 0)])
-    # And that one is just over a week away from here.
+    # Today's starts 30 minutes from now: what's left of it from an hour on is
+    # offered (on the quarter hour) if the session fits, then next week's (EDT by then).
+    expect(suggested(15, at: Time.utc(2030, 3, 4, 17, 25))).to eq([Time.utc(2030, 3, 4, 18, 30), Time.utc(2030, 3, 11, 17, 0)])
+    expect(suggested(60, at: Time.utc(2030, 3, 4, 17, 25))).to eq([Time.utc(2030, 3, 11, 17, 0)])
+    # And next week's is just over a week away from here.
     expect(suggested(15, at: Time.utc(2030, 3, 4, 16, 59))).to eq([Time.utc(2030, 3, 4, 18, 0)])
   end
 
@@ -63,6 +65,18 @@ RSpec.describe SessionTimes do
 
     expect(suggested(30)).to eq([Time.utc(2030, 3, 4, 18, 30)])
     expect(suggested(60)).to be_empty
+  end
+
+  it "works around the viewer's confirmed sessions with other partners too" do
+    window(me, 1, "18:00", "21:00")
+    window(partner, 1, "13:00", "14:00")
+    other = create(:offer, pair_request: create(:pair_request, user: me))
+    other.post_message(me, "Hi")
+    other.propose_partnership!(by: other.offerer)
+    elsewhere = other.accept_proposal!(by: me)
+    create(:session, partnership: elsewhere, proposed_by: me, status: "confirmed", start_at: Time.utc(2030, 3, 4, 18, 0), end_at: Time.utc(2030, 3, 4, 18, 30))
+
+    expect(suggested(30)).to eq([Time.utc(2030, 3, 4, 18, 30)])
   end
 
   it "gives at most six, soonest first" do
@@ -84,6 +98,15 @@ RSpec.describe SessionTimes do
   end
 
   describe "#to_props" do
+    it "leaves out an under-18 partner's hours, which would hint at where they are" do
+      partnership
+      partner.update_columns(date_of_birth: 17.years.ago.to_date)
+      window(partner, 1, "13:00", "14:00")
+
+      fresh = described_class.new(Partnership.find(partnership.id), viewer: me, now:)
+      expect(fresh.to_props[:partner_hours]).to be_nil
+    end
+
     it "has the suggestions for every length, and both people's hours, in UTC" do
       window(me, 1, "18:00", "20:00")
       window(me, 1, "20:00", "21:00")
