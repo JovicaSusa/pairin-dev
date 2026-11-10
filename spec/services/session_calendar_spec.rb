@@ -138,8 +138,10 @@ RSpec.describe SessionCalendar do
     it "opens Outlook with the event filled in" do
       url = described_class.new(session, for_user: partner).outlook_url
 
-      expect(url).to start_with("https://outlook.live.com/calendar/0/action/compose?")
+      expect(url).to start_with("https://outlook.live.com/calendar/0/deeplink/compose?")
       expect(query(url)).to include(
+        "path" => "/calendar/action/compose",
+        "rru" => "addevent",
         "subject" => "Pairin session with Maya",
         "startdt" => "2030-03-04T17:30:00Z",
         "enddt" => "2030-03-04T19:00:00Z",

@@ -106,7 +106,7 @@ RSpec.describe "Calendar files for sessions", type: :request do
       links = page["upcoming"].sole["calendar"]
       expect(links["download"]).to eq(calendar_partner_session_path(partnership, session))
       expect(links["google"]).to start_with("https://calendar.google.com/calendar/render?action=TEMPLATE")
-      expect(links["outlook"]).to start_with("https://outlook.live.com/calendar/0/action/compose?")
+      expect(links["outlook"]).to start_with("https://outlook.live.com/calendar/0/deeplink/compose?")
       expect(page["past"].sole["calendar"]).to be_nil
     end
   end

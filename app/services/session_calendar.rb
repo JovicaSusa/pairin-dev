@@ -38,9 +38,11 @@ class SessionCalendar
   end
 
   # Personal Outlook.com accounts; work and school ones live on outlook.office.com.
+  # The deeplink route with path and rru is the one that opens a prefilled
+  # event on desktop and mobile; action/compose alone is desktop only.
   def outlook_url
-    link("https://outlook.live.com/calendar/0/action/compose",
-         subject: title, startdt: @session.start_at.getutc.iso8601, enddt: @session.end_at.getutc.iso8601,
+    link("https://outlook.live.com/calendar/0/deeplink/compose",
+         path: "/calendar/action/compose", rru: "addevent", subject: title, startdt: @session.start_at.getutc.iso8601, enddt: @session.end_at.getutc.iso8601,
          body: description, location: @session.call_link)
   end
 

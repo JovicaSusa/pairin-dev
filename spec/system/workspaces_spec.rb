@@ -282,7 +282,7 @@ RSpec.describe "workspaces", type: :system do
       click_button "Add to calendar"
 
       expect(page).to have_link("Google Calendar", href: /\Ahttps:\/\/calendar\.google\.com\/calendar\/render\?action=TEMPLATE/)
-      expect(page).to have_link("Outlook", href: /\Ahttps:\/\/outlook\.live\.com\//)
+      expect(page).to have_link("Outlook", href: /\Ahttps:\/\/outlook\.live\.com\/calendar\/0\/deeplink\/compose\?path=/)
       expect(page).to have_link("Apple / other (.ics)", href: calendar_partner_session_path(partnership, confirmed))
     end
 
