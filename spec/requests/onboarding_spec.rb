@@ -124,6 +124,17 @@ RSpec.describe "Onboarding", type: :request do
       expect(user.reload.name).to be_nil
     end
 
+    it "keeps an earlier About when it's left out, and caps its length" do
+      user.update_columns(about: "Saved before")
+
+      save_profile(name: "Maya", level: "")
+      expect(user.reload.about).to eq("Saved before")
+
+      save_profile(name: "Maya", about: "x" * 1001)
+      expect(session[:inertia_errors]).to include(about: "Keep it to 1000 characters")
+      expect(user.reload.about).to eq("Saved before")
+    end
+
     it "keeps the profile when the search part is skipped" do
       save_profile(name: "Maya", about: "Hi")
       post skip_onboarding_path

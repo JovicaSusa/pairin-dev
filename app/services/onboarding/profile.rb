@@ -4,6 +4,7 @@ module Onboarding
   # part, so skipping that keeps these.
   class Profile
     NAME_MAX = 60
+    ABOUT_MAX = 1000
 
     Result = Data.define(:errors) do
       def success? = errors.empty?
@@ -22,6 +23,7 @@ module Onboarding
       errors = {}
       errors[:name] = self.class.name_error(name) if @params.key?(:name) && self.class.name_error(name)
       errors[:level] = "Choose one of the levels" if level && !User::LEVELS.include?(level)
+      errors[:about] = "Keep it to #{ABOUT_MAX} characters" if @params[:about].to_s.strip.length > ABOUT_MAX
       return Result.new(errors:) if errors.any?
 
       changes = { name: }.compact

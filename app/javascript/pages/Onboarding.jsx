@@ -228,7 +228,7 @@ export default function Onboarding({ tags, levels, commitments, weekdays, name, 
       body: (
         <div>
           <Label htmlFor="onboarding_about" className="mb-1 block">About you</Label>
-          <Textarea id="onboarding_about" rows={4} value={data.about} placeholder="Backend dev learning Go, usually free on weekday evenings" onChange={(e) => setData("about", e.target.value)} />
+          <Textarea id="onboarding_about" rows={4} maxLength={1000} value={data.about} placeholder="Backend dev learning Go, usually free on weekday evenings" onChange={(e) => setData("about", e.target.value)} />
         </div>
       ),
     },
@@ -293,7 +293,8 @@ export default function Onboarding({ tags, levels, commitments, weekdays, name, 
 
   const advance = ({ skipped = false } = {}) => {
     if (step === PROFILE_STEPS - 1) {
-      saveProfile({ name: data.name, level: data.level, about: skipped ? "" : data.about });
+      // Skipping leaves any About saved earlier as it is.
+      saveProfile(skipped ? { name: data.name, level: data.level } : { name: data.name, level: data.level, about: data.about });
     } else if (last) {
       post("/onboarding");
     } else {
