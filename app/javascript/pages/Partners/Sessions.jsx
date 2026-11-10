@@ -1,6 +1,6 @@
 import { router, useForm } from "@inertiajs/react";
-import { useState } from "react";
-import { CalendarPlus, Check, ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CalendarPlus, Check, ChevronDown, Video } from "lucide-react";
 import SessionTime, { isoDay, zoneLabel } from "@/components/SessionTime";
 import WorkspaceFrame from "@/components/WorkspaceFrame";
 import { Button } from "@/components/ui/button";
@@ -170,6 +170,35 @@ function SessionActions({ session, partnership }) {
   return null;
 }
 
+// From this long before the start, Join call becomes the main button (#259).
+const JOIN_SOON = 10 * 60 * 1000;
+
+// Re-renders every 30 seconds while mounted, so the button changes without a reload.
+function useNow() {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30 * 1000);
+    return () => clearInterval(timer);
+  }, []);
+  return now;
+}
+
+// Always there for a confirmed session, so people can test their mic early,
+// and the filled main button from 10 minutes before until it ends.
+function JoinCall({ session }) {
+  const now = useNow();
+  const soon = now >= Date.parse(session.start_at) - JOIN_SOON && now < Date.parse(session.end_at);
+
+  return (
+    <Button asChild size="sm" variant={soon ? "default" : "neutral"} className={soon ? "join-call-now" : undefined}>
+      <a href={session.call_link} target="_blank" rel="noopener noreferrer nofollow">
+        <Video className="h-4 w-4" />
+        Join call
+      </a>
+    </Button>
+  );
+}
+
 // A confirmed session that has started: whether it took place, once a partner
 // has said so. Completed means at least one said yes.
 function pastState(session) {
@@ -184,6 +213,8 @@ function SessionCard({ session, partnership, past }) {
   const [label, style] = BADGE[state];
   const faded = ["declined", "withdrawn", "cancelled", "expired", "didnt_happen"].includes(state);
   const text = note(session, name, past);
+  // Until it ends, even once it has started and moved under Past.
+  const joinable = session.call_link && session.status === "confirmed" && !session.ended;
 
   return (
     <li className={`flex min-w-0 items-start gap-3 p-4 ${PANEL} ${faded ? "opacity-70 shadow-none" : ""}`}>
@@ -191,15 +222,17 @@ function SessionCard({ session, partnership, past }) {
       <div className="min-w-0 flex-1">
         <SessionTime session={session} timeZone={partnership.timezone} partnerTimeZone={partnership.partner_timezone} partnerName={name} />
         {text && <p className="text-xs text-black/65">{text}</p>}
-        {session.call_link && !faded && !past && (
+        {/* A proposal shows which tool it'll be; a confirmed session gets Join call. */}
+        {session.call_link && session.status === "proposed" && !past && (
           <a href={session.call_link} target="_blank" rel="noopener noreferrer nofollow" className="mt-1 block truncate text-xs font-bold underline">
             {session.call_link.replace(/^https?:\/\//, "")}
           </a>
         )}
         <div className="mt-3 empty:hidden">
-          {session.calendar && (
-            <div className="mb-3">
-              <AddToCalendar links={session.calendar} />
+          {(joinable || session.calendar) && (
+            <div className="mb-3 flex flex-wrap items-center gap-3">
+              {joinable && <JoinCall session={session} />}
+              {session.calendar && <AddToCalendar links={session.calendar} />}
             </div>
           )}
           <SessionActions session={session} partnership={partnership} />
@@ -224,7 +257,7 @@ function Group({ title, sessions, partnership, past = false }) {
 
 // The Workspace's Sessions page: propose a time, and see every session (#228).
 export default function Sessions({ partnership }) {
-  const { upcoming, past } = partnership.sessions;
+  const { upcoming, not_happening: notHappening, past } = partnership.sessions;
   const name = partnership.conversation.other.name;
 
   return (
@@ -232,10 +265,11 @@ export default function Sessions({ partnership }) {
       <div className="grid grid-cols-1 items-start gap-4 md:gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
         {!partnership.ended && <ProposeForm partnership={partnership} />}
         <div className={`min-w-0 ${partnership.ended ? "lg:col-span-2" : ""}`}>
-          {upcoming.length + past.length === 0 && (
+          {upcoming.length + notHappening.length + past.length === 0 && (
             <p className="text-black/65">No sessions yet. Propose a time and {name} can answer it here.</p>
           )}
           <Group title="Upcoming" sessions={upcoming} partnership={partnership} />
+          <Group title="Not happening" sessions={notHappening} partnership={partnership} />
           <Group title="Past" sessions={past} partnership={partnership} past />
         </div>
       </div>

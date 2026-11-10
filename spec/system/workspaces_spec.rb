@@ -286,6 +286,46 @@ RSpec.describe "workspaces", type: :system do
       expect(page).to have_link("Apple / other (.ics)", href: calendar_partner_session_path(partnership, confirmed))
     end
 
+    it "offers 15 minutes as the shortest length" do
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_select("Length", with_options: ["15 min", "30 min"])
+      fill_in "Date", with: Date.new(2030, 3, 4)
+      set_time_field("session_time", "18:30")
+      select "15 min", from: "Length"
+      click_button "Propose session"
+
+      expect(page).to have_content("Mon 4 Mar · 18:30–18:45")
+    end
+
+    it "has a Join call button on a confirmed session, which stands out from 10 minutes before" do
+      later = create(:session, partnership:, proposed_by: poster, start_at: 2.days.from_now.change(min: 0), call_link: "https://meet.google.com/later")
+      later.confirm!(by: partner)
+      soon = create(:session, partnership:, proposed_by: poster, start_at: 5.minutes.from_now, call_link: "https://meet.google.com/soon")
+      soon.confirm!(by: partner)
+      create(:session, partnership:, proposed_by: poster, start_at: 3.days.from_now.change(min: 0), call_link: "https://meet.google.com/waiting")
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_link("Join call", href: "https://meet.google.com/soon", class: "join-call-now")
+      expect(page).to have_link("Join call", href: "https://meet.google.com/later")
+      expect(page).not_to have_css("a.join-call-now[href='https://meet.google.com/later']")
+      expect(page).to have_link("meet.google.com/waiting", href: "https://meet.google.com/waiting")
+      expect(page).not_to have_link("Join call", href: "https://meet.google.com/waiting")
+      expect(page).not_to have_link("meet.google.com/soon")
+    end
+
+    it "keeps Join call on a session that has started but not ended" do
+      ongoing = create(:session, partnership:, proposed_by: poster, start_at: 1.day.from_now.change(min: 0), call_link: "https://meet.google.com/now")
+      ongoing.confirm!(by: partner)
+      ongoing.update_columns(start_at: 5.minutes.ago, end_at: 55.minutes.from_now)
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_link("Join call", href: "https://meet.google.com/now", class: "join-call-now")
+    end
+
     it "shows the next confirmed session on the overview" do
       create(:session, partnership:, proposed_by: partner, status: "confirmed", start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30), call_link: "https://zoom.us/j/1")
       sign_in(poster)
