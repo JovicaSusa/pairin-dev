@@ -89,6 +89,12 @@ RSpec.describe "Did it happen?", type: :request do
       expect(session.answers.count).to eq(2)
     end
 
+    # The answer row and its email are queued in one transaction, so the email
+    # job must be queued straight away for a failure to roll the row back.
+    it "queues the email inside the transaction, not after it commits" do
+      expect(SessionMailer.delivery_job.enqueue_after_transaction_commit).to be(false)
+    end
+
     it "doesn't ask about sessions that ended long ago" do
       travel_to starts + 3.days
 
