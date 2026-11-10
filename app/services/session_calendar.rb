@@ -28,6 +28,24 @@ class SessionCalendar
 
   def filename = "pairin-session-#{@session.start_at.getutc.strftime('%Y-%m-%d')}.ics"
 
+  # "Add to calendar" links that open the user's web calendar with the event
+  # filled in (#258). Unlike the files they share no UID with us, so a
+  # cancellation can't remove what they add.
+  def google_url
+    link("https://calendar.google.com/calendar/render",
+         action: "TEMPLATE", text: title, dates: "#{utc(@session.start_at)}/#{utc(@session.end_at)}",
+         details: description, location: @session.call_link)
+  end
+
+  # Personal Outlook.com accounts; work and school ones live on outlook.office.com.
+  # The deeplink route with path and rru is the one that opens a prefilled
+  # event on desktop and mobile; action/compose alone is desktop only.
+  def outlook_url
+    link("https://outlook.live.com/calendar/0/deeplink/compose",
+         path: "/calendar/action/compose", rru: "addevent", subject: title, startdt: @session.start_at.getutc.iso8601, enddt: @session.end_at.getutc.iso8601,
+         body: description, location: @session.call_link)
+  end
+
   private
 
   def calendar(method, sequence:, status: nil, attendee: false)
@@ -42,7 +60,7 @@ class SessionCalendar
       "DTSTAMP:#{utc(Time.current)}",
       "DTSTART:#{utc(@session.start_at)}",
       "DTEND:#{utc(@session.end_at)}",
-      "SUMMARY:#{text("Pairin session with #{@partner.display_name}")}",
+      "SUMMARY:#{text(title)}",
       ("LOCATION:#{text(@session.call_link)}" if @session.call_link),
       "DESCRIPTION:#{text(description)}",
       "URL:#{workspace_url}",
@@ -55,6 +73,13 @@ class SessionCalendar
     ].compact
 
     lines.map { |line| fold(line) }.join("\r\n") + "\r\n"
+  end
+
+  def title = "Pairin session with #{@partner.display_name}"
+
+  # Spaces as %20, not +: Outlook shows a + literally.
+  def link(base, **params)
+    "#{base}?" + params.compact.map { |key, value| "#{key}=#{ERB::Util.url_encode(value)}" }.join("&")
   end
 
   def description

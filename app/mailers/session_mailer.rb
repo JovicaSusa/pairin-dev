@@ -51,7 +51,9 @@ class SessionMailer < ApplicationMailer
       by: params[:by],
       # "the", not "your": the other partner may have been the one to propose it.
       heading: "#{params[:by].display_name} cancelled the session",
-      next_step: "You can propose another time in your Workspace.",
+      # The attached cancellation can't reach entries added from a Google or
+      # Outlook link (#258).
+      next_step: "If you added it to your calendar, remove it there. You can propose another time in your Workspace.",
       calendar: :cancellation
     )
   end

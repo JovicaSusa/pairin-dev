@@ -101,6 +101,12 @@ class Partners::SessionsController < ApplicationController
     @partnership = partnerships.find(params[:partner_id])
   end
 
+  # "Add to calendar": Google, Outlook, or the .ics file for anything else (#258).
+  def calendar_links(session)
+    file = SessionCalendar.new(session, for_user: current_user)
+    { google: file.google_url, outlook: file.outlook_url, download: calendar_partner_session_path(@partnership, session) }
+  end
+
   # Only past sessions have "Did it happen?" answers; the past list preloads them.
   def props_for(session, past: false)
     happened = session.happened if past
@@ -114,7 +120,7 @@ class Partners::SessionsController < ApplicationController
       status: session.expired? ? "expired" : session.status,
       mine: session.proposed_by_id == current_user.id,
       cancelled_by: session.cancelled_by_id && (session.cancelled_by_id == current_user.id ? "you" : "partner"),
-      calendar_path: (calendar_partner_session_path(@partnership, session) if session.confirmed? && !past),
+      calendar: (calendar_links(session) if session.confirmed? && !past),
       # "Did it happen?": true, false, or nil until either partner answers.
       happened: (happened if session.confirmed?),
       ended: session.end_at.past?,

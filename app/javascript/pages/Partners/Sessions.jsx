@@ -1,11 +1,12 @@
 import { router, useForm } from "@inertiajs/react";
 import { useEffect, useState } from "react";
-import { CalendarPlus, Check, Video } from "lucide-react";
+import { CalendarPlus, Check, ChevronDown, Video } from "lucide-react";
 import SessionTime, { isoDay, zoneLabel } from "@/components/SessionTime";
 import WorkspaceFrame from "@/components/WorkspaceFrame";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const PANEL = "rounded-2xl border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]";
 const DAY = 24 * 60 * 60 * 1000;
@@ -81,6 +82,30 @@ function ProposeForm({ partnership }) {
         <Button type="submit" size="sm" disabled={processing}>Propose session</Button>
       </div>
     </form>
+  );
+}
+
+const MENU_ITEM = "block rounded-base px-3 py-2 text-sm font-bold hover:bg-yellow-50 focus-visible:bg-yellow-50 focus-visible:outline-hidden";
+
+// Google and Outlook open the web calendar with the event filled in; the .ics
+// download covers Apple Calendar and everything else (#258).
+function AddToCalendar({ links }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button type="button" className="inline-flex min-h-9 items-center gap-1.5 text-xs font-bold underline">
+          <CalendarPlus className="h-3.5 w-3.5" />
+          Add to calendar
+          <ChevronDown className="h-3.5 w-3.5" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-56 bg-white p-1">
+        <a href={links.google} target="_blank" rel="noopener noreferrer" className={MENU_ITEM}>Google Calendar</a>
+        <a href={links.outlook} target="_blank" rel="noopener noreferrer" className={MENU_ITEM}>Outlook</a>
+        {/* A plain link: it downloads a file, so no Inertia visit (#230). */}
+        <a href={links.download} download className={MENU_ITEM}>Apple / other (.ics)</a>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -204,16 +229,10 @@ function SessionCard({ session, partnership, past }) {
           </a>
         )}
         <div className="mt-3 empty:hidden">
-          {(joinable || session.calendar_path) && (
+          {(joinable || session.calendar) && (
             <div className="mb-3 flex flex-wrap items-center gap-3">
               {joinable && <JoinCall session={session} />}
-              {/* A plain link: it downloads a file, so no Inertia visit (#230). */}
-              {session.calendar_path && (
-                <a href={session.calendar_path} download className="inline-flex items-center gap-1.5 text-xs font-bold underline">
-                  <CalendarPlus className="h-3.5 w-3.5" />
-                  Add to calendar
-                </a>
-              )}
+              {session.calendar && <AddToCalendar links={session.calendar} />}
             </div>
           )}
           <SessionActions session={session} partnership={partnership} />
