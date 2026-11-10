@@ -22,7 +22,7 @@ module Onboarding
       pair_request = @user.with_lock do
         next @user.pair_requests.first if @user.pair_requests.exists?
 
-        save_profile
+        save_timezone
         save_weekly_hours
         post_search
       end
@@ -47,7 +47,6 @@ module Onboarding
     def required_answers_missing
       errors = {}
       errors[:topics] = "Pick at least one topic" if topics.empty?
-      errors[:level] = "Choose where you're at" unless User::LEVELS.include?(@params[:level])
       errors
     end
 
@@ -59,11 +58,10 @@ module Onboarding
       @params[:goal].to_s.strip
     end
 
-    # Only these fields: an older, half-filled profile mustn't block a first search.
-    def save_profile
-      changes = { level: @params[:level] }
-      changes[:timezone] = @params[:timezone] if User::TIMEZONES.include?(@params[:timezone])
-      @user.update_columns(changes)
+    # Only the timezone: the profile part saved the rest, and an older,
+    # half-filled profile mustn't block a first search.
+    def save_timezone
+      @user.update_columns(timezone: @params[:timezone]) if User::TIMEZONES.include?(@params[:timezone])
     end
 
     # Hours saved earlier stay as they are, and anything that overlaps them is

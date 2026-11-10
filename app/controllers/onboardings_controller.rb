@@ -2,6 +2,8 @@
 class OnboardingsController < ApplicationController
   include Authenticated
 
+  # Onboarding asks for the name itself, as its first question.
+  skip_before_action :require_name, only: [:show, :profile]
   before_action :redirect_if_already_searching
 
   def show
@@ -10,7 +12,9 @@ class OnboardingsController < ApplicationController
       levels: User::LEVELS.reverse,
       commitments: PairRequest::COMMITMENTS.map { |value, label| { value:, label: } },
       weekdays: AvailabilityWindow::WEEKDAYS.map { |value, label| { value:, label: } },
+      name: current_user.name,
       level: current_user.level,
+      about: current_user.about,
       timezone: current_user.timezone
     }
   end
@@ -20,6 +24,17 @@ class OnboardingsController < ApplicationController
 
     if result.success?
       redirect_to users_pair_requests_path, notice: "Your partner search is live!"
+    else
+      redirect_to onboarding_path, inertia: { errors: result.errors }
+    end
+  end
+
+  # The "about you" part, saved on its own so skipping the search keeps it.
+  def profile
+    result = Onboarding::Profile.call(current_user, params.permit(:name, :level, :about))
+
+    if result.success?
+      redirect_to onboarding_path
     else
       redirect_to onboarding_path, inertia: { errors: result.errors }
     end
@@ -38,6 +53,6 @@ class OnboardingsController < ApplicationController
   end
 
   def onboarding_params
-    params.permit(:level, :goal, :commitment, :timezone, topics: [], windows: [:weekday, :start_minute, :end_minute])
+    params.permit(:goal, :commitment, :timezone, topics: [], windows: [:weekday, :start_minute, :end_minute])
   end
 end

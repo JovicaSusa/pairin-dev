@@ -92,6 +92,65 @@ RSpec.describe "Onboarding", type: :request do
     end
   end
 
+  describe "the profile part" do
+    before do
+      user.update_columns(name: nil)
+      sign_in(user)
+    end
+
+    def save_profile(params) = patch(profile_onboarding_path, params:, as: :json)
+
+    it "saves the name, the level and a line about them, then carries on with onboarding" do
+      save_profile(name: " Maya ", level: "competent", about: "Rails dev learning Go")
+
+      expect(response).to redirect_to(onboarding_path)
+      expect(user.reload).to have_attributes(name: "Maya", level: "competent", about: "Rails dev learning Go")
+    end
+
+    it "needs only the name" do
+      save_profile(name: "Maya", level: "", about: "")
+
+      expect(user.reload).to have_attributes(name: "Maya", level: nil, about: nil)
+    end
+
+    it "won't go on without a name, or with an unknown level" do
+      save_profile(name: " ", level: "novice")
+      expect(response).to redirect_to(onboarding_path)
+      expect(session[:inertia_errors]).to include(name: "Enter a name")
+      expect(user.reload.name).to be_nil
+
+      save_profile(name: "Maya", level: "wizard")
+      expect(session[:inertia_errors]).to include(:level)
+      expect(user.reload.name).to be_nil
+    end
+
+    it "keeps an earlier About when it's left out, and caps its length" do
+      user.update_columns(about: "Saved before")
+
+      save_profile(name: "Maya", level: "")
+      expect(user.reload.about).to eq("Saved before")
+
+      save_profile(name: "Maya", about: "x" * 1001)
+      expect(session[:inertia_errors]).to include(about: "Keep it to 1000 characters")
+      expect(user.reload.about).to eq("Saved before")
+    end
+
+    it "keeps the profile when the search part is skipped" do
+      save_profile(name: "Maya", about: "Hi")
+      post skip_onboarding_path
+
+      expect(user.reload).to have_attributes(name: "Maya", about: "Hi", onboarding_skipped_at: be_present)
+    end
+
+    it "is passed back to the page, so returning to onboarding shows it" do
+      user.update_columns(name: "Maya", about: "Hi", level: "expert")
+
+      get onboarding_path
+
+      expect(props).to include("name" => "Maya", "about" => "Hi", "level" => "expert")
+    end
+  end
+
   describe "finishing" do
     before { sign_in(user) }
 
@@ -101,7 +160,7 @@ RSpec.describe "Onboarding", type: :request do
       finish
 
       expect(response).to redirect_to(users_pair_requests_path)
-      expect(user.reload).to have_attributes(level: "novice", timezone: "Europe/Berlin")
+      expect(user.reload).to have_attributes(timezone: "Europe/Berlin")
       expect(user.availability_windows.pluck(:weekday, :start_minute, :end_minute)).to eq([[2, 1080, 1200]])
 
       search = user.pair_requests.sole
@@ -119,15 +178,25 @@ RSpec.describe "Onboarding", type: :request do
       expect(user.availability_windows).to be_empty
     end
 
-    it "needs a topic and a level, and saves nothing without them" do
+    it "needs a topic, and saves nothing without one" do
       expect { finish(answers.merge(topics: [])) }.not_to change(PairRequest, :count)
       expect(session[:inertia_errors]).to include(:topics)
+    end
 
-      expect { finish(answers.merge(level: "")) }.not_to change(PairRequest, :count)
-      expect(session[:inertia_errors]).to include(:level)
+    it "needs the name from the profile part first" do
+      user.update_columns(name: nil)
 
-      expect { finish(answers.merge(level: "wizard")) }.not_to change(PairRequest, :count)
-      expect(user.reload.level).to be_nil
+      expect { finish }.not_to change(PairRequest, :count)
+      expect(response).to redirect_to(name_path)
+    end
+
+    it "doesn't need a level, and leaves the one from the profile part alone" do
+      user.update_columns(level: "expert")
+
+      finish(answers.except(:level))
+
+      expect(user.pair_requests).to exist
+      expect(user.reload.level).to eq("expert")
     end
 
     it "isn't blocked by hours they saved earlier" do
@@ -202,7 +271,7 @@ RSpec.describe "Onboarding", type: :request do
 
       finish
 
-      expect(user.reload.level).to eq("novice")
+      expect(user.pair_requests).to exist
     end
   end
 

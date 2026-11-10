@@ -51,7 +51,9 @@ Rails.application.routes.draw do
 
   resource :onboarding, only: [:show, :create] do
     post :skip
+    patch :profile
   end
+  resource :name, only: [:show, :update]
 
   resources :partners, only: [:index, :show, :update], controller: "partnerships" do
     post :end_partnership, on: :member

@@ -35,6 +35,11 @@ RSpec.describe "sharing a partner search", type: :system do
     fill_in "Password", with: "Password33*"
     click_button "Log in"
 
+    # A new account gives a name first, then carries on to the form (#262).
+    expect(page).to have_content("What should partners call you?")
+    fill_in "Your name", with: "Alex"
+    click_button "Continue"
+
     expect(page).to have_content("What do you want to get out of this?")
     expect(page).to have_content("Your level")
 
