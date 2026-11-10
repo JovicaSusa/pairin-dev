@@ -109,6 +109,20 @@ RSpec.describe "Workspace sessions", type: :request do
       expect(page.dig("sessions", "past")).to match([a_hash_including("id" => past.id, "status" => "expired")])
     end
 
+    it "has both partners' usual hours and suggested times, in UTC, and links to where to add hours" do
+      create(:availability_window, user: poster, weekday: 1, start_minute: 0, end_minute: 1440)
+      create(:availability_window, user: partner, weekday: 1, start_minute: 0, end_minute: 1440)
+      sign_in(poster)
+
+      get partner_sessions_path(partnership)
+
+      availability = props.dig("partnership", "availability")
+      expect(availability["suggestions"].keys).to eq(Session::LENGTHS.map(&:to_s))
+      expect(availability["my_hours"]).to all(match([/Z\z/, /Z\z/]))
+      expect(availability["partner_hours"]).not_to be_empty
+      expect(availability["hours_path"]).to eq(availability_path)
+    end
+
     it "lists upcoming declined, withdrawn and cancelled sessions under Not happening, soonest first" do
       confirmed = create(:session, partnership:, proposed_by: partner, start_at: 4.days.from_now.change(min: 0))
       confirmed.confirm!(by: poster)

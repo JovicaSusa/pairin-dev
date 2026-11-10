@@ -16,6 +16,45 @@ export function isoDay(date, timeZone) {
   return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
 }
 
+// "18:30", the time in that timezone, for time inputs.
+export function isoTime(date, timeZone) {
+  return new Intl.DateTimeFormat("en-GB", { timeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(date);
+}
+
+// How far that timezone's wall clock is ahead of UTC at an instant, in ms.
+function offset(instant, timeZone) {
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", { timeZone, hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric" })
+      .formatToParts(instant)
+      .map(({ type, value }) => [type, Number(value)]),
+  );
+  return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - (instant - (instant % 1000));
+}
+
+// The instant of a date ("2030-03-04") and time ("18:30") in a timezone, or
+// null if either is missing or doesn't parse (an input mid-edit is empty).
+//
+// Matches Rails' `Time.find_zone!(tz).local`, which picks the instant the
+// session is saved at: a time that happens twice when clocks go back is the
+// first (daylight-saving) one, and a time skipped when clocks go forward moves
+// on by the jump (02:30 becomes 03:30).
+export function zonedTime(day, time, timeZone) {
+  const [y, m, d] = (day || "").split("-").map(Number);
+  const [h, min] = (time || "").split(":").map(Number);
+  if (![y, m, d, h, min].every(Number.isInteger)) return null;
+
+  const wall = Date.UTC(y, m - 1, d, h, min);
+  const DAY = 24 * 60 * 60 * 1000;
+  // The offsets either side of any change; clocks never change twice in two days.
+  const before = wall - offset(wall - DAY, timeZone);
+  const after = wall - offset(wall + DAY, timeZone);
+  const fits = (instant) => instant + offset(instant, timeZone) === wall;
+
+  if (fits(before) && fits(after)) return new Date(Math.min(before, after));
+  if (fits(after)) return new Date(after);
+  return new Date(before);
+}
+
 export function when(startAt, endAt, timeZone) {
   const start = new Date(startAt);
   const end = new Date(endAt);

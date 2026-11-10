@@ -272,6 +272,68 @@ RSpec.describe "workspaces", type: :system do
       expect(partnership.sessions).to be_empty
     end
 
+    it "suggests times you're both usually free, and warns about one outside the partner's hours" do
+      (1..7).each do |day|
+        create(:availability_window, user: poster, weekday: day, start_minute: 10 * 60, end_minute: 12 * 60)
+        create(:availability_window, user: partner, weekday: day, start_minute: 4 * 60, end_minute: 6 * 60)
+      end
+      first = SessionTimes.new(Partnership.find(partnership.id), viewer: poster.reload).suggestions(60).first.in_time_zone("Europe/Berlin")
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("You're both usually free")
+      expect(page).to have_css("button[aria-pressed]", count: 6)
+
+      set_time_field("session_time", "03:00")
+      expect(page).to have_content("Outside Sam's usual hours. You can still propose it.")
+
+      find("button[aria-pressed]", match: :first).click
+      expect(page).to have_field("Date", with: first.to_date.iso8601)
+      expect(page).to have_field("session_time", with: first.strftime("%H:%M"))
+      expect(page).to have_css("button[aria-pressed='true']", count: 1)
+      expect(page).not_to have_content("Outside Sam's usual hours")
+
+      click_button "Propose session"
+      expect(page).to have_content("Waiting for Sam to answer")
+      expect(partnership.sessions.sole.start_at).to eq(first)
+    end
+
+    it "keeps the page up when the date or time is cleared mid-edit" do
+      (1..7).each { |day| create(:availability_window, user: partner, weekday: day, start_minute: 4 * 60, end_minute: 6 * 60) }
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      set_time_field("session_time", "03:00")
+      expect(page).to have_content("Outside Sam's usual hours")
+      set_time_field("session_time", "")
+      expect(page).to have_button("Propose session")
+      expect(page).not_to have_content("Outside Sam's usual hours")
+
+      set_time_field("session_time", "03:00")
+      set_time_field("session_date", "")
+      expect(page).to have_button("Propose session")
+    end
+
+    it "says when there are no hours to go on" do
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("Sam hasn't added their usual hours yet.")
+      expect(page).to have_link("Add your hours", href: availability_path)
+      expect(page).not_to have_content("You're both usually free")
+    end
+
+    it "lists each partner's hours when they don't overlap" do
+      create(:availability_window, user: poster, weekday: 1, start_minute: 8 * 60, end_minute: 9 * 60)
+      create(:availability_window, user: partner, weekday: 3, start_minute: 12 * 60, end_minute: 13 * 60)
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).to have_content("No shared hours in the next week that fit 1 hour.")
+      expect(page).to have_content(/Sam is usually free \(your time\): Wed \d+ \w+ 1[78]:00–1[89]:00/)
+      expect(page).to have_content(/You're usually free: Mon \d+ \w+ 08:00–09:00/)
+    end
+
     it "adds a confirmed session to Google, Outlook or another calendar from one menu" do
       confirmed = create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30))
       confirmed.confirm!(by: partner)
