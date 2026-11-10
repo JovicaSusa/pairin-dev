@@ -4,7 +4,7 @@
 # the rest. Times are stored in UTC and entered and shown in each person's own
 # timezone.
 class Session < ApplicationRecord
-  LENGTHS = [30, 45, 60, 90, 120].freeze
+  LENGTHS = [15, 30, 45, 60, 90, 120].freeze
   CALL_LINK_MAX_LENGTH = 2000
   # Each proposal emails the other partner, so one person can't pile them up.
   MAX_WAITING = 5
