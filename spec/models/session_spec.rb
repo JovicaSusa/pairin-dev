@@ -37,6 +37,7 @@ RSpec.describe Session do
 
   it "only takes the lengths offered" do
     expect(propose(minutes: "60")).to be_valid
+    expect(propose(minutes: "15")).to be_valid
     expect(propose(minutes: "61").tap(&:validate).errors[:end_at]).to include("must be one of the lengths offered")
     expect(propose(minutes: "0").tap(&:validate).errors[:end_at]).to include("must be one of the lengths offered")
   end

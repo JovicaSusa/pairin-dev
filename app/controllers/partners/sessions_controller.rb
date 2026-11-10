@@ -7,6 +7,9 @@ class Partners::SessionsController < ApplicationController
 
   before_action :set_partnership
 
+  # Upcoming sessions that may still take place.
+  LIVE = %w[proposed confirmed].freeze
+
   def index
     sessions = @partnership.sessions
     partner = @partnership.offer.other_person(current_user)
@@ -20,7 +23,9 @@ class Partners::SessionsController < ApplicationController
         # Suggested times and both partners' usual hours, all in UTC (#261).
         availability: (SessionTimes.new(@partnership, viewer: current_user).to_props.merge(hours_path: availability_path) unless @partnership.ended?),
         sessions: {
-          upcoming: sessions.upcoming.map { |session| props_for(session) },
+          upcoming: sessions.upcoming.where(status: LIVE).map { |session| props_for(session) },
+          # Declined, withdrawn and cancelled ones sink below the live ones (#260).
+          not_happening: sessions.upcoming.where.not(status: LIVE).map { |session| props_for(session) },
           past: sessions.past.includes(:answers).map { |session| props_for(session, past: true) }
         }
       )
