@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
 
 const LEVEL_LABELS = {
   novice: "Just starting",
@@ -174,30 +175,43 @@ function WeeklyHours({ weekdays, windows, onChange, timezone, onTimezone }) {
   );
 }
 
-export default function Onboarding({ tags, levels, commitments, weekdays, level, timezone }) {
+// The first steps are about you and are saved on their own, so skipping the
+// partner search keeps them; only the name is required (#262).
+const PROFILE_STEPS = 3;
+
+export default function Onboarding({ tags, levels, commitments, weekdays, name, level, about, timezone }) {
   const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
   // The column defaults to UTC, so UTC usually means "never set": use the browser's zone.
   const startingZone = timezone === "UTC" && detected ? detected : timezone;
 
-  const { data, setData, post, processing, errors } = useForm({
-    topics: [],
+  const { data, setData, post, processing, errors, setError, clearErrors } = useForm({
+    name: name ?? "",
     level: level ?? "",
+    about: about ?? "",
+    topics: [],
     goal: "",
     commitment: "one_to_three_months",
     timezone: startingZone,
     windows: [],
   });
   const [step, setStep] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   const steps = [
     {
-      title: "What do you want to learn or practise?",
-      ready: data.topics.length > 0,
-      body: <TopicCombobox tags={tags} value={data.topics} onChange={(v) => setData("topics", v)} />,
+      title: "What should partners call you?",
+      ready: data.name.trim().length > 0,
+      body: (
+        <div>
+          <Label htmlFor="onboarding_name" className="mb-1 block">Your name</Label>
+          <Input id="onboarding_name" autoFocus maxLength={60} autoComplete="given-name" value={data.name} onChange={(e) => setData("name", e.target.value)} />
+          <p className="mt-2 text-sm text-black/65">Your partners see this in chats, sessions and emails.</p>
+        </div>
+      ),
     },
     {
       title: "Where are you at?",
-      ready: Boolean(data.level),
+      skippable: true,
       body: (
         <div className="flex flex-col gap-2">
           {levels.map((value) => (
@@ -207,6 +221,21 @@ export default function Onboarding({ tags, levels, commitments, weekdays, level,
           ))}
         </div>
       ),
+    },
+    {
+      title: "Anything partners should know about you?",
+      skippable: true,
+      body: (
+        <div>
+          <Label htmlFor="onboarding_about" className="mb-1 block">About you</Label>
+          <Textarea id="onboarding_about" rows={4} value={data.about} placeholder="Backend dev learning Go, usually free on weekday evenings" onChange={(e) => setData("about", e.target.value)} />
+        </div>
+      ),
+    },
+    {
+      title: "What do you want to learn or practise?",
+      ready: data.topics.length > 0,
+      body: <TopicCombobox tags={tags} value={data.topics} onChange={(v) => setData("topics", v)} />,
     },
     {
       title: "What's your goal, in a line?",
@@ -242,8 +271,30 @@ export default function Onboarding({ tags, levels, commitments, weekdays, level,
   const last = step === steps.length - 1;
   const firstError = Object.values(errors)[0];
 
-  const next = () => {
-    if (last) {
+  // Leaving the last "about you" step saves that part before the search questions.
+  const saveProfile = (profile) => router.patch(
+    "/onboarding/profile",
+    profile,
+    {
+      preserveState: true,
+      preserveScroll: true,
+      onStart: () => setSaving(true),
+      onFinish: () => setSaving(false),
+      onSuccess: () => {
+        clearErrors();
+        setStep(PROFILE_STEPS);
+      },
+      onError: (errs) => {
+        setError(errs);
+        if (errs.name) setStep(0);
+      },
+    },
+  );
+
+  const advance = ({ skipped = false } = {}) => {
+    if (step === PROFILE_STEPS - 1) {
+      saveProfile({ name: data.name, level: data.level, about: skipped ? "" : data.about });
+    } else if (last) {
       post("/onboarding");
     } else {
       setStep(step + 1);
@@ -256,9 +307,12 @@ export default function Onboarding({ tags, levels, commitments, weekdays, level,
 
       <div className="mb-6 flex items-center justify-between gap-4">
         <Progress value={((step + 1) / steps.length) * 100} className="flex-1" aria-label={`Step ${step + 1} of ${steps.length}`} />
-        <button type="button" onClick={() => router.post("/onboarding/skip")} className="inline-flex min-h-11 shrink-0 items-center text-xs font-bold text-black/65 hover:text-black">
-          Skip setup
-        </button>
+        {/* Only the partner search can be skipped as a whole. */}
+        {step >= PROFILE_STEPS && (
+          <button type="button" onClick={() => router.post("/onboarding/skip")} className="inline-flex min-h-11 shrink-0 items-center text-xs font-bold text-black/65 hover:text-black">
+            Skip setup
+          </button>
+        )}
       </div>
 
       <h1 className="mb-5 text-3xl">{current.title}</h1>
@@ -270,9 +324,9 @@ export default function Onboarding({ tags, levels, commitments, weekdays, level,
         <Button type="button" variant="neutral" disabled={step === 0} onClick={() => setStep(step - 1)}>Back</Button>
         <div className="flex items-center gap-3">
           {current.skippable && !last && (
-            <button type="button" onClick={() => setStep(step + 1)} className="inline-flex min-h-11 items-center text-sm font-bold text-black/65 hover:text-black">Skip this</button>
+            <button type="button" disabled={saving} onClick={() => advance({ skipped: true })} className="inline-flex min-h-11 items-center text-sm font-bold text-black/65 hover:text-black">Skip this</button>
           )}
-          <Button type="button" disabled={processing || (!current.skippable && !current.ready)} onClick={next}>
+          <Button type="button" disabled={processing || saving || (!current.skippable && !current.ready)} onClick={() => advance()}>
             {last ? (processing ? "Finding..." : "Find me a partner") : "Next"}
           </Button>
         </div>
