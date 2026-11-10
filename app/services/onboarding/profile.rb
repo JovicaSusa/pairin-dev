@@ -4,7 +4,7 @@ module Onboarding
   # part, so skipping that keeps these.
   class Profile
     NAME_MAX = 60
-    ABOUT_MAX = 1000
+    ABOUT_MAX = User::ABOUT_MAX
 
     Result = Data.define(:errors) do
       def success? = errors.empty?

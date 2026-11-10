@@ -2,6 +2,7 @@ class User < ApplicationRecord
   include ImageUploader::Attachment(:image) # adds an `image` virtual attribute
   #TODO: Temp, move this when separate model for prog languages is created
   LEVELS = %w(expert proficient competent advanced_beginner novice).freeze
+  ABOUT_MAX = 1000
   # Not legal advice: see the "Minimum-age requirements for Pairin" research.
   MINIMUM_AGE = 16
   ADULT_AGE = 18
@@ -123,6 +124,8 @@ class User < ApplicationRecord
   validates :language, inclusion: { in: I18nData.languages.keys }, allow_nil: true
   validates :country, inclusion: { in: I18nData.countries.keys }, allow_nil: true
   validates :level, inclusion: { in: LEVELS }, allow_nil: true
+  # Only when it changes, so an older, longer About never blocks other edits.
+  validates :about, length: { maximum: ABOUT_MAX }, if: :about_changed?
   validates :date_of_birth, presence: true, on: :create
   validates :date_of_birth, comparison: { less_than_or_equal_to: -> { Date.current }, message: "can't be in the future" }, allow_nil: true
   validate :old_enough_for_an_account, on: :create, if: :under_age?

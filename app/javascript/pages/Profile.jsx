@@ -85,7 +85,10 @@ export default function Profile({ user, countries, languages, levels }) {
 
               <div>
                 <Label className="block mb-1">About</Label>
-                <Textarea name="about" rows="4" defaultValue={user.about || ""} />
+                <Textarea name="about" rows="4" maxLength={1000} defaultValue={user.about || ""} />
+                {errors.about ? (
+                  <div className="text-red font-bold mt-1 text-sm">{errors.about}</div>
+                ) : null}
               </div>
 
               <div>
