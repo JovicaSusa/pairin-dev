@@ -17,6 +17,8 @@ class Partners::SessionsController < ApplicationController
         # A minor's partner sees only their name, so not where they are either.
         partner_timezone: (partner.timezone unless partner.minor?),
         lengths: Session::LENGTHS,
+        # Suggested times and both partners' usual hours, all in UTC (#261).
+        availability: (SessionTimes.new(@partnership, viewer: current_user).to_props.merge(hours_path: availability_path) unless @partnership.ended?),
         sessions: {
           upcoming: sessions.upcoming.map { |session| props_for(session) },
           past: sessions.past.includes(:answers).map { |session| props_for(session, past: true) }

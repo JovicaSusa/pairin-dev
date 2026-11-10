@@ -1,7 +1,7 @@
-import { router, useForm } from "@inertiajs/react";
+import { Link, router, useForm } from "@inertiajs/react";
 import { useState } from "react";
 import { CalendarPlus, Check } from "lucide-react";
-import SessionTime, { isoDay, zoneLabel } from "@/components/SessionTime";
+import SessionTime, { isoDay, isoTime, when, zonedTime, zoneLabel } from "@/components/SessionTime";
 import WorkspaceFrame from "@/components/WorkspaceFrame";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,79 @@ function lengthLabel(minutes) {
   if (minutes < 60) return `${minutes} min`;
   const hours = minutes / 60;
   return `${hours} ${hours === 1 ? "hour" : "hours"}`;
+}
+
+const CHIP = "rounded-full border-2 border-black px-3 py-1 text-xs font-bold";
+const MINUTE = 60 * 1000;
+
+// "Mon 4 Mar 18:00–20:00" for each stretch starting in the next week.
+function hoursText(hours, timeZone) {
+  const weekAhead = Date.now() + 7 * DAY;
+  return hours
+    .filter(([from]) => Date.parse(from) < weekAhead)
+    .map(([from, to]) => {
+      const { day, range } = when(from, to, timeZone);
+      return `${day} ${range}`;
+    })
+    .join(", ");
+}
+
+// Times you're both usually free, from your weekly hours, and a note when the
+// chosen time is outside the partner's. Only ever a hint: any time can be
+// proposed (#261).
+function Availability({ availability, data, setData, timezone, name }) {
+  const { suggestions, my_hours: mine, partner_hours: theirs, hours_path: hoursPath } = availability;
+  const chips = suggestions[data.minutes] ?? [];
+  const start = zonedTime(data.date, data.time, timezone);
+  const end = start && new Date(start.getTime() + Number(data.minutes) * MINUTE);
+  const pick = (at) => {
+    const date = new Date(at);
+    setData((current) => ({ ...current, date: isoDay(date, timezone), time: isoTime(date, timezone) }));
+  };
+
+  // Only as far ahead as the partner's hours were sent.
+  const lastKnown = theirs.length > 0 ? Date.parse(theirs[theirs.length - 1][1]) : 0;
+  const outside = start && start.getTime() > Date.now() && start.getTime() < lastKnown &&
+    !theirs.some(([from, to]) => Date.parse(from) <= start.getTime() && end.getTime() <= Date.parse(to));
+
+  return (
+    <div className="flex flex-col gap-2">
+      {chips.length > 0 ? (
+        <>
+          <p className="text-sm font-bold">You're both usually free</p>
+          <div className="flex flex-wrap gap-2">
+            {chips.map((at) => {
+              const date = new Date(at);
+              const chosen = start && start.getTime() === date.getTime();
+              const { day } = when(at, at, timezone);
+              return (
+                <button key={at} type="button" aria-pressed={Boolean(chosen)} onClick={() => pick(at)} className={`${CHIP} ${chosen ? "bg-purple text-white" : "bg-white hover:bg-yellow-50"}`}>
+                  {day} · {isoTime(date, timezone)}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <div className="text-xs text-black/65">
+          {mine.length > 0 && theirs.length > 0 && <p className="mb-1 font-bold">No shared hours in the next week that fit {lengthLabel(Number(data.minutes))}.</p>}
+          {theirs.length > 0 && hoursText(theirs, timezone) && <p>{name} is usually free (your time): {hoursText(theirs, timezone)}</p>}
+          {mine.length > 0 && hoursText(mine, timezone) && <p>You're usually free: {hoursText(mine, timezone)}</p>}
+          {theirs.length === 0 && <p>{name} hasn't added their usual hours yet.</p>}
+        </div>
+      )}
+      {mine.length === 0 && (
+        <p className="text-xs text-black/65">
+          <Link href={hoursPath} className="font-bold underline">Add your hours</Link> to see times you're both free.
+        </p>
+      )}
+      {outside && (
+        <p role="status" className="rounded-xl border-2 border-black bg-yellow-50 p-2 text-xs font-bold">
+          Outside {name}'s usual hours. You can still propose it.
+        </p>
+      )}
+    </div>
+  );
 }
 
 function ProposeForm({ partnership }) {
@@ -68,6 +141,9 @@ function ProposeForm({ partnership }) {
         </div>
       </div>
       <p className="-mt-1 text-xs text-black/65">Times are in your timezone, {timezone}.</p>
+      {partnership.availability && (
+        <Availability availability={partnership.availability} data={data} setData={setData} timezone={timezone} name={partnership.conversation.other.name} />
+      )}
       {errors.start_at && <p className="text-sm font-bold text-red">{errors.start_at}</p>}
       {errors.end_at && <p className="text-sm font-bold text-red">{errors.end_at}</p>}
       <div>
