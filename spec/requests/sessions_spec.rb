@@ -109,6 +109,30 @@ RSpec.describe "Workspace sessions", type: :request do
       expect(page.dig("sessions", "past")).to match([a_hash_including("id" => past.id, "status" => "expired")])
     end
 
+    it "lists upcoming declined, withdrawn and cancelled sessions under Not happening, soonest first" do
+      confirmed = create(:session, partnership:, proposed_by: partner, start_at: 4.days.from_now.change(min: 0))
+      confirmed.confirm!(by: poster)
+      proposed = create(:session, partnership:, proposed_by: partner, start_at: 5.days.from_now.change(min: 0))
+      cancelled = create(:session, partnership:, proposed_by: partner, start_at: 1.day.from_now.change(min: 0))
+      cancelled.confirm!(by: poster)
+      cancelled.cancel!(by: poster)
+      declined = create(:session, partnership:, proposed_by: partner, start_at: 3.days.from_now.change(min: 0))
+      declined.decline!(by: poster)
+      withdrawn = create(:session, partnership:, proposed_by: poster, start_at: 2.days.from_now.change(min: 0))
+      withdrawn.withdraw!(by: poster)
+      gone = create(:session, partnership:, proposed_by: partner, start_at: 2.days.from_now.change(min: 0))
+      gone.decline!(by: poster)
+      gone.update_columns(start_at: 2.days.ago, end_at: 2.days.ago + 1.hour)
+      sign_in(poster)
+
+      get partner_sessions_path(partnership)
+
+      sessions = props.dig("partnership", "sessions")
+      expect(sessions["upcoming"].map { _1["id"] }).to eq([confirmed.id, proposed.id])
+      expect(sessions["not_happening"].map { _1["id"] }).to eq([cancelled.id, withdrawn.id, declined.id])
+      expect(sessions["past"].map { _1["id"] }).to eq([gone.id])
+    end
+
     it "doesn't say where an under-18 partner is" do
       partnership
       partner.update_columns(date_of_birth: 17.years.ago.to_date)
@@ -197,7 +221,7 @@ RSpec.describe "Workspace sessions", type: :request do
       get partner_sessions_path(partnership)
 
       expect(props.dig("partnership", "ended")).to be(true)
-      expect(props.dig("partnership", "sessions", "upcoming").size).to eq(1)
+      expect(props.dig("partnership", "sessions", "not_happening").size).to eq(1)
     end
 
     it "doesn't let anyone propose a session" do
@@ -310,7 +334,7 @@ RSpec.describe "Workspace sessions", type: :request do
       session.confirm!(by: partner)
       session.cancel!(by: partner)
       get partner_sessions_path(partnership)
-      expect(props.dig("partnership", "sessions", "upcoming", 0)).to include("status" => "cancelled", "cancelled_by" => "partner")
+      expect(props.dig("partnership", "sessions", "not_happening", 0)).to include("status" => "cancelled", "cancelled_by" => "partner")
     end
 
     %i[confirm decline withdraw cancel].each do |action|
