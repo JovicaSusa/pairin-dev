@@ -44,6 +44,16 @@ RSpec.describe "Calendar files for sessions", type: :request do
       body = calendar_part(mail).decoded
       expect(body).to include("METHOD:CANCEL", "STATUS:CANCELLED", "UID:session-#{session.id}@pairin.dev")
     end
+
+    it "says to remove an entry added through Google or Outlook, which the file can't reach" do
+      session.update_columns(status: "confirmed", confirmed_at: Time.current)
+      sign_in(partner)
+      perform_enqueued_jobs { patch cancel_partner_session_path(partnership, session) }
+
+      mail = ActionMailer::Base.deliveries.last
+      body = mail.html_part ? mail.html_part.body.to_s : mail.body.to_s
+      expect(body).to include("If you added it to your calendar, remove it there.")
+    end
   end
 
   it "attaches nothing to the other session emails" do
@@ -85,7 +95,7 @@ RSpec.describe "Calendar files for sessions", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it "offers the link on confirmed upcoming sessions only" do
+    it "offers Google, Outlook and a download on confirmed upcoming sessions only" do
       past = create(:session, partnership:, proposed_by: poster, status: "confirmed", start_at: 3.days.from_now.change(min: 0))
       past.update_columns(start_at: 2.days.ago, end_at: 2.days.ago + 1.hour)
       sign_in(poster)
@@ -93,8 +103,11 @@ RSpec.describe "Calendar files for sessions", type: :request do
       get partner_sessions_path(partnership)
 
       page = JSON.parse(Nokogiri::HTML(response.body).at("[data-page]")["data-page"])["props"]["partnership"]["sessions"]
-      expect(page["upcoming"].sole).to include("calendar_path" => calendar_partner_session_path(partnership, session))
-      expect(page["past"].sole["calendar_path"]).to be_nil
+      links = page["upcoming"].sole["calendar"]
+      expect(links["download"]).to eq(calendar_partner_session_path(partnership, session))
+      expect(links["google"]).to start_with("https://calendar.google.com/calendar/render?action=TEMPLATE")
+      expect(links["outlook"]).to start_with("https://outlook.live.com/calendar/0/action/compose?")
+      expect(page["past"].sole["calendar"]).to be_nil
     end
   end
 end

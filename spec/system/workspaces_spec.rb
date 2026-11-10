@@ -272,6 +272,20 @@ RSpec.describe "workspaces", type: :system do
       expect(partnership.sessions).to be_empty
     end
 
+    it "adds a confirmed session to Google, Outlook or another calendar from one menu" do
+      confirmed = create(:session, partnership:, proposed_by: poster, start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30))
+      confirmed.confirm!(by: partner)
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      expect(page).not_to have_link("Google Calendar")
+      click_button "Add to calendar"
+
+      expect(page).to have_link("Google Calendar", href: /\Ahttps:\/\/calendar\.google\.com\/calendar\/render\?action=TEMPLATE/)
+      expect(page).to have_link("Outlook", href: /\Ahttps:\/\/outlook\.live\.com\//)
+      expect(page).to have_link("Apple / other (.ics)", href: calendar_partner_session_path(partnership, confirmed))
+    end
+
     it "shows the next confirmed session on the overview" do
       create(:session, partnership:, proposed_by: partner, status: "confirmed", start_at: Time.utc(2030, 3, 4, 17, 30), end_at: Time.utc(2030, 3, 4, 18, 30), call_link: "https://zoom.us/j/1")
       sign_in(poster)
@@ -355,8 +369,9 @@ RSpec.describe "workspaces", type: :system do
       sign_in(partner)
       visit partner_sessions_path(partnership)
 
-      expect(page).to have_link("Add to calendar", count: 1)
-      link = find_link("Add to calendar")
+      expect(page).to have_button("Add to calendar", count: 1)
+      click_button "Add to calendar"
+      link = find_link("Apple / other (.ics)")
       expect(link[:href]).to end_with(calendar_partner_session_path(partnership, confirmed))
       expect(link[:download]).not_to be_nil
     end
