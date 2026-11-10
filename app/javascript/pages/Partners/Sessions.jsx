@@ -201,7 +201,7 @@ function Group({ title, sessions, partnership, past = false }) {
 
 // The Workspace's Sessions page: propose a time, and see every session (#228).
 export default function Sessions({ partnership }) {
-  const { upcoming, past } = partnership.sessions;
+  const { upcoming, not_happening: notHappening, past } = partnership.sessions;
   const name = partnership.conversation.other.name;
 
   return (
@@ -209,10 +209,11 @@ export default function Sessions({ partnership }) {
       <div className="grid grid-cols-1 items-start gap-4 md:gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
         {!partnership.ended && <ProposeForm partnership={partnership} />}
         <div className={`min-w-0 ${partnership.ended ? "lg:col-span-2" : ""}`}>
-          {upcoming.length + past.length === 0 && (
+          {upcoming.length + notHappening.length + past.length === 0 && (
             <p className="text-black/65">No sessions yet. Propose a time and {name} can answer it here.</p>
           )}
           <Group title="Upcoming" sessions={upcoming} partnership={partnership} />
+          <Group title="Not happening" sessions={notHappening} partnership={partnership} />
           <Group title="Past" sessions={past} partnership={partnership} past />
         </div>
       </div>
