@@ -32,17 +32,27 @@ function offset(instant, timeZone) {
 }
 
 // The instant of a date ("2030-03-04") and time ("18:30") in a timezone, or
-// null if either doesn't parse. Twice round, to settle on the right side of a
-// daylight-saving change.
+// null if either is missing or doesn't parse (an input mid-edit is empty).
+//
+// Matches Rails' `Time.find_zone!(tz).local`, which picks the instant the
+// session is saved at: a time that happens twice when clocks go back is the
+// first (daylight-saving) one, and a time skipped when clocks go forward moves
+// on by the jump (02:30 becomes 03:30).
 export function zonedTime(day, time, timeZone) {
   const [y, m, d] = (day || "").split("-").map(Number);
   const [h, min] = (time || "").split(":").map(Number);
-  if ([y, m, d, h, min].some(Number.isNaN)) return null;
+  if (![y, m, d, h, min].every(Number.isInteger)) return null;
 
   const wall = Date.UTC(y, m - 1, d, h, min);
-  let guess = wall - offset(wall, timeZone);
-  guess = wall - offset(guess, timeZone);
-  return new Date(guess);
+  const DAY = 24 * 60 * 60 * 1000;
+  // The offsets either side of any change; clocks never change twice in two days.
+  const before = wall - offset(wall - DAY, timeZone);
+  const after = wall - offset(wall + DAY, timeZone);
+  const fits = (instant) => instant + offset(instant, timeZone) === wall;
+
+  if (fits(before) && fits(after)) return new Date(Math.min(before, after));
+  if (fits(after)) return new Date(after);
+  return new Date(before);
 }
 
 export function when(startAt, endAt, timeZone) {

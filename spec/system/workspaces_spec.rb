@@ -298,6 +298,22 @@ RSpec.describe "workspaces", type: :system do
       expect(partnership.sessions.sole.start_at).to eq(first)
     end
 
+    it "keeps the page up when the date or time is cleared mid-edit" do
+      (1..7).each { |day| create(:availability_window, user: partner, weekday: day, start_minute: 4 * 60, end_minute: 6 * 60) }
+      sign_in(poster)
+      visit partner_sessions_path(partnership)
+
+      set_time_field("session_time", "03:00")
+      expect(page).to have_content("Outside Sam's usual hours")
+      set_time_field("session_time", "")
+      expect(page).to have_button("Propose session")
+      expect(page).not_to have_content("Outside Sam's usual hours")
+
+      set_time_field("session_time", "03:00")
+      set_time_field("session_date", "")
+      expect(page).to have_button("Propose session")
+    end
+
     it "says when there are no hours to go on" do
       sign_in(poster)
       visit partner_sessions_path(partnership)

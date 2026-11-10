@@ -107,6 +107,14 @@ RSpec.describe SessionTimes do
       expect(fresh.to_props[:partner_hours]).to be_nil
     end
 
+    it "shows hours under way from their real start, not from now" do
+      window(me, 1, "18:00", "20:00")
+
+      props = times(at: Time.utc(2030, 3, 4, 17, 37)).to_props
+
+      expect(props[:my_hours].first).to eq(["2030-03-04T17:00:00Z", "2030-03-04T19:00:00Z"])
+    end
+
     it "has the suggestions for every length, and both people's hours, in UTC" do
       window(me, 1, "18:00", "20:00")
       window(me, 1, "20:00", "21:00")

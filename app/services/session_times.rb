@@ -60,8 +60,10 @@ class SessionTimes
         end
       end
 
-      # Anything starting within `ahead` counts, at its full length.
-      merge(ranges.filter_map { |from, to| [[from, @now].max, to] if to > @now && from < finish && to > from })
+      # Anything not over yet and starting within `ahead` counts, at its full
+      # length: one under way still shows from its real start, and suggestions
+      # never start before `earliest` anyway.
+      merge(ranges.select { |from, to| to > @now && from < finish && to > from })
     end
   end
 
