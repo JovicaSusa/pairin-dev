@@ -116,7 +116,7 @@ RSpec.describe Release::SendLaunchEmail, type: :unit do
     end
 
     it "mentions the first-sign-in steps only to those who'll see them" do
-      expect(text).not_to include("The first time you sign in")
+      expect(text).not_to include("the first time you sign in")
 
       user.update_columns(date_of_birth: nil)
       expect(LaunchMailer.with(user:).announcement.text_part.body.encoded).to include("we'll ask for your date of birth.")
@@ -131,6 +131,17 @@ RSpec.describe Release::SendLaunchEmail, type: :unit do
     it "says Pairin is built by two developers" do
       [html, text].each { |body| expect(body).to include("Pairin is built by two developers") }
       expect(text).not_to include("on my own")
+    end
+
+    it "speaks as we throughout, and introduces the first-sign-in step" do
+      user.update_columns(date_of_birth: nil)
+      create(:pair_request, user:, paused_at: 1.day.ago)
+      mail = LaunchMailer.with(user:).announcement
+      [mail.text_part.body.encoded, mail.html_part.body.encoded].each do |body|
+        expect(body).not_to match(/\bI('d|'ve| read)\b|on me\b/)
+        expect(body).to include("That's on us", "So we've changed it", "We've switched off your old search")
+        expect(body).to include("Quick note: the first time you sign in, we'll ask for your date of birth.")
+      end
     end
 
     it "escapes a search's subject in the HTML" do

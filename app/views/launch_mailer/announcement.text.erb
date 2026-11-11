@@ -1,13 +1,13 @@
 Hi<%= " #{@user.name.split.first}" if @user.name.present? %>,
 
-You signed up for Pairin a while ago, and I'd guess it didn't do much for you. That's on me: it asked you to book a call with a stranger before you'd exchanged a word.
+You signed up for Pairin a while ago, and we'd guess it didn't do much for you. That's on us: it asked you to book a call with a stranger before you'd exchanged a word.
 
-So I've changed it. You post what you want to learn, someone applies, and you talk in the app first. If it's a good fit, you both say yes and get a shared Workspace to keep going in. If it isn't, nobody's the worse for it. No time slots, no intro calls.
+So we've changed it. You post what you want to learn, someone applies, and you talk in the app first. If it's a good fit, you both say yes and get a shared Workspace to keep going in. If it isn't, nobody's the worse for it. No time slots, no intro calls.
 
 <% if @paused_searches.size == 1 -%>
-I've switched off your old search, "<%= @paused_searches.first.subject %>", so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch it back on:
+We've switched off your old search, "<%= @paused_searches.first.subject %>", so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch it back on:
 <% elsif @paused_searches.size > 1 -%>
-I've switched off your old searches, so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch one back on:
+We've switched off your old searches, so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch one back on:
 <% elsif @has_on_search -%>
 Your search is still on, so there's nothing you need to do. You can see it here:
 <% else -%>
@@ -16,7 +16,7 @@ If you still want someone to learn with, posting a search takes about a minute:
 <%= @action_url %>
 
 <% if @first_sign_in.any? -%>
-The first time you sign in, we'll ask for your <%= @first_sign_in.to_sentence %>. It's a one-time step.
+Quick note: the first time you sign in, we'll ask for your <%= @first_sign_in.to_sentence %>. It's a one-time step.
 
 <% end -%>
 Pairin is built by two developers, and it's still early. If you'd like to help us shape it, or you have an idea or any feedback, just reply. We'd like to hear from you, and we read every reply.

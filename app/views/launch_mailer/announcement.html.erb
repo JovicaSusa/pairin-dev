@@ -3,12 +3,12 @@
   <body style="margin: 0; padding: 32px 16px; background-color: #ffffff; color: #1f2937; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 16px; line-height: 24px">
     <div style="max-width: 560px; margin: 0 auto">
       <p>Hi<%= " #{@user.name.split.first}" if @user.name.present? %>,</p>
-      <p>You signed up for Pairin a while ago, and I'd guess it didn't do much for you. That's on me: it asked you to book a call with a stranger before you'd exchanged a word.</p>
-      <p>So I've changed it. You post what you want to learn, someone applies, and you talk in the app first. If it's a good fit, you both say yes and get a shared Workspace to keep going in. If it isn't, nobody's the worse for it. No time slots, no intro calls.</p>
+      <p>You signed up for Pairin a while ago, and we'd guess it didn't do much for you. That's on us: it asked you to book a call with a stranger before you'd exchanged a word.</p>
+      <p>So we've changed it. You post what you want to learn, someone applies, and you talk in the app first. If it's a good fit, you both say yes and get a shared Workspace to keep going in. If it isn't, nobody's the worse for it. No time slots, no intro calls.</p>
       <% if @paused_searches.size == 1 %>
-        <p>I've switched off your old search, "<%= @paused_searches.first.subject %>", so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch it back on.</p>
+        <p>We've switched off your old search, "<%= @paused_searches.first.subject %>", so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch it back on.</p>
       <% elsif @paused_searches.size > 1 %>
-        <p>I've switched off your old searches, so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch one back on.</p>
+        <p>We've switched off your old searches, so nobody applies to something you've forgotten about. If you're still looking, it takes one click to switch one back on.</p>
       <% elsif @has_on_search %>
         <p>Your search is still on, so there's nothing you need to do.</p>
       <% else %>
@@ -18,7 +18,7 @@
         <a href="<%= @action_url %>" style="display: inline-block; border: 2px solid #000001; border-radius: 12px; background-color: #FF8B37; padding: 12px 24px; font-weight: 600; color: #000001; text-decoration: none"><%= @paused_searches.any? || @has_on_search ? "See your searches" : "Find a partner" %></a>
       </p>
       <% if @first_sign_in.any? %>
-        <p>The first time you sign in, we'll ask for your <%= @first_sign_in.to_sentence %>. It's a one-time step.</p>
+        <p>Quick note: the first time you sign in, we'll ask for your <%= @first_sign_in.to_sentence %>. It's a one-time step.</p>
       <% end %>
       <p>Pairin is built by two developers, and it's still early. If you'd like to help us shape it, or you have an idea or any feedback, just reply. We'd like to hear from you, and we read every reply.</p>
       <p>Jovica</p>
