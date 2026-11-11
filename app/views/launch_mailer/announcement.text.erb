@@ -15,11 +15,11 @@ If you still want someone to learn with, posting a search takes about a minute:
 <% end -%>
 <%= @action_url %>
 
-<% if @user.date_of_birth.blank? -%>
-The first time you sign in, we'll ask for your date of birth. It's a one-time step.
+<% if @first_sign_in.any? -%>
+The first time you sign in, we'll ask for your <%= @first_sign_in.to_sentence %>. It's a one-time step.
 
 <% end -%>
-I'm building this on my own, so if you'd like to help shape it, or you have an idea or a complaint, just reply. I read every reply.
+Pairin is built by two developers, and it's still early. If you'd like to help us shape it, or you have an idea or any feedback, just reply. We'd like to hear from you, and we read every reply.
 
 Jovica
 

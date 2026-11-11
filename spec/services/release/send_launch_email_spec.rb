@@ -69,7 +69,7 @@ RSpec.describe Release::SendLaunchEmail, type: :unit do
     end
 
     it "invites replies, in both versions" do
-      [html, text].each { |body| expect(body.gsub(/\s+/, " ")).to include("just reply. I read every reply.") }
+      [html, text].each { |body| expect(body.gsub(/\s+/, " ")).to include("just reply. We'd like to hear from you, and we read every reply.") }
     end
 
     it "greets by first name, or without one" do
@@ -115,11 +115,22 @@ RSpec.describe Release::SendLaunchEmail, type: :unit do
       expect(text).not_to include("switched off")
     end
 
-    it "mentions the date-of-birth step only to those who'll see it" do
-      expect(text).not_to include("date of birth")
+    it "mentions the first-sign-in steps only to those who'll see them" do
+      expect(text).not_to include("The first time you sign in")
 
       user.update_columns(date_of_birth: nil)
-      expect(LaunchMailer.with(user:).announcement.text_part.body.encoded).to include("date of birth")
+      expect(LaunchMailer.with(user:).announcement.text_part.body.encoded).to include("we'll ask for your date of birth.")
+
+      user.update_columns(name: nil)
+      expect(LaunchMailer.with(user:).announcement.text_part.body.encoded).to include("we'll ask for your name and date of birth.")
+
+      user.update_columns(date_of_birth: Date.new(1990, 1, 1))
+      expect(LaunchMailer.with(user:).announcement.text_part.body.encoded).to include("we'll ask for your name.")
+    end
+
+    it "says Pairin is built by two developers" do
+      [html, text].each { |body| expect(body).to include("Pairin is built by two developers") }
+      expect(text).not_to include("on my own")
     end
 
     it "escapes a search's subject in the HTML" do
