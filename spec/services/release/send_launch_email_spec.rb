@@ -130,6 +130,7 @@ RSpec.describe Release::SendLaunchEmail, type: :unit do
 
     it "says Pairin is built by two developers" do
       [html, text].each { |body| expect(body).to include("Pairin is built by two developers") }
+      [html, text].each { |body| expect(body).to include("Jovica, for the Pairin team") }
       expect(text).not_to include("on my own")
     end
 
