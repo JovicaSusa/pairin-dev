@@ -9,6 +9,8 @@ class LaunchMailer < ApplicationMailer
     @paused_searches = @user.pair_requests.where.not(paused_at: nil).order(created_at: :desc).to_a
     @has_on_search = @user.pair_requests.switched_on.exists?
     @action_url = @paused_searches.any? || @has_on_search ? users_pair_requests_url : onboarding_url
+    # What the one-time steps on first sign-in will ask this user for.
+    @first_sign_in = [("name" if @user.name.blank?), ("date of birth" if @user.date_of_birth.blank?)].compact
     allow_unsubscribe(@user, "announcements")
 
     mail(to: @user.email, reply_to: "hello@pairin.dev", subject: "Pairin works differently now")
