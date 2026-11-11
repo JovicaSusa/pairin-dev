@@ -80,4 +80,4 @@ Merging `chat-first` to `main` deploys it, so do these in order.
   ```
 
 - [x] *(2026-11-11, first batch: 1 hard bounce, 3 soft bounces, the rest delivered)* Wait a few hours, then check Mailjet for bounces, blocks and spam reports. You can't see other people's inboxes, so these numbers and any replies are your signal. If they look bad, stop and find out why.
-- [ ] Repeat with the next batch until `Still to send` is 0. Each run skips anyone already sent to, so nobody gets it twice.
+- [x] *(2026-11-11, 17:25 UTC: remaining 91 sent; 141 in total, still to send 0. 1 user opted out between batches)* Repeat with the next batch until `Still to send` is 0. Each run skips anyone already sent to, so nobody gets it twice.
