@@ -160,10 +160,10 @@ RSpec.describe "Did it happen?", type: :request do
       expect(answer_for(partner).happened).to be_nil
     end
 
-    it "keeps the token out of referrers, caches and search engines" do
+    it "keeps the token out of referrers to other sites, caches and search engines" do
       get session_answer_path(token:)
 
-      expect(response.headers["Referrer-Policy"]).to eq("no-referrer")
+      expect(response.headers["Referrer-Policy"]).to eq("same-origin")
       expect(response.headers["Cache-Control"]).to include("no-store")
       expect(response.headers["X-Robots-Tag"]).to include("noindex")
     end
