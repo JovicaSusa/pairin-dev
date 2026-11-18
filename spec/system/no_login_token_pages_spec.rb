@@ -62,4 +62,21 @@ RSpec.describe "answering from an emailed link, with no login", type: :system do
     expect(page).to have_no_content("Still looking for a partner?")
     expect(search.reload).not_to be_paused
   end
+
+  # Our other pages load analytics, which records document.referrer. Leaving a
+  # token page must not hand them the token URL.
+  it "sends no referrer when leaving the page" do
+    check_in = CheckIn.create!(partnership:, user: partner, week: 1)
+
+    visit check_in_path(token: check_in.generate_token_for(:answer))
+    click_link "Back to Pairin"
+
+    expect(page).to have_current_path(root_path)
+    expect(page.evaluate_script("document.referrer")).to eq("")
+  end
+
+  it "keeps the origin check on for the rest of the app" do
+    expect(CheckInsController.forgery_protection_origin_check).to be(false)
+    expect(ApplicationController.forgery_protection_origin_check).to be(true)
+  end
 end
