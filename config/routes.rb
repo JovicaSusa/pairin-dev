@@ -24,6 +24,11 @@ Rails.application.routes.draw do
   get "terms" => "pages#terms", as: :terms
   get "account-suspended" => "pages#account_suspended", as: :account_suspended
 
+  get "blog" => "blog#index", as: :blog
+  get "blog/feed.xml" => "blog#feed", as: :blog_feed, format: false, defaults: { format: :atom }
+  get "blog/:slug" => "blog#show", as: :blog_post, constraints: { slug: /[a-z0-9-]+/ }
+  get "sitemap.xml" => "sitemaps#show", as: :sitemap, format: false, defaults: { format: :xml }
+
   # One-time step for accounts with no date of birth.
   resource :date_of_birth, only: [:show, :update]
 

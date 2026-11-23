@@ -1,0 +1,23 @@
+<% content_for :title, "Blog - Pairin" %>
+<% content_for :description, "Guides on pair programming and learning to code with a partner, from Pairin." %>
+<%= render "blog/head" %>
+<%= render "blog/header" %>
+
+<main class="px-6 md:px-16 lg:px-24 py-16 md:py-20 max-w-3xl mx-auto">
+  <h1 class="font-display font-extrabold text-4xl md:text-5xl tracking-tight leading-none mb-4">Blog</h1>
+  <p class="text-gray-600 text-lg mb-12">Guides on pair programming and learning to code with a partner.</p>
+
+  <ul class="space-y-10 list-none">
+    <% @posts.each do |post| %>
+      <li>
+        <h2 class="font-display font-bold text-2xl leading-snug">
+          <%= link_to post.title, blog_post_path(post), class: "hover:text-purple hover:underline" %>
+        </h2>
+        <p class="text-gray-500 text-sm mt-1"><time datetime="<%= post.date.iso8601 %>"><%= post.date.strftime("%B %-d, %Y") %></time></p>
+        <p class="text-gray-700 mt-2 leading-relaxed"><%= post.description %></p>
+      </li>
+    <% end %>
+  </ul>
+
+  <%= render "blog/sign_off" %>
+</main>

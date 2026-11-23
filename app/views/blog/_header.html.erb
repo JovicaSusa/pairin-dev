@@ -1,0 +1,16 @@
+<%# Slim header for blog pages: readers from search may not know Pairin yet. %>
+<header class="w-full border-b-4 px-4 border-black bg-yellow-50 font-bold">
+  <div class="flex items-center justify-between max-w-screen-xl py-3 mx-auto md:px-6 lg:px-8">
+    <%= link_to root_path, class: "flex items-center gap-2" do %>
+      <%= image_tag "logo.svg", alt: "Pairin logo", class: "h-8 w-8" %>
+      <span class="font-display text-xl font-extrabold tracking-tight">pairin</span>
+    <% end %>
+
+    <a
+      href="/users/sign_up"
+      class="inline-block font-headline font-bold text-sm px-4 py-2 rounded-md border-2 border-black bg-purple text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+    >
+      Sign up
+    </a>
+  </div>
+</header>
