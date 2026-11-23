@@ -126,3 +126,16 @@ html {
 .hw-combobox {
   width: 100%;
 }
+
+/* Pull quotes in blog posts: brand purple bar, display font, no italics. */
+.blog-prose blockquote {
+  @apply border-l-8 border-purple bg-white rounded-r-lg py-3 pr-6 pl-6 not-italic font-display font-bold text-2xl leading-snug text-black;
+}
+.blog-prose blockquote p {
+  margin: 0;
+}
+.blog-prose blockquote p:first-of-type::before,
+.blog-prose blockquote p:last-of-type::after {
+  content: none;
+}
+

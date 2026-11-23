@@ -31,9 +31,17 @@ For two learners at a similar level, plain driver and navigator with regular swa
 
 ## What developers like about it, and what they don't
 
-The case for pairing is mostly about thinking out loud. In their [long guide on martinfowler.com](https://www.martinfowler.com/articles/on-pair-programming.html), Birgitta Böckeler and Nina Siessegger put it simply: "Pair programming forces us to discuss approaches and solutions, instead of only thinking them through in our own head." Debugging comes up often too. One developer, in replies collected by [Julia Evans](https://jvns.ca/blog/2014/08/05/pair-programming-is-amazing-except-when-its-not/), said that "pair debugging on the other hand can be excellent." When we asked on r/learnprogramming how people learned with a partner, one reply described a lot of personal success with it, mostly from having someone to talk confusing problems through with.
+The case for pairing is mostly about thinking out loud. In their [long guide on martinfowler.com](https://www.martinfowler.com/articles/on-pair-programming.html), Birgitta Böckeler and Nina Siessegger put it simply:
 
-The case against is just as real. The same guide admits that "working so closely with another person for long stretches of time is intense." Others in Julia Evans' collection were blunter: pairing "can be very stressful and draining for an introvert," and "I type somewhat slow and I always feel pressure (real or imagined) from the other person." Differences in skill level and who gets to decide come up again and again. And in our own Reddit thread, the worst stories were about partners: someone who went silent before a deadline, or someone who let the other person do all the work.
+> Pair programming forces us to discuss approaches and solutions, instead of only thinking them through in our own head.
+
+Debugging comes up often too. One developer, in replies collected by [Julia Evans](https://jvns.ca/blog/2014/08/05/pair-programming-is-amazing-except-when-its-not/), said that "pair debugging on the other hand can be excellent." When we asked on r/learnprogramming how people learned with a partner, one reply described a lot of personal success with it, mostly from having someone to talk confusing problems through with.
+
+The case against is just as real. The same guide admits it:
+
+> Working so closely with another person for long stretches of time is intense.
+
+Others in Julia Evans' collection were blunter: pairing "can be very stressful and draining for an introvert," and "I type somewhat slow and I always feel pressure (real or imagined) from the other person." Differences in skill level and who gets to decide come up again and again. And in our own Reddit thread, the worst stories were about partners: someone who went silent before a deadline, or someone who let the other person do all the work.
 
 Read together, most of the complaints are about long hours, mismatched partners or the wrong setup, not about the idea itself. Short sessions with someone at a similar level avoid a lot of them.
 
