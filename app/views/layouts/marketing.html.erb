@@ -1,22 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "Pairin - Find a coding buddy or pair programming partner to learn with" %></title>
+    <% page_title = content_for(:title) || "Pairin - Find a coding buddy or pair programming partner to learn with" %>
+    <% page_description = content_for(:description) || "Post what you want to learn, talk to the people who apply, and commit when it's a good fit. Find a coding buddy or pair programming partner on Pairin. Free during beta." %>
+    <title><%= page_title %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="<%= content_for(:description) || "Post what you want to learn, talk to the people who apply, and commit when it&#39;s a good fit. Find a coding buddy or pair programming partner on Pairin. Free during beta." %>" />
+    <meta name="description" content="<%= page_description %>" />
     <link rel="canonical" href="<%= canonical_url %>">
 
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="<%= content_for(:og_type) || "website" %>">
     <meta property="og:site_name" content="Pairin">
-    <meta property="og:title" content="Pairin - Find a coding buddy or pair programming partner to learn with">
-    <meta property="og:description" content="Post what you want to learn, talk to the people who apply, and commit when it&#39;s a good fit. Find a coding buddy or pair programming partner on Pairin. Free during beta.">
+    <meta property="og:title" content="<%= page_title %>">
+    <meta property="og:description" content="<%= page_description %>">
     <meta property="og:url" content="<%= canonical_url %>">
-    <meta property="og:image" content="<%= image_url('logo.svg') %>">
+    <meta property="og:image" content="<%= image_url("og-default.png") %>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Pairin - Find a coding buddy or pair programming partner to learn with">
-    <meta name="twitter:description" content="Post what you want to learn, talk to the people who apply, and commit when it&#39;s a good fit. Find a coding buddy or pair programming partner on Pairin. Free during beta.">
-    <meta name="twitter:image" content="<%= image_url('logo.svg') %>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= page_title %>">
+    <meta name="twitter:description" content="<%= page_description %>">
+    <meta name="twitter:image" content="<%= image_url("og-default.png") %>">
 
     <script type="application/ld+json">
       <%== {
@@ -37,6 +41,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
 
     <%= favicon_link_tag asset_path('logo.svg') %>
+
+    <%= yield :head %>
 
     <%= render "layouts/posthog" %>
   </head>

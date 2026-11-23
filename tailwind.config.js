@@ -67,4 +67,9 @@ module.exports = {
       },
     },
   },
+  // Article styles for blog posts only. A custom class name, so the bare
+  // "prose" class already on the privacy and terms pages stays inert.
+  plugins: [
+    require("@tailwindcss/typography")({ className: "blog-prose" }),
+  ],
 }
