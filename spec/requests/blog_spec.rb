@@ -28,11 +28,11 @@ RSpec.describe "Blog", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("<title>What Is Pair Programming? A Guide for Solo Learners - Pairin</title>")
-      expect(response.body).to include('<meta name="description" content="Pair programming explained for people learning to code on their own')
+      expect(response.body).to include('<meta name="description" content="What pair programming is, where it came from, the main styles')
       expect(response.body).to include('<meta property="og:type" content="article">')
       expect(response.body).to include('<meta property="og:title" content="What Is Pair Programming? A Guide for Solo Learners - Pairin">')
       expect(response.body).to include(%(<link rel="canonical" href="https://pairin.dev/blog/#{post_slug}">))
-      expect(response.body).to match(%r{<h2[^>]*>The part that's easy to skip alone})
+      expect(response.body).to match(%r{<h2[^>]*>Types of pair programming})
       expect(response.body).to include("Pairin team")
     end
 
@@ -74,7 +74,7 @@ RSpec.describe "Blog", type: :request do
       entry = feed.at("entry")
       expect(entry.at("title").text).to eq("What Is Pair Programming? A Guide for Solo Learners")
       expect(entry.at("link")["href"]).to eq("https://pairin.dev/blog/#{post_slug}")
-      expect(entry.at("content").text).to include("strong-style pairing")
+      expect(entry.at("content").text).to include("Driver and navigator")
     end
   end
 
