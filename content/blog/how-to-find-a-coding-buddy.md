@@ -1,7 +1,7 @@
 ---
 title: How to Find a Coding Buddy (and Actually Keep One)
 description: Where to find a coding buddy, what to check before you commit, and the simple habits that keep a learning partnership going past the first few weeks.
-date: 2026-11-30
+date: 2026-11-26
 ---
 
 Learning to code on your own is hard to keep up. When researchers at Harvard and MIT looked at millions of registrations for their free online courses, [only about 3 to 6% of participants finished](https://webs.um.es/jruiperez/papers/journals/2019_Science_MOOCPivot_postprint.pdf). Even among people who said up front that they intended to complete a course, fewer than one in five did.
