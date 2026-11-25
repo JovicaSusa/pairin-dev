@@ -71,7 +71,8 @@ RSpec.describe "Blog", type: :request do
       expect(response.media_type).to eq("application/atom+xml")
 
       feed = Nokogiri::XML(response.body).remove_namespaces!
-      entry = feed.at("entry")
+      expect(feed.css("entry").size).to eq(BlogPost.all.size)
+      entry = feed.css("entry").find { |e| e.at("link")["href"].end_with?("/#{post_slug}") }
       expect(entry.at("title").text).to eq("What Is Pair Programming? A Guide for Solo Learners")
       expect(entry.at("link")["href"]).to eq("https://pairin.dev/blog/#{post_slug}")
       expect(entry.at("content").text).to include("Driver and navigator")
@@ -87,10 +88,11 @@ RSpec.describe "Blog", type: :request do
       expect(locs).to contain_exactly(
         "https://pairin.dev/",
         "https://pairin.dev/blog",
-        "https://pairin.dev/blog/#{post_slug}",
+        *BlogPost.all.map { |post| "https://pairin.dev/blog/#{post.slug}" },
         "https://pairin.dev/privacy",
         "https://pairin.dev/terms"
       )
+      expect(locs).to include("https://pairin.dev/blog/#{post_slug}")
     end
   end
 

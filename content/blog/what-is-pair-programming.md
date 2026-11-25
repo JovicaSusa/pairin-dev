@@ -53,6 +53,8 @@ You'll also see AI coding assistants described as an "AI pair programmer." They'
 
 ## Where to find someone to pair with
 
+A short list is below. For more on choosing someone and keeping it going, see [How to Find a Coding Buddy (and Actually Keep One)](/blog/how-to-find-a-coding-buddy).
+
 - **People you already know.** Classmates, a bootcamp cohort, a coworker who's also learning. The easiest start, if you have them.
 - **Course communities.** Free courses like The Odin Project and freeCodeCamp have busy Discord servers and forums, and people there do look for study partners. Requests can get lost in fast-moving channels, so be specific about what you're working on and when you're free.
 - **Reddit.** r/programmingbuddies exists for exactly this. Posts often get plenty of "count me in" replies; fewer turn into regular sessions.
