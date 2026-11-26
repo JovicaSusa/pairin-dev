@@ -103,6 +103,12 @@ RSpec.describe "Blog", type: :request do
       expect(response.body).to include(%(href="/blog"))
     end
 
+    it "links to the source code from the footer, as the AGPL license expects" do
+      get "/"
+
+      expect(response.body).to include(%(href="https://github.com/JovicaSusa/pairin-dev"), ">Source code</a>")
+    end
+
     it "shares a PNG card and a plain apostrophe in the description" do
       get "/"
 
