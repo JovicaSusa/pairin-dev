@@ -22,7 +22,7 @@ Developers have sat at one desk and worked through a problem together for as lon
 
 There are a few common styles, and most pairs mix them.
 
-- **Driver and navigator.** The classic version described above. A good default if you've never paired before.
+- **Driver and navigator.** The classic version described above. A good default if you've never paired before, and we cover it in more detail in [The Driver/Navigator Technique, Explained](/blog/driver-navigator-pair-programming).
 - **Ping-pong.** One person writes a failing test, the other writes the code to make it pass, then they swap. It works well if you're learning test-driven development, because the rhythm is built in.
 - **Strong-style.** The person with the idea isn't allowed to type it. As Llewellyn Falco, who came up with the style, puts it: for an idea to go from your head into the computer, it must go through someone else's hands. It's slower, and it's very good for learning, because you can't skip explaining.
 - **Mob (or ensemble) programming.** The same idea with a whole group: one driver, everyone else navigating, rotating often.
